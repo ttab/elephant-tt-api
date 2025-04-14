@@ -1,0 +1,1132 @@
+{
+  "components": {
+    "schemas": {
+      "newsdoc.Block": {
+        "description": "Block is the building block for data embedded in documents. It is used for both content, links and metadata. Blocks have can be nested, but that's nothing to strive for, keep it simple.",
+        "properties": {
+          "content": {
+            "description": "Content is used to embed content blocks.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "contenttype": {
+            "description": "ContentType is used to describe the content type of the block/linked entity if it differs from the type of the block.",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data contains block data.",
+            "type": "object"
+          },
+          "id": {
+            "description": "ID is the block ID,",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are used to link to other resources and documents.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is used to embed metadata",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name is a name for the block. An alternative to \"rel\" when relationship is a term that doesn't fit.",
+            "type": "string"
+          },
+          "rel": {
+            "description": "Rel describes the relationship to the document/parent entity.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Role is used either as an alternative to rel, or for nuancing the relationship.",
+            "type": "string"
+          },
+          "sensitivity": {
+            "description": "Sensitivity can be use to communicate how the information in a block can be handled. It could f.ex. be set to \"internal\", to show that it contains information that must be removed or transformed before publishing.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title is the title/headline of the block, typically used in the presentation of the block.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the type of the block",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI is used to reference another entity in a document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is a browseable URL for the the block.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is used to reference another Document in a block.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value is a value for the block. Useful when we want to store a primitive value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "newsdoc.Document": {
+        "description": "Document is a NewsDoc document.",
+        "properties": {
+          "content": {
+            "description": "Content is the content of the document, this is essentially what gets rendered on the page when you view a document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language is the language used in the document as an IETF language tag. F.ex. \"en\", \"en-UK\", \"es\", or \"sv-SE\".",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are links to other resources and entities. This could be links to topics, categories and subjects for the document, or credited authors.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is the metadata for a document, this could be things like teasers, open graph data, newsvalues.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Title is the title of the document, can be used as the document name, or the headline when the document is displayed.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the content type of the document.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI identifies the document (in a more human-readable way than the UUID).",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is the browseable location of the document (if any).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is a unique ID for the document, this can for example be a random v4 UUID, or a URI-derived v5 UUID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.CopyArticleToFlowRequest": {
+        "properties": {
+          "article": {
+            "description": "Article is the name of the defined print content in the flow to instantiate. Required.",
+            "type": "string"
+          },
+          "date": {
+            "description": "Date to set for the copy on in the format YYYY-MM-DD. Required.",
+            "type": "string"
+          },
+          "flow_uuid": {
+            "description": "FlowUuid to copy the article to. Required.",
+            "type": "string"
+          },
+          "source_uuid": {
+            "description": "SourceUuid is the UUID of the article that we want to copy. Required.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.CopyArticleToFlowResponse": {
+        "properties": {
+          "uuid": {
+            "description": "Uuid of the created article.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.CreateFlowRequest": {
+        "properties": {
+          "articles": {
+            "description": "Articles to instantiate. Names of the defined print contents in the flow. Optional, omit to instantiate all.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "date": {
+            "description": "Date to instantiate the flow on in the format YYYY-MM-DD. Required.",
+            "type": "string"
+          },
+          "flow_uuid": {
+            "description": "FlowUuid to instantiate on the given date. Required.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.CreateFlowResponse": {
+        "properties": {
+          "articles": {
+            "description": "Articles that were created.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.PrintArticleReference"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.DeleteFontRequest": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.DeleteFontResponse": {
+        "type": "object"
+      },
+      "ttab.baboon.Font": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.FontInfo": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.FontRef": {
+        "properties": {
+          "if_not_version": {
+            "description": "IfNotVersion can be used to only return a font if it hasn't been updated.",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.FrameType": {
+        "enum": [
+          "FRAME_UNKNOWN",
+          "FRAME_TEXT",
+          "FRAME_IMAGE"
+        ],
+        "type": "string"
+      },
+      "ttab.baboon.GetEditableArchiveRequest": {
+        "properties": {
+          "render_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.GetEditableArchiveResponse": {
+        "type": "object"
+      },
+      "ttab.baboon.GetFontsRequest": {
+        "properties": {
+          "fonts": {
+            "description": "Fonts to load, maximum of 20 fonts per batch.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.FontRef"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.GetFontsResponse": {
+        "properties": {
+          "fonts": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Font"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.GetScribusInfoRequest": {
+        "properties": {
+          "uuid": {
+            "description": "Uuid of the layout document to get information for. Required.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.GetScribusInfoResponse": {
+        "properties": {
+          "fonts": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.ScribusDependency"
+            },
+            "type": "array"
+          },
+          "icc_profiles": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.ScribusDependency"
+            },
+            "type": "array"
+          },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.ScribusLayer"
+            },
+            "type": "array"
+          },
+          "slots": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ICCProfileInfo": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.LayoutPreviewRequest": {
+        "properties": {
+          "article_layout": {
+            "type": "string"
+          },
+          "content": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "content_uuid": {
+            "type": "string"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object"
+          },
+          "layout": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "sla_file": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.LayoutPreviewResponse": {
+        "properties": {
+          "images": {
+            "description": "Images that were mounted.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.MountedImage"
+            },
+            "type": "array"
+          },
+          "overflows": {
+            "description": "Overflows is a list of text frames whose contents overflowed the frame.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Overflow"
+            },
+            "type": "array"
+          },
+          "pdf_data": {
+            "description": "PDFData produced by the render.",
+            "type": "string"
+          },
+          "scribus_doc": {
+            "description": "ScribusDoc is the Scribus document used to render the preview.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ListFontsRequest": {
+        "properties": {
+          "page": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ListFontsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.FontInfo"
+            },
+            "type": "array"
+          },
+          "next_page": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ListICCProfilesRequest": {
+        "properties": {
+          "page": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ListICCProfilesResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.ICCProfileInfo"
+            },
+            "type": "array"
+          },
+          "next_page": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.MountedImage": {
+        "properties": {
+          "bounding_box": {
+            "$ref": "#/components/schemas/ttab.baboon.Rect"
+          },
+          "frame": {
+            "description": "Frame name that was used for the image.",
+            "type": "string"
+          },
+          "ppi": {
+            "description": "PPI before any PDF downsampling was applied.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.Overflow": {
+        "properties": {
+          "bounding_box": {
+            "$ref": "#/components/schemas/ttab.baboon.Rect"
+          },
+          "frame": {
+            "description": "Frame name that overflowed.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.PrintArticleReference": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.Rect": {
+        "properties": {
+          "height": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RenderArticleRequest": {
+        "properties": {
+          "article_uuid": {
+            "description": "ArticleUuid is the UUID of the print article to render. Required.",
+            "type": "string"
+          },
+          "layout_id": {
+            "description": "LayoutId is the ID of the article layout to render. Required.",
+            "type": "string"
+          },
+          "png_scale": {
+            "description": "PngScale is the DPI of the rendered PDF. Defaults to 200.",
+            "type": "integer"
+          },
+          "render_pdf": {
+            "description": "RenderPDF will enable PDF rendering.",
+            "type": "boolean"
+          },
+          "render_png": {
+            "description": "RenderPDF will enable PNG rendering.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RenderArticleResponse": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "images": {
+            "description": "Images that were mounted.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.MountedImage"
+            },
+            "type": "array"
+          },
+          "overflows": {
+            "description": "Overflows is a list of text frames whose contents overflowed the frame.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Overflow"
+            },
+            "type": "array"
+          },
+          "pdf_url": {
+            "type": "string"
+          },
+          "png_height": {
+            "type": "integer"
+          },
+          "png_url": {
+            "type": "string"
+          },
+          "png_width": {
+            "type": "integer"
+          },
+          "scribus_url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ScribusDependency": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "satisfied": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ScribusFrame": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.baboon.FrameType"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ScribusLayer": {
+        "properties": {
+          "frames": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.ScribusFrame"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.StoreFontRequest": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.StoreFontResponse": {
+        "properties": {
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.StoreICCProfileRequest": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Name is optional, will be extracted from ICC data if not provided. Setting a name for the profile that differs from the one in the ICC data will not make Scribus resolve it correctly. Forcing a different name should only be done if baboon cannot parse the ICC file correctly.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.StoreICCProfileResponse": {
+        "properties": {
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "baboon API",
+    "version": "v0.17.19"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.baboon.Assets/DeleteFont": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.DeleteFontRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.DeleteFontResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DeleteFont",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Assets/GetFonts": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.GetFontsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.GetFontsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetFonts",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Assets/ListFonts": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.ListFontsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.ListFontsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListFonts",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Assets/ListICCProfiles": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.ListICCProfilesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.ListICCProfilesResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListICCProfiles",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Assets/StoreFont": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.StoreFontRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.StoreFontResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "StoreFont",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Assets/StoreICCProfile": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.StoreICCProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.StoreICCProfileResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "StoreICCProfile",
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/CopyArticleToFlow": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.CopyArticleToFlowRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.CopyArticleToFlowResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "CopyArticleToFlow",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/CreateFlow": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.CreateFlowRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.CreateFlowResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "CreateFlow",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/GetEditableArchive": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.GetEditableArchiveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.GetEditableArchiveResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetEditableArchive",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/GetScribusInfo": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.GetScribusInfoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.GetScribusInfoResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetScribusInfo",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/LayoutPreview": {
+      "post": {
+        "description": "LayoutPreview is used by the CLI tool to do preview rendering.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.LayoutPreviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.LayoutPreviewResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "LayoutPreview",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/RenderArticle": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.RenderArticleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.RenderArticleResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RenderArticle",
+        "tags": [
+          "Print"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://baboon.api.tt.se"
+    },
+    {
+      "url": "https://baboon.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Assets"
+    },
+    {
+      "name": "Print"
+    }
+  ]
+}
