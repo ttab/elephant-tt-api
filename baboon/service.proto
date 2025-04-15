@@ -23,6 +23,38 @@ service Print {
   rpc CreateFlow(CreateFlowRequest) returns (CreateFlowResponse);
   rpc CopyArticleToFlow(CopyArticleToFlowRequest) returns (CopyArticleToFlowResponse);
   rpc GetScribusInfo(GetScribusInfoRequest) returns (GetScribusInfoResponse);
+  // GetRenderedArticles allows a client to consume and download all finished renders.
+  rpc GetRenderedArticles(GetRenderedArticlesRequest) returns (GetRenderedArticlesResponse);
+}
+
+message GetRenderedArticlesRequest {
+  // After is used to control the position in the render event log.
+  int64 after = 1;
+}
+
+message GetRenderedArticlesResponse {
+  repeated RenderEvent events = 1;
+}
+
+message RenderEvent {
+  int64 id = 1;
+  // Rendered articles that should be downloaded.
+  repeated RenderedArticle rendered = 2;
+  // Removed articles that should be deleted.
+  repeated RenderedArticle removed = 3;
+}
+
+message RenderedArticle {
+  string date          = 1;
+  string layout        = 2;
+  string position      = 3;
+  // DownloadLink that can be used to fetch the PDF. Not present for removed
+  // articles.
+  string download_link = 4;
+  // Size of the PDF in bytes.
+  int64 size           = 5;
+  // Sha256Hash is the SHA-256 checksum for the PDF.
+  string sha256_hash   = 6;
 }
 
 message CreateFlowRequest {

@@ -292,6 +292,26 @@
         },
         "type": "object"
       },
+      "ttab.baboon.GetRenderedArticlesRequest": {
+        "properties": {
+          "after": {
+            "description": "After is used to control the position in the render event log.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.GetRenderedArticlesResponse": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.RenderEvent"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.baboon.GetScribusInfoRequest": {
         "properties": {
           "uuid": {
@@ -559,6 +579,54 @@
         },
         "type": "object"
       },
+      "ttab.baboon.RenderEvent": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "removed": {
+            "description": "Removed articles that should be deleted.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.RenderedArticle"
+            },
+            "type": "array"
+          },
+          "rendered": {
+            "description": "Rendered articles that should be downloaded.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.RenderedArticle"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RenderedArticle": {
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "download_link": {
+            "description": "DownloadLink that can be used to fetch the PDF. Not present for removed articles.",
+            "type": "string"
+          },
+          "layout": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "sha256_hash": {
+            "description": "Sha256Hash is the SHA-256 checksum for the PDF.",
+            "type": "string"
+          },
+          "size": {
+            "description": "Size of the PDF in bytes.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ttab.baboon.ScribusDependency": {
         "properties": {
           "name": {
@@ -663,7 +731,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.17.19"
+    "version": "v0.1.1"
   },
   "openapi": "3.0.0",
   "paths": {
@@ -995,6 +1063,44 @@
           }
         ],
         "summary": "GetEditableArchive",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/GetRenderedArticles": {
+      "post": {
+        "description": "GetRenderedArticles allows a client to consume and download all finished renders.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.GetRenderedArticlesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.GetRenderedArticlesResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetRenderedArticles",
         "tags": [
           "Print"
         ]
