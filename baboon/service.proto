@@ -237,6 +237,8 @@ message RenderArticleResponse {
   repeated MountedImage images = 7;
   // Overflows is a list of text frames whose contents overflowed the frame.
   repeated Overflow overflows  = 8;
+  // TaggedTextUrl is a zip archive with the indesign-tagged text for the article.
+  string tagged_text_url       = 9;
 }
 
 message MountedImage {

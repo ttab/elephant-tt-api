@@ -575,6 +575,10 @@
           },
           "scribus_url": {
             "type": "string"
+          },
+          "tagged_text_url": {
+            "description": "TaggedTextUrl is a zip archive with the indesign-tagged text for the article.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -731,7 +735,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.1"
+    "version": "v0.1.2"
   },
   "openapi": "3.0.0",
   "paths": {
