@@ -616,14 +616,28 @@
           "date": {
             "type": "string"
           },
-          "download_link": {
-            "description": "DownloadLink that can be used to fetch the PDF. Not present for removed articles.",
-            "type": "string"
-          },
           "layout": {
             "type": "string"
           },
+          "pdf": {
+            "$ref": "#/components/schemas/ttab.baboon.RenderedAsset"
+          },
           "position": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "tagged_text": {
+            "$ref": "#/components/schemas/ttab.baboon.RenderedAsset"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RenderedAsset": {
+        "properties": {
+          "download_link": {
+            "description": "DownloadLink that can be used to fetch the asset.",
             "type": "string"
           },
           "sha256_hash": {

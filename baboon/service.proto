@@ -47,16 +47,21 @@ message RenderEvent {
 }
 
 message RenderedArticle {
-  string date          = 1;
-  string layout        = 2;
-  string position      = 3;
-  // DownloadLink that can be used to fetch the PDF. Not present for removed
-  // articles.
-  string download_link = 4;
+  string date               = 1;
+  string product            = 2;
+  string layout             = 3;
+  string position           = 4;
+  RenderedAsset pdf         = 5;
+  RenderedAsset tagged_text = 6;
+}
+
+message RenderedAsset {
+  // DownloadLink that can be used to fetch the asset.
+  string download_link = 5;
   // Size of the PDF in bytes.
-  int64 size           = 5;
+  int64 size           = 6;
   // Sha256Hash is the SHA-256 checksum for the PDF.
-  string sha256_hash   = 6;
+  string sha256_hash   = 7;
 }
 
 message CreateFlowRequest {
