@@ -585,6 +585,9 @@
       },
       "ttab.baboon.RenderEvent": {
         "properties": {
+          "error": {
+            "type": "string"
+          },
           "id": {
             "type": "integer"
           },
@@ -601,6 +604,9 @@
               "$ref": "#/components/schemas/ttab.baboon.RenderedArticle"
             },
             "type": "array"
+          },
+          "type": {
+            "type": "string"
           }
         },
         "type": "object"
