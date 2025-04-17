@@ -585,6 +585,9 @@
       },
       "ttab.baboon.RenderEvent": {
         "properties": {
+          "article": {
+            "type": "string"
+          },
           "error": {
             "type": "string"
           },

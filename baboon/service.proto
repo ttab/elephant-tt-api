@@ -37,13 +37,14 @@ message GetRenderedArticlesResponse {
 }
 
 message RenderEvent {
-  int64 id     = 1;
-  string type  = 2;
-  string error = 3;
+  int64 id       = 1;
+  string type    = 2;
+  string article = 3;
+  string error   = 4;
   // Rendered articles that should be downloaded.
-  repeated RenderedArticle rendered = 4;
+  repeated RenderedArticle rendered = 5;
   // Removed articles that should be deleted.
-  repeated RenderedArticle removed  = 5;
+  repeated RenderedArticle removed  = 6;
 }
 
 message RenderedArticle {
