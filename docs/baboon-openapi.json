@@ -575,12 +575,22 @@
           },
           "scribus_url": {
             "type": "string"
+          },
+          "tagged_text_url": {
+            "description": "TaggedTextUrl is a zip archive with the indesign-tagged text for the article.",
+            "type": "string"
           }
         },
         "type": "object"
       },
       "ttab.baboon.RenderEvent": {
         "properties": {
+          "article": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
           "id": {
             "type": "integer"
           },
@@ -597,6 +607,9 @@
               "$ref": "#/components/schemas/ttab.baboon.RenderedArticle"
             },
             "type": "array"
+          },
+          "type": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -606,14 +619,28 @@
           "date": {
             "type": "string"
           },
-          "download_link": {
-            "description": "DownloadLink that can be used to fetch the PDF. Not present for removed articles.",
-            "type": "string"
-          },
           "layout": {
             "type": "string"
           },
+          "pdf": {
+            "$ref": "#/components/schemas/ttab.baboon.RenderedAsset"
+          },
           "position": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "tagged_text": {
+            "$ref": "#/components/schemas/ttab.baboon.RenderedAsset"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RenderedAsset": {
+        "properties": {
+          "download_link": {
+            "description": "DownloadLink that can be used to fetch the asset.",
             "type": "string"
           },
           "sha256_hash": {
@@ -731,7 +758,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.1"
+    "version": "v0.1.2"
   },
   "openapi": "3.0.0",
   "paths": {
