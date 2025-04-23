@@ -37,14 +37,20 @@ message GetRenderedArticlesResponse {
 }
 
 message RenderEvent {
+  // Id of the event.
   int64 id       = 1;
+  // Type of the event, one of "rendered", "failed", "failed_attempt".
   string type    = 2;
+  // Article UUID.
   string article = 3;
+  // Error - if any that prevented rendering.
   string error   = 4;
   // Rendered articles that should be downloaded.
   repeated RenderedArticle rendered = 5;
   // Removed articles that should be deleted.
   repeated RenderedArticle removed  = 6;
+  // ArticleVersion is the version of the article that was rendered.
+  int64 article_version             = 7;
 }
 
 message RenderedArticle {
