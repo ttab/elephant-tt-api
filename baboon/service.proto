@@ -51,6 +51,8 @@ message RenderEvent {
   repeated RenderedArticle removed  = 6;
   // ArticleVersion is the version of the article that was rendered.
   int64 article_version             = 7;
+  // Time is the time the event as an RFC3339 timestamp.
+  string time                       = 8;
 }
 
 message RenderedArticle {

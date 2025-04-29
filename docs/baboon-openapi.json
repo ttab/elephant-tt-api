@@ -615,6 +615,10 @@
             },
             "type": "array"
           },
+          "time": {
+            "description": "Time is the time the event as an RFC3339 timestamp.",
+            "type": "string"
+          },
           "type": {
             "description": "Type of the event, one of \"rendered\", \"failed\", \"failed_attempt\".",
             "type": "string"
@@ -766,7 +770,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.3"
+    "version": "v0.1.4"
   },
   "openapi": "3.0.0",
   "paths": {
