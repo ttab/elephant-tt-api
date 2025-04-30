@@ -180,6 +180,10 @@
           "flow_uuid": {
             "description": "FlowUuid to instantiate on the given date. Required.",
             "type": "string"
+          },
+          "template_uuid": {
+            "description": "TemplateUUID is the UUID of an article to use as a template for the created print articles.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -770,7 +774,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.4"
+    "version": "v0.1.5"
   },
   "openapi": "3.0.0",
   "paths": {

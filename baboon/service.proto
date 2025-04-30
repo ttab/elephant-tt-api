@@ -81,6 +81,9 @@ message CreateFlowRequest {
   // Articles to instantiate. Names of the defined print contents in the
   // flow. Optional, omit to instantiate all.
   repeated string articles = 3;
+  // TemplateUUID is the UUID of an article to use as a template for the created
+  // print articles.
+  string template_uuid     = 4;
 }
 
 message CreateFlowResponse {
