@@ -25,7 +25,39 @@ service Print {
   rpc GetScribusInfo(GetScribusInfoRequest) returns (GetScribusInfoResponse);
   // GetRenderedArticles allows a client to consume and download all finished renders.
   rpc GetRenderedArticles(GetRenderedArticlesRequest) returns (GetRenderedArticlesResponse);
+  // AddHypenation allows clients to set custom hypenation for a word.
+  rpc AddHypenation(AddHypenationRequest) returns (AddHypenationResponse);
+  // ListHypenations is used to list words in the hypenation dictionary.
+  rpc ListHypenations(ListHypenationsRequest) returns (ListHypenationsResponse);
+  // RemoveHypenation is used to remove a custom hypenation for a word.
+  rpc RemoveHypenation(RemoveHypenationRequest) returns (RemoveHypenationResponse);
 }
+
+message AddHypenationRequest {
+  Hypenation hypenation = 1;
+}
+
+message Hypenation {
+  string word      = 1;
+  string hypenated = 2;
+  bool ignore      = 3;
+}
+
+message AddHypenationResponse {}
+
+message ListHypenationsRequest {
+  int64 page = 1;
+}
+
+message ListHypenationsResponse {
+  repeated Hypenation items = 1;
+}
+
+message RemoveHypenationRequest {
+  string word = 1;
+}
+
+message RemoveHypenationResponse {}
 
 message GetRenderedArticlesRequest {
   // After is used to control the position in the render event log.

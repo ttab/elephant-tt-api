@@ -134,6 +134,17 @@
         },
         "type": "object"
       },
+      "ttab.baboon.AddHypenationRequest": {
+        "properties": {
+          "hypenation": {
+            "$ref": "#/components/schemas/ttab.baboon.Hypenation"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.AddHypenationResponse": {
+        "type": "object"
+      },
       "ttab.baboon.CopyArticleToFlowRequest": {
         "properties": {
           "article": {
@@ -354,6 +365,20 @@
         },
         "type": "object"
       },
+      "ttab.baboon.Hypenation": {
+        "properties": {
+          "hypenated": {
+            "type": "string"
+          },
+          "ignore": {
+            "type": "boolean"
+          },
+          "word": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.baboon.ICCProfileInfo": {
         "properties": {
           "description": {
@@ -443,6 +468,25 @@
         },
         "type": "object"
       },
+      "ttab.baboon.ListHypenationsRequest": {
+        "properties": {
+          "page": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.ListHypenationsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Hypenation"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.baboon.ListICCProfilesRequest": {
         "properties": {
           "page": {
@@ -519,6 +563,17 @@
             "type": "number"
           }
         },
+        "type": "object"
+      },
+      "ttab.baboon.RemoveHypenationRequest": {
+        "properties": {
+          "word": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.baboon.RemoveHypenationResponse": {
         "type": "object"
       },
       "ttab.baboon.RenderArticleRequest": {
@@ -1000,6 +1055,44 @@
         ]
       }
     },
+    "/twirp/ttab.baboon.Print/AddHypenation": {
+      "post": {
+        "description": "AddHypenation allows clients to set custom hypenation for a word.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.AddHypenationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.AddHypenationResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AddHypenation",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
     "/twirp/ttab.baboon.Print/CopyArticleToFlow": {
       "post": {
         "requestBody": {
@@ -1219,6 +1312,82 @@
           }
         ],
         "summary": "LayoutPreview",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/ListHypenations": {
+      "post": {
+        "description": "ListHypenations is used to list words in the hypenation dictionary.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.ListHypenationsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.ListHypenationsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListHypenations",
+        "tags": [
+          "Print"
+        ]
+      }
+    },
+    "/twirp/ttab.baboon.Print/RemoveHypenation": {
+      "post": {
+        "description": "RemoveHypenation is used to remove a custom hypenation for a word.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.baboon.RemoveHypenationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.baboon.RemoveHypenationResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RemoveHypenation",
         "tags": [
           "Print"
         ]
