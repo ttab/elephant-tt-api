@@ -373,6 +373,9 @@
           "ignore": {
             "type": "boolean"
           },
+          "language": {
+            "type": "string"
+          },
           "word": {
             "type": "string"
           }
@@ -470,6 +473,9 @@
       },
       "ttab.baboon.ListHypenationsRequest": {
         "properties": {
+          "language": {
+            "type": "string"
+          },
           "page": {
             "type": "integer"
           }
