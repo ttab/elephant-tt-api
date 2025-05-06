@@ -34,16 +34,11 @@ service Print {
 }
 
 message SetHypenationRequest {
-  Hypenation hypenation = 1;
-}
-
-message Hypenation {
   string language  = 1;
   string word      = 2;
   string hypenated = 3;
   bool ignore      = 4;
 }
-
 message SetHypenationResponse {}
 
 message ListHypenationsRequest {
@@ -55,8 +50,19 @@ message ListHypenationsResponse {
   repeated Hypenation items = 1;
 }
 
+message Hypenation {
+  string language   = 1;
+  string word       = 2;
+  string created    = 3;
+  string updated    = 4;
+  string updated_by = 5;
+  string hypenated  = 6;
+  bool ignore       = 7;
+}
+
 message RemoveHypenationRequest {
-  string word = 1;
+  string language = 1;
+  string word     = 2;
 }
 
 message RemoveHypenationResponse {}

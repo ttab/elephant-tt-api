@@ -356,6 +356,9 @@
       },
       "ttab.baboon.Hypenation": {
         "properties": {
+          "created": {
+            "type": "string"
+          },
           "hypenated": {
             "type": "string"
           },
@@ -363,6 +366,12 @@
             "type": "boolean"
           },
           "language": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "updated_by": {
             "type": "string"
           },
           "word": {
@@ -562,6 +571,9 @@
       },
       "ttab.baboon.RemoveHypenationRequest": {
         "properties": {
+          "language": {
+            "type": "string"
+          },
           "word": {
             "type": "string"
           }
@@ -767,8 +779,17 @@
       },
       "ttab.baboon.SetHypenationRequest": {
         "properties": {
-          "hypenation": {
-            "$ref": "#/components/schemas/ttab.baboon.Hypenation"
+          "hypenated": {
+            "type": "string"
+          },
+          "ignore": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": "string"
+          },
+          "word": {
+            "type": "string"
           }
         },
         "type": "object"
