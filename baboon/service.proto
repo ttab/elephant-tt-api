@@ -25,15 +25,15 @@ service Print {
   rpc GetScribusInfo(GetScribusInfoRequest) returns (GetScribusInfoResponse);
   // GetRenderedArticles allows a client to consume and download all finished renders.
   rpc GetRenderedArticles(GetRenderedArticlesRequest) returns (GetRenderedArticlesResponse);
-  // AddHypenation allows clients to set custom hypenation for a word.
-  rpc AddHypenation(AddHypenationRequest) returns (AddHypenationResponse);
+  // SetHypenation allows clients to set custom hypenation for a word.
+  rpc SetHypenation(SetHypenationRequest) returns (SetHypenationResponse);
   // ListHypenations is used to list words in the hypenation dictionary.
   rpc ListHypenations(ListHypenationsRequest) returns (ListHypenationsResponse);
   // RemoveHypenation is used to remove a custom hypenation for a word.
   rpc RemoveHypenation(RemoveHypenationRequest) returns (RemoveHypenationResponse);
 }
 
-message AddHypenationRequest {
+message SetHypenationRequest {
   Hypenation hypenation = 1;
 }
 
@@ -44,7 +44,7 @@ message Hypenation {
   bool ignore      = 4;
 }
 
-message AddHypenationResponse {}
+message SetHypenationResponse {}
 
 message ListHypenationsRequest {
   string language = 1;
