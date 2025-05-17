@@ -25,7 +25,47 @@ service Print {
   rpc GetScribusInfo(GetScribusInfoRequest) returns (GetScribusInfoResponse);
   // GetRenderedArticles allows a client to consume and download all finished renders.
   rpc GetRenderedArticles(GetRenderedArticlesRequest) returns (GetRenderedArticlesResponse);
+  // SetHypenation allows clients to set custom hypenation for a word.
+  rpc SetHypenation(SetHypenationRequest) returns (SetHypenationResponse);
+  // ListHypenations is used to list words in the hypenation dictionary.
+  rpc ListHypenations(ListHypenationsRequest) returns (ListHypenationsResponse);
+  // RemoveHypenation is used to remove a custom hypenation for a word.
+  rpc RemoveHypenation(RemoveHypenationRequest) returns (RemoveHypenationResponse);
 }
+
+message SetHypenationRequest {
+  string language  = 1;
+  string word      = 2;
+  string hypenated = 3;
+  bool ignore      = 4;
+}
+message SetHypenationResponse {}
+
+message ListHypenationsRequest {
+  string language = 1;
+  int64  page     = 2;
+}
+
+message ListHypenationsResponse {
+  repeated Hypenation items = 1;
+}
+
+message Hypenation {
+  string language   = 1;
+  string word       = 2;
+  string created    = 3;
+  string updated    = 4;
+  string updated_by = 5;
+  string hypenated  = 6;
+  bool ignore       = 7;
+}
+
+message RemoveHypenationRequest {
+  string language = 1;
+  string word     = 2;
+}
+
+message RemoveHypenationResponse {}
 
 message GetRenderedArticlesRequest {
   // After is used to control the position in the render event log.
@@ -82,7 +122,7 @@ message CreateFlowRequest {
   // flow. Optional, omit to instantiate all.
   repeated string articles = 3;
   // TemplateUUID is the UUID of an article to use as a template for the created
-  // print articles.
+  // print articles. Optional.
   string template_uuid     = 4;
 }
 
