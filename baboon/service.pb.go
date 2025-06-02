@@ -804,7 +804,7 @@ type CreateFlowRequest struct {
 	// flow. Optional, omit to instantiate all.
 	Articles []string `protobuf:"bytes,3,rep,name=articles,proto3" json:"articles,omitempty"`
 	// TemplateUUID is the UUID of an article to use as a template for the created
-	// print articles.
+	// print articles. Optional.
 	TemplateUuid  string `protobuf:"bytes,4,opt,name=template_uuid,json=templateUuid,proto3" json:"template_uuid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

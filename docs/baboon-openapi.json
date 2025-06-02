@@ -182,7 +182,7 @@
             "type": "string"
           },
           "template_uuid": {
-            "description": "TemplateUUID is the UUID of an article to use as a template for the created print articles.",
+            "description": "TemplateUUID is the UUID of an article to use as a template for the created print articles. Optional.",
             "type": "string"
           }
         },
@@ -856,7 +856,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.5"
+    "version": "v0.1.7"
   },
   "openapi": "3.0.0",
   "paths": {
