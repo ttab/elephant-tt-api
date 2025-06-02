@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "newsdoc/newsdoc.proto";
+
+package ttab.eidos;
+
+option go_package = "github.com/ttab/elephant-tt-api/eidos";
+
+service Tagger {
+  // AnalyseDocument and return the generated meta document and the text
+  // representatin of the document that was used for analysis.
+  rpc AnalyseDocument(AnalyseDocumentRequest) returns (AnalyseDocumentResponse);
+}
+
+message AnalyseDocumentRequest {
+  // DocumentUUID is the uuid of the document to analyse, optional. Required if
+  // no document is provided in the request.
+  string document_uuid      = 1;
+  // Document to analyse, optional.
+  newsdoc.Document document = 2;
+}
+
+message AnalyseDocumentResponse {
+  // Meta document with the detected entities and topics.
+  newsdoc.Document meta = 1;
+  // Text used in recognition query.
+  string text           = 2;
+}

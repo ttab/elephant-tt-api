@@ -1,0 +1,228 @@
+{
+  "components": {
+    "schemas": {
+      "newsdoc.Block": {
+        "description": "Block is the building block for data embedded in documents. It is used for both content, links and metadata. Blocks have can be nested, but that's nothing to strive for, keep it simple.",
+        "properties": {
+          "content": {
+            "description": "Content is used to embed content blocks.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "contenttype": {
+            "description": "ContentType is used to describe the content type of the block/linked entity if it differs from the type of the block.",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data contains block data.",
+            "type": "object"
+          },
+          "id": {
+            "description": "ID is the block ID,",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are used to link to other resources and documents.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is used to embed metadata",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name is a name for the block. An alternative to \"rel\" when relationship is a term that doesn't fit.",
+            "type": "string"
+          },
+          "rel": {
+            "description": "Rel describes the relationship to the document/parent entity.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Role is used either as an alternative to rel, or for nuancing the relationship.",
+            "type": "string"
+          },
+          "sensitivity": {
+            "description": "Sensitivity can be use to communicate how the information in a block can be handled. It could f.ex. be set to \"internal\", to show that it contains information that must be removed or transformed before publishing.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title is the title/headline of the block, typically used in the presentation of the block.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the type of the block",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI is used to reference another entity in a document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is a browseable URL for the the block.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is used to reference another Document in a block.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value is a value for the block. Useful when we want to store a primitive value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "newsdoc.Document": {
+        "description": "Document is a NewsDoc document.",
+        "properties": {
+          "content": {
+            "description": "Content is the content of the document, this is essentially what gets rendered on the page when you view a document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language is the language used in the document as an IETF language tag. F.ex. \"en\", \"en-UK\", \"es\", or \"sv-SE\".",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are links to other resources and entities. This could be links to topics, categories and subjects for the document, or credited authors.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is the metadata for a document, this could be things like teasers, open graph data, newsvalues.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Title is the title of the document, can be used as the document name, or the headline when the document is displayed.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the content type of the document.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI identifies the document (in a more human-readable way than the UUID).",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is the browseable location of the document (if any).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is a unique ID for the document, this can for example be a random v4 UUID, or a URI-derived v5 UUID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.eidos.AnalyseDocumentRequest": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "document_uuid": {
+            "description": "DocumentUUID is the uuid of the document to analyse, optional. Required if no document is provided in the request.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.eidos.AnalyseDocumentResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "text": {
+            "description": "Text used in recognition query.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "eidos API",
+    "version": "v0.1.7"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.eidos.Tagger/AnalyseDocument": {
+      "post": {
+        "description": "AnalyseDocument and return the generated meta document and the text representatin of the document that was used for analysis.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.eidos.AnalyseDocumentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.eidos.AnalyseDocumentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AnalyseDocument",
+        "tags": [
+          "Tagger"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://eidos.api.tt.se"
+    },
+    {
+      "url": "https://eidos.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tagger"
+    }
+  ]
+}
