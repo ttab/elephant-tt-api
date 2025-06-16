@@ -443,6 +443,13 @@
           "scribus_doc": {
             "description": "ScribusDoc is the Scribus document used to render the preview.",
             "type": "string"
+          },
+          "underflows": {
+            "description": "Underflows is a list of text frames whose contents underflowed.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Underflow"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -645,6 +652,13 @@
           "tagged_text_url": {
             "description": "TaggedTextUrl is a zip archive with the indesign-tagged text for the article.",
             "type": "string"
+          },
+          "underflows": {
+            "description": "Underflows is a list of text frames whose contents underflowed.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.baboon.Underflow"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -844,6 +858,18 @@
           }
         },
         "type": "object"
+      },
+      "ttab.baboon.Underflow": {
+        "properties": {
+          "bounding_box": {
+            "$ref": "#/components/schemas/ttab.baboon.Rect"
+          },
+          "frame": {
+            "description": "Frame name that underflowed.",
+            "type": "string"
+          }
+        },
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -856,7 +882,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.1.7"
+    "version": "v0.1.8"
   },
   "openapi": "3.0.0",
   "paths": {

@@ -293,11 +293,13 @@ message RenderArticleResponse {
   int32 png_width    = 5;
   int32 png_height   = 6;
   // Images that were mounted.
-  repeated MountedImage images = 7;
+  repeated MountedImage images  = 7;
   // Overflows is a list of text frames whose contents overflowed the frame.
-  repeated Overflow overflows  = 8;
+  repeated Overflow overflows   = 8;
   // TaggedTextUrl is a zip archive with the indesign-tagged text for the article.
-  string tagged_text_url       = 9;
+  string tagged_text_url        = 9;
+  // Underflows is a list of text frames whose contents underflowed.
+  repeated Underflow underflows = 10;
 }
 
 message MountedImage {
@@ -312,6 +314,14 @@ message MountedImage {
 
 message Overflow {
   // Frame name that overflowed.
+  string frame      = 1;
+  // BoundingBox for the frame in 0.0-1.0 coordinates relative to the page width
+  // and height.
+  Rect bounding_box = 2;
+}
+
+message Underflow {
+  // Frame name that underflowed.
   string frame      = 1;
   // BoundingBox for the frame in 0.0-1.0 coordinates relative to the page width
   // and height.
@@ -342,11 +352,13 @@ message LayoutPreviewRequest {
 
 message LayoutPreviewResponse {
   // PDFData produced by the render.
-  bytes pdf_data               = 1;
+  bytes pdf_data                = 1;
   // Images that were mounted.
-  repeated MountedImage images = 2;
+  repeated MountedImage images  = 2;
   // Overflows is a list of text frames whose contents overflowed the frame.
-  repeated Overflow overflows  = 3;
+  repeated Overflow overflows   = 3;
   // ScribusDoc is the Scribus document used to render the preview.
-  bytes scribus_doc            = 4;
+  bytes scribus_doc             = 4;
+  // Underflows is a list of text frames whose contents underflowed.
+  repeated Underflow underflows = 5;
 }
