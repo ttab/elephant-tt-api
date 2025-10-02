@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+import "newsdoc/newsdoc.proto";
+
+package ttab.genai;
+
+option go_package = "github.com/ttab/elephant-tt-api/genai";
+
+service Generate {
+  // DocumentFromText creates a document from an input text.
+  rpc DocumentFromText(DocumentFromTextRequest) returns (DocumentFromTextResponse);
+
+  // ListJobs that have been submitted.
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
+  // WaitForJobs is used to wait for status updates for a set of jobs.
+  rpc WaitForJobs(WaitForJobsRequest) returns (WaitForJobsResponse);
+  // GetResult returns the result for a job.
+  rpc GetResult(GetResultRequest) returns (GetResultResponse);
+
+  // SetPrompt creates or updates a prompt.
+  rpc SetPrompt(SetPromptRequest) returns (SetPromptResponse);
+  // GetPromt returns a prompt.
+  rpc GetPrompt(GetPromptRequest) returns (GetPromptResponse);
+}
+
+message DocumentFromTextRequest {
+  // PromptName is the name of the prompt to use.
+  string prompt_name = 1;
+  // Text to send as input.
+  string text        = 2;
+  // UUID to set for the document.
+  string uuid        = 3;
+  // URI to set for the document.
+  string uri         = 4;
+  // AdditionalLinks that should be added to the generated document.
+  repeated newsdoc.Block additionalLinks = 5;
+  // AdditionalMeta blocks that should be added to the generated document.
+  repeated newsdoc.Block additionalMeta  = 6;
+}
+
+message DocumentFromTextResponse {
+  // JobID that identifies the job
+  int64 job_id = 1;
+}
+
+message ListJobsRequest {
+  // After lists jobs after the given ID. Optional, omit to get latest.
+  int64 after = 1;
+}
+
+message ListJobsResponse {
+  repeated JobReference jobs = 1;
+}
+
+message WaitForJobsRequest {
+  // Jobs and the currently known version that the client is waiting
+  // for. Required.
+  map<int64, int64> jobs = 1;
+  // MaxWaitSec is the maximum time to wait for updates. Optional, defaults to
+  // 10.
+  int64 max_wait_sec = 2;
+}
+
+message WaitForJobsResponse {
+  // Updated jobs, can be empty if the wait timed out without any updates.
+  repeated JobReference updated = 1;
+}
+
+message GetResultRequest {
+  int64 id = 1;
+}
+
+enum JobStatus {
+  STATUS_UNKNOWN = 0;
+  STATUS_DONE    = 1;
+  STATUS_FAILED  = 2;
+}
+
+message JobReference {
+  int64 id          = 1;
+  int64 version     = 2;
+  JobStatus status  = 3;
+}
+
+message GetResultResponse {
+  int64 id          = 1;
+  int64 version     = 2;
+  JobStatus status  = 3;
+  string error_code = 4;
+  string error      = 5;
+  newsdoc.Document document = 6;
+}
+
+enum PromptType {
+  PROMPT_TYPE_UNKNOWN  = 0;
+  PROMPT_TYPE_DOCUMENT = 1;
+}
+
+message SetPromptRequest {
+  string name     = 1;
+  PromptType type = 2;
+  PromptMeta meta = 3;
+  string prompt   = 4;
+}
+
+message PromptMeta {
+  // DocumentType of the document that should be generated if this is a document
+  // prompt.
+  string documentType = 1;
+}
+
+message SetPromptResponse {}
+
+message GetPromptRequest {
+  // Name of the prompt.
+  string name   = 1;
+  // Version of the prompt to get, leave empty for latest version.
+  int64 version = 2;
+}
+
+message GetPromptResponse {
+  string name     = 1;
+  int64 version   = 2;
+  PromptType type = 3;
+  PromptMeta meta = 4;
+  string prompt   = 5;
+  string created  = 6;
+  string updated  = 7;
+}

@@ -1,0 +1,614 @@
+{
+  "components": {
+    "schemas": {
+      "newsdoc.Block": {
+        "description": "Block is the building block for data embedded in documents. It is used for both content, links and metadata. Blocks have can be nested, but that's nothing to strive for, keep it simple.",
+        "properties": {
+          "content": {
+            "description": "Content is used to embed content blocks.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "contenttype": {
+            "description": "ContentType is used to describe the content type of the block/linked entity if it differs from the type of the block.",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data contains block data.",
+            "type": "object"
+          },
+          "id": {
+            "description": "ID is the block ID,",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are used to link to other resources and documents.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is used to embed metadata",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name is a name for the block. An alternative to \"rel\" when relationship is a term that doesn't fit.",
+            "type": "string"
+          },
+          "rel": {
+            "description": "Rel describes the relationship to the document/parent entity.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Role is used either as an alternative to rel, or for nuancing the relationship.",
+            "type": "string"
+          },
+          "sensitivity": {
+            "description": "Sensitivity can be use to communicate how the information in a block can be handled. It could f.ex. be set to \"internal\", to show that it contains information that must be removed or transformed before publishing.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title is the title/headline of the block, typically used in the presentation of the block.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the type of the block",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI is used to reference another entity in a document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is a browseable URL for the the block.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is used to reference another Document in a block.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value is a value for the block. Useful when we want to store a primitive value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "newsdoc.Document": {
+        "description": "Document is a NewsDoc document.",
+        "properties": {
+          "content": {
+            "description": "Content is the content of the document, this is essentially what gets rendered on the page when you view a document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language is the language used in the document as an IETF language tag. F.ex. \"en\", \"en-UK\", \"es\", or \"sv-SE\".",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are links to other resources and entities. This could be links to topics, categories and subjects for the document, or credited authors.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is the metadata for a document, this could be things like teasers, open graph data, newsvalues.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Title is the title of the document, can be used as the document name, or the headline when the document is displayed.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the content type of the document.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI identifies the document (in a more human-readable way than the UUID).",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is the browseable location of the document (if any).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is a unique ID for the document, this can for example be a random v4 UUID, or a URI-derived v5 UUID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.DocumentFromTextRequest": {
+        "properties": {
+          "additionalLinks": {
+            "description": "AdditionalLinks that should be added to the generated document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "additionalMeta": {
+            "description": "AdditionalMeta blocks that should be added to the generated document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "prompt_name": {
+            "description": "PromptName is the name of the prompt to use.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Text to send as input.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI to set for the document.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID to set for the document.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.DocumentFromTextResponse": {
+        "properties": {
+          "job_id": {
+            "description": "JobID that identifies the job",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetPromptRequest": {
+        "properties": {
+          "name": {
+            "description": "Name of the prompt.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the prompt to get, leave empty for latest version.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetPromptResponse": {
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ttab.genai.PromptMeta"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.genai.PromptType"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetResultRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetResultResponse": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "error": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.JobReference": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.JobStatus": {
+        "enum": [
+          "STATUS_UNKNOWN",
+          "STATUS_DONE",
+          "STATUS_FAILED"
+        ],
+        "type": "string"
+      },
+      "ttab.genai.ListJobsRequest": {
+        "properties": {
+          "after": {
+            "description": "After lists jobs after the given ID. Optional, omit to get latest.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.ListJobsResponse": {
+        "properties": {
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.genai.JobReference"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.PromptMeta": {
+        "properties": {
+          "documentType": {
+            "description": "DocumentType of the document that should be generated if this is a document prompt.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.PromptType": {
+        "enum": [
+          "PROMPT_TYPE_UNKNOWN",
+          "PROMPT_TYPE_DOCUMENT"
+        ],
+        "type": "string"
+      },
+      "ttab.genai.SetPromptRequest": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/ttab.genai.PromptMeta"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.genai.PromptType"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.SetPromptResponse": {
+        "type": "object"
+      },
+      "ttab.genai.WaitForJobsRequest": {
+        "properties": {
+          "jobs": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Jobs and the currently known version that the client is waiting for. Required.",
+            "type": "object"
+          },
+          "max_wait_sec": {
+            "description": "MaxWaitSec is the maximum time to wait for updates. Optional, defaults to 10.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.WaitForJobsResponse": {
+        "properties": {
+          "updated": {
+            "description": "Updated jobs, can be empty if the wait timed out without any updates.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.genai.JobReference"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "genai API",
+    "version": "v0.1.8"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.genai.Generate/DocumentFromText": {
+      "post": {
+        "description": "DocumentFromText creates a document from an input text.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.DocumentFromTextRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.DocumentFromTextResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DocumentFromText",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/GetPrompt": {
+      "post": {
+        "description": "GetPromt returns a prompt.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.GetPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.GetPromptResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetPrompt",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/GetResult": {
+      "post": {
+        "description": "GetResult returns the result for a job.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.GetResultRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.GetResultResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetResult",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/ListJobs": {
+      "post": {
+        "description": "ListJobs that have been submitted.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.ListJobsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.ListJobsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListJobs",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/SetPrompt": {
+      "post": {
+        "description": "SetPrompt creates or updates a prompt.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.SetPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.SetPromptResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "SetPrompt",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/WaitForJobs": {
+      "post": {
+        "description": "WaitForJobs is used to wait for status updates for a set of jobs.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.WaitForJobsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.WaitForJobsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "WaitForJobs",
+        "tags": [
+          "Generate"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://genai.api.tt.se"
+    },
+    {
+      "url": "https://genai.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Generate"
+    }
+  ]
+}
