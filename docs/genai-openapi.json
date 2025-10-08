@@ -180,6 +180,10 @@
       },
       "ttab.genai.GetPromptRequest": {
         "properties": {
+          "language": {
+            "description": "Language of the prompt. In the case of a model used for language feedback this would be the input language. In prompts used for translation it would be the target language.",
+            "type": "string"
+          },
           "name": {
             "description": "Name of the prompt.",
             "type": "string"
@@ -345,7 +349,7 @@
       },
       "ttab.genai.PromptMeta": {
         "properties": {
-          "documentType": {
+          "document_type": {
             "description": "DocumentType of the document that should be generated if this is a document prompt.",
             "type": "string"
           }
@@ -355,19 +359,31 @@
       "ttab.genai.PromptType": {
         "enum": [
           "PROMPT_TYPE_UNKNOWN",
-          "PROMPT_TYPE_DOCUMENT"
+          "PROMPT_TYPE_DOCUMENT",
+          "PROMPT_TYPE_FEEDBACK",
+          "PROMPT_TYPE_TRANSLATION"
         ],
         "type": "string"
       },
       "ttab.genai.SetPromptRequest": {
         "properties": {
+          "language": {
+            "description": "Language of the prompt. In the case of a model used for language feedback this would be the input language. In prompts used for translation it would be the target language.",
+            "type": "string"
+          },
           "meta": {
             "$ref": "#/components/schemas/ttab.genai.PromptMeta"
           },
+          "model": {
+            "description": "Model is the underlying model that should be used for the prompt.",
+            "type": "string"
+          },
           "name": {
+            "description": "Name of the prompt.",
             "type": "string"
           },
           "prompt": {
+            "description": "Prompt is the prompt itself.",
             "type": "string"
           },
           "type": {
