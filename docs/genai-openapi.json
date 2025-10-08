@@ -270,6 +270,59 @@
         ],
         "type": "string"
       },
+      "ttab.genai.LanguageFeedback": {
+        "properties": {
+          "motivation": {
+            "description": "Motivation for the change.",
+            "type": "string"
+          },
+          "original": {
+            "description": "Original text excerpt.",
+            "type": "string"
+          },
+          "paragraph": {
+            "description": "Paragraph index. Set to -1 if the feedback couldn't be connected to a specific paragraph.",
+            "type": "integer"
+          },
+          "suggestion": {
+            "description": "Suggestion for new text.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.LanguageFeedbackRequest": {
+        "properties": {
+          "language": {
+            "description": "Language the content is in. Must be supported by the model.",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model name is the name of the model to use.",
+            "type": "string"
+          },
+          "paragraphs": {
+            "description": "Paragraphs to review. Feedback will",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.LanguageFeedbackResponse": {
+        "properties": {
+          "feedback": {
+            "description": "Feedback items.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.genai.ListJobsRequest": {
         "properties": {
           "after": {
@@ -478,6 +531,44 @@
           }
         ],
         "summary": "GetResult",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/LanguageFeedback": {
+      "post": {
+        "description": "LanguageFeedback gives feedback on a text.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.LanguageFeedbackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.LanguageFeedbackResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "LanguageFeedback",
         "tags": [
           "Generate"
         ]

@@ -10,6 +10,9 @@ service Generate {
   // DocumentFromText creates a document from an input text.
   rpc DocumentFromText(DocumentFromTextRequest) returns (DocumentFromTextResponse);
 
+  // LanguageFeedback gives feedback on a text.
+  rpc LanguageFeedback(LanguageFeedbackRequest) returns (LanguageFeedbackResponse);
+
   // ListJobs that have been submitted.
   rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
   // WaitForJobs is used to wait for status updates for a set of jobs.
@@ -41,6 +44,32 @@ message DocumentFromTextRequest {
 message DocumentFromTextResponse {
   // JobID that identifies the job
   int64 job_id = 1;
+}
+
+message LanguageFeedbackRequest {
+  // Model name is the name of the model to use.
+  string model               = 1;
+  // Language the content is in. Must be supported by the model.
+  string language            = 2;
+  // Paragraphs to review. Feedback will 
+  repeated string paragraphs = 3;
+}
+
+message LanguageFeedbackResponse {
+  // Feedback items.
+  repeated LanguageFeedback feedback = 1;
+}
+
+message LanguageFeedback {
+  // Paragraph index. Set to -1 if the feedback couldn't be connected to a
+  // specific paragraph.
+  int64 paragraph   = 1;
+  // Original text excerpt.
+  string original   = 2;
+  // Suggestion for new text.
+  string suggestion = 4;
+  // Motivation for the change.
+  string motivation = 5;
 }
 
 message ListJobsRequest {
