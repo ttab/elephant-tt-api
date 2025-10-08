@@ -19,11 +19,6 @@ service Generate {
   rpc WaitForJobs(WaitForJobsRequest) returns (WaitForJobsResponse);
   // GetResult returns the result for a job.
   rpc GetResult(GetResultRequest) returns (GetResultResponse);
-
-  // SetPrompt creates or updates a prompt.
-  rpc SetPrompt(SetPromptRequest) returns (SetPromptResponse);
-  // GetPromt returns a prompt.
-  rpc GetPrompt(GetPromptRequest) returns (GetPromptResponse);
 }
 
 message DocumentFromTextRequest {
@@ -118,57 +113,4 @@ message GetResultResponse {
   string error_code = 4;
   string error      = 5;
   newsdoc.Document document = 6;
-}
-
-enum PromptType {
-  PROMPT_TYPE_UNKNOWN     = 0;
-  PROMPT_TYPE_DOCUMENT    = 1;
-  PROMPT_TYPE_FEEDBACK    = 2;
-  PROMPT_TYPE_TRANSLATION = 3;
-}
-
-message SetPromptRequest {
-  // Name of the prompt.
-  string name     = 1;
-  // Language of the prompt. In the case of a model used for language feedback
-  // this would be the input language. In prompts used for translation it would
-  // be the target language.
-  string language = 2;
-  // Type of the prompt.
-  PromptType type = 3;
-  // Meta information for the prompt.
-  PromptMeta meta = 4;
-  // Prompt is the prompt itself.
-  string prompt   = 5;
-  // Model is the underlying model that should be used for the prompt.
-  string model    = 6;
-}
-
-message PromptMeta {
-  // DocumentType of the document that should be generated if this is a document
-  // prompt.
-  string document_type   = 1;
-}
-
-message SetPromptResponse {}
-
-message GetPromptRequest {
-  // Name of the prompt.
-  string name   = 1;
-  // Language of the prompt. In the case of a model used for language feedback
-  // this would be the input language. In prompts used for translation it would
-  // be the target language.
-  string language = 2;
-  // Version of the prompt to get, leave empty for latest version.
-  int64 version = 3;
-}
-
-message GetPromptResponse {
-  string name     = 1;
-  int64 version   = 2;
-  PromptType type = 3;
-  PromptMeta meta = 4;
-  string prompt   = 5;
-  string created  = 6;
-  string updated  = 7;
 }

@@ -178,49 +178,6 @@
         },
         "type": "object"
       },
-      "ttab.genai.GetPromptRequest": {
-        "properties": {
-          "language": {
-            "description": "Language of the prompt. In the case of a model used for language feedback this would be the input language. In prompts used for translation it would be the target language.",
-            "type": "string"
-          },
-          "name": {
-            "description": "Name of the prompt.",
-            "type": "string"
-          },
-          "version": {
-            "description": "Version of the prompt to get, leave empty for latest version.",
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.genai.GetPromptResponse": {
-        "properties": {
-          "created": {
-            "type": "string"
-          },
-          "meta": {
-            "$ref": "#/components/schemas/ttab.genai.PromptMeta"
-          },
-          "name": {
-            "type": "string"
-          },
-          "prompt": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ttab.genai.PromptType"
-          },
-          "updated": {
-            "type": "string"
-          },
-          "version": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
       "ttab.genai.GetResultRequest": {
         "properties": {
           "id": {
@@ -347,54 +304,6 @@
         },
         "type": "object"
       },
-      "ttab.genai.PromptMeta": {
-        "properties": {
-          "document_type": {
-            "description": "DocumentType of the document that should be generated if this is a document prompt.",
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.genai.PromptType": {
-        "enum": [
-          "PROMPT_TYPE_UNKNOWN",
-          "PROMPT_TYPE_DOCUMENT",
-          "PROMPT_TYPE_FEEDBACK",
-          "PROMPT_TYPE_TRANSLATION"
-        ],
-        "type": "string"
-      },
-      "ttab.genai.SetPromptRequest": {
-        "properties": {
-          "language": {
-            "description": "Language of the prompt. In the case of a model used for language feedback this would be the input language. In prompts used for translation it would be the target language.",
-            "type": "string"
-          },
-          "meta": {
-            "$ref": "#/components/schemas/ttab.genai.PromptMeta"
-          },
-          "model": {
-            "description": "Model is the underlying model that should be used for the prompt.",
-            "type": "string"
-          },
-          "name": {
-            "description": "Name of the prompt.",
-            "type": "string"
-          },
-          "prompt": {
-            "description": "Prompt is the prompt itself.",
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ttab.genai.PromptType"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.genai.SetPromptResponse": {
-        "type": "object"
-      },
       "ttab.genai.WaitForJobsRequest": {
         "properties": {
           "jobs": {
@@ -471,44 +380,6 @@
           }
         ],
         "summary": "DocumentFromText",
-        "tags": [
-          "Generate"
-        ]
-      }
-    },
-    "/twirp/ttab.genai.Generate/GetPrompt": {
-      "post": {
-        "description": "GetPromt returns a prompt.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.genai.GetPromptRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.GetPromptResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "GetPrompt",
         "tags": [
           "Generate"
         ]
@@ -623,44 +494,6 @@
           }
         ],
         "summary": "ListJobs",
-        "tags": [
-          "Generate"
-        ]
-      }
-    },
-    "/twirp/ttab.genai.Generate/SetPrompt": {
-      "post": {
-        "description": "SetPrompt creates or updates a prompt.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.genai.SetPromptRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.SetPromptResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "SetPrompt",
         "tags": [
           "Generate"
         ]
