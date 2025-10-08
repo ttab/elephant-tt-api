@@ -150,8 +150,12 @@
             },
             "type": "array"
           },
-          "prompt_name": {
-            "description": "PromptName is the name of the prompt to use.",
+          "async_timeout_seconds": {
+            "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
+            "type": "integer"
+          },
+          "prompt": {
+            "description": "Prompt is the UUID of the prompt to use.",
             "type": "string"
           },
           "text": {
@@ -171,8 +175,11 @@
       },
       "ttab.genai.DocumentFromTextResponse": {
         "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
           "job_id": {
-            "description": "JobID that identifies the job",
+            "description": "JobID that identifies the job.",
             "type": "integer"
           }
         },
@@ -197,14 +204,20 @@
           "error_code": {
             "type": "string"
           },
+          "feedback": {
+            "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
+          },
           "id": {
             "type": "integer"
+          },
+          "prompt": {
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/ttab.genai.JobStatus"
           },
-          "version": {
-            "type": "integer"
+          "type": {
+            "$ref": "#/components/schemas/ttab.genai.JobType"
           }
         },
         "type": "object"
@@ -216,9 +229,6 @@
           },
           "status": {
             "$ref": "#/components/schemas/ttab.genai.JobStatus"
-          },
-          "version": {
-            "type": "integer"
           }
         },
         "type": "object"
@@ -228,6 +238,14 @@
           "STATUS_UNKNOWN",
           "STATUS_DONE",
           "STATUS_FAILED"
+        ],
+        "type": "string"
+      },
+      "ttab.genai.JobType": {
+        "enum": [
+          "JOB_TYPE_UNKNOWN",
+          "JOB_TYPE_DOCUMENT",
+          "JOB_TYPE_FEEDBACK"
         ],
         "type": "string"
       },
@@ -254,20 +272,20 @@
       },
       "ttab.genai.LanguageFeedbackRequest": {
         "properties": {
-          "language": {
-            "description": "Language the content is in. Must be supported by the model.",
-            "type": "string"
-          },
-          "model": {
-            "description": "Model name is the name of the model to use.",
-            "type": "string"
+          "async_timeout_seconds": {
+            "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
+            "type": "integer"
           },
           "paragraphs": {
-            "description": "Paragraphs to review. Feedback will",
+            "description": "Paragraphs to review. Feedback will reference these paragraphs by index.",
             "items": {
               "type": "string"
             },
             "type": "array"
+          },
+          "prompt": {
+            "description": "Prompt is the UUID of the prompt to use.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -280,6 +298,10 @@
               "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
             },
             "type": "array"
+          },
+          "job_id": {
+            "description": "JobID that identifies the created job.",
+            "type": "integer"
           }
         },
         "type": "object"

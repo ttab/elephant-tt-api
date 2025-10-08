@@ -22,8 +22,8 @@ service Generate {
 }
 
 message DocumentFromTextRequest {
-  // PromptName is the name of the prompt to use.
-  string prompt_name = 1;
+  // Prompt is the UUID of the prompt to use.
+  string prompt = 1;
   // Text to send as input.
   string text        = 2;
   // UUID to set for the document.
@@ -34,25 +34,33 @@ message DocumentFromTextRequest {
   repeated newsdoc.Block additionalLinks = 5;
   // AdditionalMeta blocks that should be added to the generated document.
   repeated newsdoc.Block additionalMeta  = 6;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds            = 7;
 }
 
 message DocumentFromTextResponse {
-  // JobID that identifies the job
-  int64 job_id = 1;
+  // JobID that identifies the job.
+  int64 job_id              = 1;
+  // Document that was generated.
+  newsdoc.Document document = 2;
 }
 
 message LanguageFeedbackRequest {
-  // Model name is the name of the model to use.
-  string model               = 1;
-  // Language the content is in. Must be supported by the model.
-  string language            = 2;
-  // Paragraphs to review. Feedback will 
-  repeated string paragraphs = 3;
+  // Prompt is the UUID of the prompt to use.
+  string prompt              = 1;
+  // Paragraphs to review. Feedback will reference these paragraphs by index.
+  repeated string paragraphs = 2;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds = 3;
 }
 
 message LanguageFeedbackResponse {
+  // JobID that identifies the created job.
+  int64 job_id = 1;
   // Feedback items.
-  repeated LanguageFeedback feedback = 1;
+  repeated LanguageFeedback feedback = 2;
 }
 
 message LanguageFeedback {
@@ -100,17 +108,24 @@ enum JobStatus {
   STATUS_FAILED  = 2;
 }
 
+enum JobType {
+  JOB_TYPE_UNKNOWN  = 0;
+  JOB_TYPE_DOCUMENT = 1;
+  JOB_TYPE_FEEDBACK = 2;
+}
+
 message JobReference {
   int64 id          = 1;
-  int64 version     = 2;
-  JobStatus status  = 3;
+  JobStatus status  = 2;
 }
 
 message GetResultResponse {
   int64 id          = 1;
-  int64 version     = 2;
-  JobStatus status  = 3;
-  string error_code = 4;
-  string error      = 5;
-  newsdoc.Document document = 6;
+  string prompt     = 2;
+  JobType type      = 3;
+  JobStatus status  = 4;
+  string error_code = 5;
+  string error      = 6;
+  newsdoc.Document document = 7;
+  LanguageFeedback feedback = 8;
 }
