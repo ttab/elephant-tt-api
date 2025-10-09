@@ -245,7 +245,8 @@
         "enum": [
           "JOB_TYPE_UNKNOWN",
           "JOB_TYPE_DOCUMENT",
-          "JOB_TYPE_FEEDBACK"
+          "JOB_TYPE_FEEDBACK",
+          "JOB_TYPE_TEXT"
         ],
         "type": "string"
       },
@@ -277,7 +278,7 @@
       "ttab.genai.LanguageFeedbackRequest": {
         "properties": {
           "async_timeout_seconds": {
-            "description": "blocks will be extracted and the feedback will reference them by index. AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
+            "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
           "document": {
@@ -340,6 +341,36 @@
               "$ref": "#/components/schemas/ttab.genai.JobReference"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.TextRequest": {
+        "properties": {
+          "async_timeout_seconds": {
+            "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
+            "type": "integer"
+          },
+          "model": {
+            "description": "Model is the URI of the model to use.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Text to send as input.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.TextResponse": {
+        "properties": {
+          "job_id": {
+            "description": "JobID that identifies the created job.",
+            "type": "integer"
+          },
+          "text": {
+            "description": "Text is the generated text.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -534,6 +565,44 @@
           }
         ],
         "summary": "ListJobs",
+        "tags": [
+          "Generate"
+        ]
+      }
+    },
+    "/twirp/ttab.genai.Generate/Text": {
+      "post": {
+        "description": "Text generates text from a input.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.genai.TextRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.genai.TextResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Text",
         "tags": [
           "Generate"
         ]

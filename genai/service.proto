@@ -13,6 +13,9 @@ service Generate {
   // LanguageFeedback gives feedback on a text.
   rpc LanguageFeedback(LanguageFeedbackRequest) returns (LanguageFeedbackResponse);
 
+  // Text generates text from a input.
+  rpc Text(TextRequest) returns (TextResponse);
+
   // ListJobs that have been submitted.
   rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
   // WaitForJobs is used to wait for status updates for a set of jobs.
@@ -63,7 +66,6 @@ message LanguageFeedbackRequest {
   // index. Optional, but either paragraphs, document_uuid, or document must be
   // set.
   newsdoc.Document document   = 4;
-  // blocks will be extracted and the feedback will reference them by index.
   // AsyncTimeoutSeconds is the time after which a JobID will be returned
   // instead of a direct result. Optional, defaults to no timeout.
   int64 async_timeout_seconds = 5;
@@ -91,6 +93,23 @@ message LanguageFeedback {
   // ParagraphID is present when the feedback is performed on a document and the
   // text block had a ID.
   string paragraph_id = 6;
+}
+
+message TextRequest {
+  // Model is the URI of the model to use.
+  string model       = 1;
+  // Text to send as input.
+  string text        = 2;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds = 3;
+}
+
+message TextResponse {
+  // JobID that identifies the created job.
+  int64 job_id = 1;
+  // Text is the generated text.
+  string text  = 2;
 }
 
 message ListJobsRequest {
@@ -130,6 +149,7 @@ enum JobType {
   JOB_TYPE_UNKNOWN  = 0;
   JOB_TYPE_DOCUMENT = 1;
   JOB_TYPE_FEEDBACK = 2;
+  JOB_TYPE_TEXT     = 3;
 }
 
 message JobReference {
