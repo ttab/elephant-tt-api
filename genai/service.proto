@@ -22,8 +22,8 @@ service Generate {
 }
 
 message DocumentFromTextRequest {
-  // Prompt is the UUID of the prompt to use.
-  string prompt = 1;
+  // Model is the URI of the model to use.
+  string model       = 1;
   // Text to send as input.
   string text        = 2;
   // UUID to set for the document.
@@ -47,10 +47,10 @@ message DocumentFromTextResponse {
 }
 
 message LanguageFeedbackRequest {
-  // Prompt is the UUID of the prompt to use.
-  string prompt              = 1;
+  // Model is the URI of the model to use.
+  string model                = 1;
   // Paragraphs to review. Feedback will reference these paragraphs by index.
-  repeated string paragraphs = 2;
+  repeated string paragraphs  = 2;
   // AsyncTimeoutSeconds is the time after which a JobID will be returned
   // instead of a direct result. Optional, defaults to no timeout.
   int64 async_timeout_seconds = 3;
@@ -121,7 +121,7 @@ message JobReference {
 
 message GetResultResponse {
   int64 id          = 1;
-  string prompt     = 2;
+  string model     = 2;
   JobType type      = 3;
   JobStatus status  = 4;
   string error_code = 5;

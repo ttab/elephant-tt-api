@@ -154,8 +154,8 @@
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
-          "prompt": {
-            "description": "Prompt is the UUID of the prompt to use.",
+          "model": {
+            "description": "Model is the URI of the model to use.",
             "type": "string"
           },
           "text": {
@@ -210,7 +210,7 @@
           "id": {
             "type": "integer"
           },
-          "prompt": {
+          "model": {
             "type": "string"
           },
           "status": {
@@ -276,16 +276,16 @@
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
+          "model": {
+            "description": "Model is the URI of the model to use.",
+            "type": "string"
+          },
           "paragraphs": {
             "description": "Paragraphs to review. Feedback will reference these paragraphs by index.",
             "items": {
               "type": "string"
             },
             "type": "array"
-          },
-          "prompt": {
-            "description": "Prompt is the UUID of the prompt to use.",
-            "type": "string"
           }
         },
         "type": "object"
