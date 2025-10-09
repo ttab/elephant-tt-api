@@ -355,6 +355,10 @@
             "description": "Model is the URI of the model to use.",
             "type": "string"
           },
+          "parse_text": {
+            "description": "ParseText tries to parse the generated text into blocks if set to true.",
+            "type": "boolean"
+          },
           "text": {
             "description": "Text to send as input.",
             "type": "string"
@@ -364,6 +368,13 @@
       },
       "ttab.genai.TextResponse": {
         "properties": {
+          "content": {
+            "description": "Contet blocks generated from the text.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
           "job_id": {
             "description": "JobID that identifies the created job.",
             "type": "integer"
