@@ -273,11 +273,14 @@
       "ttab.genai.LanguageFeedbackRequest": {
         "properties": {
           "async_timeout_seconds": {
-            "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
+            "description": "blocks will be extracted and the feedback will reference them by index. AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
           "document_uuid": {
-            "description": "DocumentUUID of the document to give feedback on. The \"core/text\" content blocks will be extracted and the feedback will reference them by index.",
+            "description": "DocumentUUID of the document to give feedback on. The \"core/text\" content blocks will be extracted and the feedback will reference them by index. Optional, but either paragraphs, document_uuid, or document must be set.",
             "type": "string"
           },
           "model": {
@@ -285,7 +288,7 @@
             "type": "string"
           },
           "paragraphs": {
-            "description": "Paragraphs to review. Feedback will reference these paragraphs by index. Optional, but either paragraphs or document_uuid must be set.",
+            "description": "Paragraphs to review. Feedback will reference these paragraphs by index. Optional, but either paragraphs, document_uuid, or document must be set.",
             "items": {
               "type": "string"
             },

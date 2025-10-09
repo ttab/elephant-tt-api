@@ -50,14 +50,23 @@ message LanguageFeedbackRequest {
   // Model is the URI of the model to use.
   string model                = 1;
   // Paragraphs to review. Feedback will reference these paragraphs by
-  // index. Optional, but either paragraphs or document_uuid must be set.
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
   repeated string paragraphs  = 2;
   // DocumentUUID of the document to give feedback on. The "core/text" content
-  // blocks will be extracted and the feedback will reference them by index.
+  // blocks will be extracted and the feedback will reference them by
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
   string document_uuid        = 3;
+  // Document is the document to give feedback on. The "core/text" content
+  // blocks will be extracted and the feedback will reference them by
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
+  newsdoc.Document document   = 4;
+  // blocks will be extracted and the feedback will reference them by index.
   // AsyncTimeoutSeconds is the time after which a JobID will be returned
   // instead of a direct result. Optional, defaults to no timeout.
-  int64 async_timeout_seconds = 4;
+  int64 async_timeout_seconds = 5;
 }
 
 message LanguageFeedbackResponse {
