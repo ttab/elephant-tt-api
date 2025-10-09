@@ -263,6 +263,10 @@
             "description": "Paragraph index. Set to -1 if the feedback couldn't be connected to a specific paragraph.",
             "type": "integer"
           },
+          "paragraph_id": {
+            "description": "ParagraphID is present when the feedback is performed on a document and the text block had a ID.",
+            "type": "string"
+          },
           "suggestion": {
             "description": "Suggestion for new text.",
             "type": "string"

@@ -81,13 +81,16 @@ message LanguageFeedbackResponse {
 message LanguageFeedback {
   // Paragraph index. Set to -1 if the feedback couldn't be connected to a
   // specific paragraph.
-  int64 paragraph   = 1;
+  int64 paragraph     = 1;
   // Original text excerpt.
-  string original   = 2;
+  string original     = 2;
   // Suggestion for new text.
-  string suggestion = 4;
+  string suggestion   = 4;
   // Motivation for the change.
-  string motivation = 5;
+  string motivation   = 5;
+  // ParagraphID is present when the feedback is performed on a document and the
+  // text block had a ID.
+  string paragraph_id = 6;
 }
 
 message ListJobsRequest {
