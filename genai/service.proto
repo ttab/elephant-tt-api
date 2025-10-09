@@ -49,11 +49,15 @@ message DocumentFromTextResponse {
 message LanguageFeedbackRequest {
   // Model is the URI of the model to use.
   string model                = 1;
-  // Paragraphs to review. Feedback will reference these paragraphs by index.
+  // Paragraphs to review. Feedback will reference these paragraphs by
+  // index. Optional, but either paragraphs or document_uuid must be set.
   repeated string paragraphs  = 2;
+  // DocumentUUID of the document to give feedback on. The "core/text" content
+  // blocks will be extracted and the feedback will reference them by index.
+  string document_uuid        = 3;
   // AsyncTimeoutSeconds is the time after which a JobID will be returned
   // instead of a direct result. Optional, defaults to no timeout.
-  int64 async_timeout_seconds = 3;
+  int64 async_timeout_seconds = 4;
 }
 
 message LanguageFeedbackResponse {
@@ -61,6 +65,8 @@ message LanguageFeedbackResponse {
   int64 job_id = 1;
   // Feedback items.
   repeated LanguageFeedback feedback = 2;
+  // Paragraphs are the paragraphs being referenced in the feedback.
+  repeated string paragraphs         = 3;
 }
 
 message LanguageFeedback {

@@ -276,12 +276,16 @@
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
+          "document_uuid": {
+            "description": "DocumentUUID of the document to give feedback on. The \"core/text\" content blocks will be extracted and the feedback will reference them by index.",
+            "type": "string"
+          },
           "model": {
             "description": "Model is the URI of the model to use.",
             "type": "string"
           },
           "paragraphs": {
-            "description": "Paragraphs to review. Feedback will reference these paragraphs by index.",
+            "description": "Paragraphs to review. Feedback will reference these paragraphs by index. Optional, but either paragraphs or document_uuid must be set.",
             "items": {
               "type": "string"
             },
@@ -302,6 +306,13 @@
           "job_id": {
             "description": "JobID that identifies the created job.",
             "type": "integer"
+          },
+          "paragraphs": {
+            "description": "Paragraphs are the paragraphs being referenced in the feedback.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"
