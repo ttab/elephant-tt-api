@@ -1,0 +1,175 @@
+syntax = "proto3";
+
+import "newsdoc/newsdoc.proto";
+
+package ttab.genai;
+
+option go_package = "github.com/ttab/elephant-tt-api/genai";
+
+service Generate {
+  // DocumentFromText creates a document from an input text.
+  rpc DocumentFromText(DocumentFromTextRequest) returns (DocumentFromTextResponse);
+
+  // LanguageFeedback gives feedback on a text.
+  rpc LanguageFeedback(LanguageFeedbackRequest) returns (LanguageFeedbackResponse);
+
+  // Text generates text from a input.
+  rpc Text(TextRequest) returns (TextResponse);
+
+  // ListJobs that have been submitted.
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
+  // WaitForJobs is used to wait for status updates for a set of jobs.
+  rpc WaitForJobs(WaitForJobsRequest) returns (WaitForJobsResponse);
+  // GetResult returns the result for a job.
+  rpc GetResult(GetResultRequest) returns (GetResultResponse);
+}
+
+message DocumentFromTextRequest {
+  // Model is the URI of the model to use.
+  string model       = 1;
+  // Text to send as input.
+  string text        = 2;
+  // UUID to set for the document.
+  string uuid        = 3;
+  // URI to set for the document.
+  string uri         = 4;
+  // AdditionalLinks that should be added to the generated document.
+  repeated newsdoc.Block additionalLinks = 5;
+  // AdditionalMeta blocks that should be added to the generated document.
+  repeated newsdoc.Block additionalMeta  = 6;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds            = 7;
+}
+
+message DocumentFromTextResponse {
+  // JobID that identifies the job.
+  int64 job_id              = 1;
+  // Document that was generated.
+  newsdoc.Document document = 2;
+}
+
+message LanguageFeedbackRequest {
+  // Model is the URI of the model to use.
+  string model                = 1;
+  // Paragraphs to review. Feedback will reference these paragraphs by
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
+  repeated string paragraphs  = 2;
+  // DocumentUUID of the document to give feedback on. The "core/text" content
+  // blocks will be extracted and the feedback will reference them by
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
+  string document_uuid        = 3;
+  // Document is the document to give feedback on. The "core/text" content
+  // blocks will be extracted and the feedback will reference them by
+  // index. Optional, but either paragraphs, document_uuid, or document must be
+  // set.
+  newsdoc.Document document   = 4;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds = 5;
+}
+
+message LanguageFeedbackResponse {
+  // JobID that identifies the created job.
+  int64 job_id = 1;
+  // Feedback items.
+  repeated LanguageFeedback feedback = 2;
+  // Paragraphs are the paragraphs being referenced in the feedback.
+  repeated string paragraphs         = 3;
+}
+
+message LanguageFeedback {
+  // Paragraph index. Set to -1 if the feedback couldn't be connected to a
+  // specific paragraph.
+  int64 paragraph     = 1;
+  // Original text excerpt.
+  string original     = 2;
+  // Suggestion for new text.
+  string suggestion   = 4;
+  // Motivation for the change.
+  string motivation   = 5;
+  // ParagraphID is present when the feedback is performed on a document and the
+  // text block had a ID.
+  string paragraph_id = 6;
+}
+
+message TextRequest {
+  // Model is the URI of the model to use.
+  string model          = 1;
+  // Text to send as input.
+  string text           = 2;
+  // ParseText tries to parse the generated text into blocks if set to true.
+  bool parse_text       = 3;
+  // CharacterCount sets a target for how long the generated text should be.
+  int32 character_count = 4;
+  // AsyncTimeoutSeconds is the time after which a JobID will be returned
+  // instead of a direct result. Optional, defaults to no timeout.
+  int64 async_timeout_seconds = 5;
+}
+
+message TextResponse {
+  // JobID that identifies the created job.
+  int64 job_id = 1;
+  // Text is the generated text.
+  string text  = 2;
+  // Contet blocks generated from the text.
+  repeated newsdoc.Block content = 3;
+}
+
+message ListJobsRequest {
+  // After lists jobs after the given ID. Optional, omit to get latest.
+  int64 after = 1;
+}
+
+message ListJobsResponse {
+  repeated JobReference jobs = 1;
+}
+
+message WaitForJobsRequest {
+  // Jobs and the currently known version that the client is waiting
+  // for. Required.
+  map<int64, int64> jobs = 1;
+  // MaxWaitSec is the maximum time to wait for updates. Optional, defaults to
+  // 10.
+  int64 max_wait_sec = 2;
+}
+
+message WaitForJobsResponse {
+  // Updated jobs, can be empty if the wait timed out without any updates.
+  repeated JobReference updated = 1;
+}
+
+message GetResultRequest {
+  int64 id = 1;
+}
+
+enum JobStatus {
+  STATUS_UNKNOWN = 0;
+  STATUS_DONE    = 1;
+  STATUS_FAILED  = 2;
+}
+
+enum JobType {
+  JOB_TYPE_UNKNOWN  = 0;
+  JOB_TYPE_DOCUMENT = 1;
+  JOB_TYPE_FEEDBACK = 2;
+  JOB_TYPE_TEXT     = 3;
+}
+
+message JobReference {
+  int64 id          = 1;
+  JobStatus status  = 2;
+}
+
+message GetResultResponse {
+  int64 id          = 1;
+  string model     = 2;
+  JobType type      = 3;
+  JobStatus status  = 4;
+  string error_code = 5;
+  string error      = 6;
+  newsdoc.Document document = 7;
+  LanguageFeedback feedback = 8;
+}
