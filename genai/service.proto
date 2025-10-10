@@ -97,14 +97,16 @@ message LanguageFeedback {
 
 message TextRequest {
   // Model is the URI of the model to use.
-  string model       = 1;
+  string model          = 1;
   // Text to send as input.
-  string text        = 2;
+  string text           = 2;
   // ParseText tries to parse the generated text into blocks if set to true.
-  bool parse_text    = 3;
+  bool parse_text       = 3;
+  // CharacterCount sets a target for how long the generated text should be.
+  int32 character_count = 4;
   // AsyncTimeoutSeconds is the time after which a JobID will be returned
   // instead of a direct result. Optional, defaults to no timeout.
-  int64 async_timeout_seconds = 4;
+  int64 async_timeout_seconds = 5;
 }
 
 message TextResponse {

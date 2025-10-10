@@ -351,6 +351,10 @@
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
             "type": "integer"
           },
+          "character_count": {
+            "description": "CharacterCount sets a target for how long the generated text should be.",
+            "type": "integer"
+          },
           "model": {
             "description": "Model is the URI of the model to use.",
             "type": "string"
