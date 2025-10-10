@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package ttab.everysport;
+
+option go_package = "github.com/ttab/elephant-tt-api/everysport";
+
+service Manage {
+  // ManualImport re-imports calendar events based on a search query.
+  rpc ManualImport(ManualImportRequest) returns (ManualImportResponse);
+}
+
+message ManualImportRequest {
+  // FromDate is the date from which to fetch events for import. Optional,
+  // defaults to today.
+  string from_date  = 1;
+  // FromDate is the last date we should get events for. Optional.
+  string to_date    = 2;
+  // Category only re-imports the events with the specific category.
+  int64 category    = 3;
+  // Category only re-imports the events for the specific competition static ID.
+  int64 competition = 4;
+}
+
+message ManualImportResponse {}

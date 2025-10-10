@@ -1,0 +1,95 @@
+{
+  "components": {
+    "schemas": {
+      "ttab.everysport.ManualImportRequest": {
+        "properties": {
+          "category": {
+            "description": "Category only re-imports the events with the specific category.",
+            "type": "integer"
+          },
+          "competition": {
+            "description": "Category only re-imports the events for the specific competition static ID.",
+            "type": "integer"
+          },
+          "from_date": {
+            "description": "FromDate is the date from which to fetch events for import. Optional, defaults to today.",
+            "type": "string"
+          },
+          "to_date": {
+            "description": "FromDate is the last date we should get events for. Optional.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ManualImportResponse": {
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "everysport API",
+    "version": "v0.1.8"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.everysport.Manage/ManualImport": {
+      "post": {
+        "description": "ManualImport re-imports calendar events based on a search query.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ManualImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ManualImportResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ManualImport",
+        "tags": [
+          "Manage"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://everysport.api.tt.se"
+    },
+    {
+      "url": "https://everysport.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Manage"
+    }
+  ]
+}
