@@ -23,6 +23,12 @@
         "type": "object"
       },
       "ttab.everysport.ManualImportResponse": {
+        "properties": {
+          "queued_imports": {
+            "description": "QueuedImports is the total numer of events that were queued for import.",
+            "type": "integer"
+          }
+        },
         "type": "object"
       }
     },

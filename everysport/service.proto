@@ -21,4 +21,7 @@ message ManualImportRequest {
   int64 competition = 4;
 }
 
-message ManualImportResponse {}
+message ManualImportResponse {
+  // QueuedImports is the total numer of events that were queued for import.
+  int64 queued_imports = 1;
+}
