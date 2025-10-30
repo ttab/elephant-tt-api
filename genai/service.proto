@@ -44,9 +44,14 @@ message DocumentFromTextRequest {
 
 message DocumentFromTextResponse {
   // JobID that identifies the job.
-  int64 job_id              = 1;
+  int64 job_id          = 1;
+  // Result for the request.
+  DocumentResult result = 2;
+}
+
+message DocumentResult {
   // Document that was generated.
-  newsdoc.Document document = 2;
+  newsdoc.Document document = 1;
 }
 
 message LanguageFeedbackRequest {
@@ -73,14 +78,20 @@ message LanguageFeedbackRequest {
 
 message LanguageFeedbackResponse {
   // JobID that identifies the created job.
-  int64 job_id = 1;
-  // Feedback items.
-  repeated LanguageFeedback feedback = 2;
-  // Paragraphs are the paragraphs being referenced in the feedback.
-  repeated string paragraphs         = 3;
+  int64 job_id                  = 1;
+  // Result for the request.
+  FeedbackResult result = 2;
 }
 
-message LanguageFeedback {
+message FeedbackResult {
+  // Feedback items.
+  repeated Feedback feedback = 1;
+  // Paragraphs are the paragraphs being referenced in the feedback.
+  repeated string paragraphs         = 2;
+
+}
+
+message Feedback {
   // Paragraph index. Set to -1 if the feedback couldn't be connected to a
   // specific paragraph.
   int64 paragraph     = 1;
@@ -111,7 +122,12 @@ message TextRequest {
 
 message TextResponse {
   // JobID that identifies the created job.
-  int64 job_id = 1;
+  int64 job_id      = 1;
+  // Result for the request.
+  TextResult result = 2;
+}
+
+message TextResult {
   // Text is the generated text.
   string text  = 2;
   // Contet blocks generated from the text.
@@ -119,8 +135,8 @@ message TextResponse {
 }
 
 message ListJobsRequest {
-  // After lists jobs after the given ID. Optional, omit to get latest.
-  int64 after = 1;
+  // Before lists jobs before the given ID. Optional, omit to get latest.
+  int64 before = 1;
 }
 
 message ListJobsResponse {
@@ -128,12 +144,11 @@ message ListJobsResponse {
 }
 
 message WaitForJobsRequest {
-  // Jobs and the currently known version that the client is waiting
-  // for. Required.
-  map<int64, int64> jobs = 1;
+  // JobIDs to wait for. Required.
+  repeated int64 job_ids = 1;
   // MaxWaitSec is the maximum time to wait for updates. Optional, defaults to
   // 10.
-  int64 max_wait_sec = 2;
+  int64 max_wait_sec     = 2;
 }
 
 message WaitForJobsResponse {
@@ -146,9 +161,10 @@ message GetResultRequest {
 }
 
 enum JobStatus {
-  STATUS_UNKNOWN = 0;
-  STATUS_DONE    = 1;
-  STATUS_FAILED  = 2;
+  STATUS_UNKNOWN     = 0;
+  STATUS_IN_PROGRESS = 1;
+  STATUS_DONE        = 2;
+  STATUS_FAILED      = 3;
 }
 
 enum JobType {
@@ -160,16 +176,23 @@ enum JobType {
 
 message JobReference {
   int64 id          = 1;
-  JobStatus status  = 2;
+  string model      = 2;
+  JobType type      = 3;
+  JobStatus status  = 4;
+  string error      = 5;
+  string created    = 6;
+  string finished   = 7;
 }
 
 message GetResultResponse {
   int64 id          = 1;
-  string model     = 2;
+  string model      = 2;
   JobType type      = 3;
   JobStatus status  = 4;
-  string error_code = 5;
-  string error      = 6;
-  newsdoc.Document document = 7;
-  LanguageFeedback feedback = 8;
+  string error      = 5;
+  string created    = 6;
+  string finished   = 7;
+  DocumentResult document = 8;
+  FeedbackResult feedback = 9;
+  TextResult text         = 10;
 }

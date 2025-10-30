@@ -175,82 +175,25 @@
       },
       "ttab.genai.DocumentFromTextResponse": {
         "properties": {
-          "document": {
-            "$ref": "#/components/schemas/newsdoc.Document"
-          },
           "job_id": {
             "description": "JobID that identifies the job.",
             "type": "integer"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ttab.genai.DocumentResult"
           }
         },
         "type": "object"
       },
-      "ttab.genai.GetResultRequest": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.genai.GetResultResponse": {
+      "ttab.genai.DocumentResult": {
         "properties": {
           "document": {
             "$ref": "#/components/schemas/newsdoc.Document"
-          },
-          "error": {
-            "type": "string"
-          },
-          "error_code": {
-            "type": "string"
-          },
-          "feedback": {
-            "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "model": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ttab.genai.JobStatus"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ttab.genai.JobType"
           }
         },
         "type": "object"
       },
-      "ttab.genai.JobReference": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ttab.genai.JobStatus"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.genai.JobStatus": {
-        "enum": [
-          "STATUS_UNKNOWN",
-          "STATUS_DONE",
-          "STATUS_FAILED"
-        ],
-        "type": "string"
-      },
-      "ttab.genai.JobType": {
-        "enum": [
-          "JOB_TYPE_UNKNOWN",
-          "JOB_TYPE_DOCUMENT",
-          "JOB_TYPE_FEEDBACK",
-          "JOB_TYPE_TEXT"
-        ],
-        "type": "string"
-      },
-      "ttab.genai.LanguageFeedback": {
+      "ttab.genai.Feedback": {
         "properties": {
           "motivation": {
             "description": "Motivation for the change.",
@@ -274,6 +217,112 @@
           }
         },
         "type": "object"
+      },
+      "ttab.genai.FeedbackResult": {
+        "properties": {
+          "feedback": {
+            "description": "Feedback items.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.genai.Feedback"
+            },
+            "type": "array"
+          },
+          "paragraphs": {
+            "description": "Paragraphs are the paragraphs being referenced in the feedback.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetResultRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.GetResultResponse": {
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "document": {
+            "$ref": "#/components/schemas/ttab.genai.DocumentResult"
+          },
+          "error": {
+            "type": "string"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/ttab.genai.FeedbackResult"
+          },
+          "finished": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+          },
+          "text": {
+            "$ref": "#/components/schemas/ttab.genai.TextResult"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.genai.JobType"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.JobReference": {
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "finished": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.genai.JobType"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.JobStatus": {
+        "enum": [
+          "STATUS_UNKNOWN",
+          "STATUS_IN_PROGRESS",
+          "STATUS_DONE",
+          "STATUS_FAILED"
+        ],
+        "type": "string"
+      },
+      "ttab.genai.JobType": {
+        "enum": [
+          "JOB_TYPE_UNKNOWN",
+          "JOB_TYPE_DOCUMENT",
+          "JOB_TYPE_FEEDBACK",
+          "JOB_TYPE_TEXT"
+        ],
+        "type": "string"
       },
       "ttab.genai.LanguageFeedbackRequest": {
         "properties": {
@@ -304,31 +353,20 @@
       },
       "ttab.genai.LanguageFeedbackResponse": {
         "properties": {
-          "feedback": {
-            "description": "Feedback items.",
-            "items": {
-              "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
-            },
-            "type": "array"
-          },
           "job_id": {
             "description": "JobID that identifies the created job.",
             "type": "integer"
           },
-          "paragraphs": {
-            "description": "Paragraphs are the paragraphs being referenced in the feedback.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
+          "result": {
+            "$ref": "#/components/schemas/ttab.genai.FeedbackResult"
           }
         },
         "type": "object"
       },
       "ttab.genai.ListJobsRequest": {
         "properties": {
-          "after": {
-            "description": "After lists jobs after the given ID. Optional, omit to get latest.",
+          "before": {
+            "description": "Before lists jobs before the given ID. Optional, omit to get latest.",
             "type": "integer"
           }
         },
@@ -372,16 +410,24 @@
       },
       "ttab.genai.TextResponse": {
         "properties": {
+          "job_id": {
+            "description": "JobID that identifies the created job.",
+            "type": "integer"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ttab.genai.TextResult"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.genai.TextResult": {
+        "properties": {
           "content": {
             "description": "Contet blocks generated from the text.",
             "items": {
               "$ref": "#/components/schemas/newsdoc.Block"
             },
             "type": "array"
-          },
-          "job_id": {
-            "description": "JobID that identifies the created job.",
-            "type": "integer"
           },
           "text": {
             "description": "Text is the generated text.",
@@ -392,12 +438,12 @@
       },
       "ttab.genai.WaitForJobsRequest": {
         "properties": {
-          "jobs": {
-            "additionalProperties": {
+          "job_ids": {
+            "description": "JobIDs to wait for. Required.",
+            "items": {
               "type": "integer"
             },
-            "description": "Jobs and the currently known version that the client is waiting for. Required.",
-            "type": "object"
+            "type": "array"
           },
           "max_wait_sec": {
             "description": "MaxWaitSec is the maximum time to wait for updates. Optional, defaults to 10.",
