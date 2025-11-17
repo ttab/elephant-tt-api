@@ -11,6 +11,10 @@
             "description": "Category only re-imports the events for the specific competition static ID.",
             "type": "integer"
           },
+          "force": {
+            "description": "Force overwrite of calendar entries.",
+            "type": "boolean"
+          },
           "from_date": {
             "description": "FromDate is the date from which to fetch events for import. Optional, defaults to today.",
             "type": "string"

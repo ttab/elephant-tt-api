@@ -19,6 +19,8 @@ message ManualImportRequest {
   int64 category    = 3;
   // Category only re-imports the events for the specific competition static ID.
   int64 competition = 4;
+  // Force overwrite of calendar entries.
+  bool force        = 5;
 }
 
 message ManualImportResponse {
