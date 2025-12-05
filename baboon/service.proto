@@ -146,6 +146,10 @@ message CopyArticleToFlowRequest {
   // Article is the name of the defined print content in the flow to
   // instantiate. Required.
   string article           = 4;
+  // SourceVersion is the version of the source article to get. Optional,
+  // defaults to the latest published version, or latest version of the document
+  // if no version has been published yet.
+  int64 source_version     = 5;
 }
 
 message CopyArticleToFlowResponse {

@@ -151,6 +151,10 @@
           "source_uuid": {
             "description": "SourceUuid is the UUID of the article that we want to copy. Required.",
             "type": "string"
+          },
+          "source_version": {
+            "description": "SourceVersion is the version of the source article to get. Optional, defaults to the latest published version, or latest version of the document if no version has been published yet.",
+            "type": "integer"
           }
         },
         "type": "object"
