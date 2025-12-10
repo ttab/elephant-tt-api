@@ -1,0 +1,269 @@
+{
+  "components": {
+    "schemas": {
+      "ttab.wires.DeleteFeedRequest": {
+        "properties": {
+          "uuid": {
+            "description": "UUIDv5 of the feed, created by using the url.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.DeleteFeedResponse": {
+        "type": "object"
+      },
+      "ttab.wires.ExceptionRule": {
+        "description": "One or both fileds can be used in a rule. If one of the fields in a rule matches a feed item, the exception is applied (logical OR).",
+        "properties": {
+          "has_category": {
+            "description": "A category to associate with feed items that match the title pattern. Example: \"Pressmeddelande\" or \"Pressrelease\".",
+            "type": "string"
+          },
+          "title_pattern": {
+            "description": "A regex pattern to match against feed item titles. Example: \"^PRESS:\" to match titles starting with \"PRESS:\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.Feed": {
+        "properties": {
+          "language": {
+            "description": "Language used in the feed. (BCP 47 standard)",
+            "type": "string"
+          },
+          "last_checked": {
+            "description": "The timestamp (ISO 8601 format) of the last time the feed was checked for updates. This field is managed internally by the system and is not settable by clients in update requests.",
+            "type": "string"
+          },
+          "last_publication": {
+            "description": "The timestamp (ISO 8601 format) of the most recent publication detected in the feed. This field is managed internally by the system and is not settable by clients in update requests.",
+            "type": "string"
+          },
+          "refresh_interval": {
+            "description": "Time interval (in seconds) specifying how frequently the feed should be refreshed/imported.",
+            "type": "integer"
+          },
+          "section_code": {
+            "description": "Code representing the section of the feed. Possible values: [\"inr\", \"utr\", \"eko\", \"spt\", \"nojkul\"].",
+            "type": "string"
+          },
+          "title": {
+            "description": "The human-readable title of the feed.",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ttab.wires.FeedType"
+          },
+          "type_exceptions": {
+            "description": "A list of exceptions for fine-grained type categorization of feed items. Primarily used for feeds with mixed content types.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.wires.ExceptionRule"
+            },
+            "type": "array"
+          },
+          "url": {
+            "description": "The URL from which the feed is sourced.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUIDv5 of the feed, created by using the url.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.FeedType": {
+        "enum": [
+          "TYPE_UNKNOWN",
+          "TYPE_ARTICLE",
+          "TYPE_PRESSRELEASE"
+        ],
+        "type": "string"
+      },
+      "ttab.wires.GetAllFeedsRequest": {
+        "properties": {
+          "page": {
+            "description": "The page number to retrieve. Defaults to 0 if not specified, representing the first page.",
+            "type": "integer"
+          },
+          "page_size": {
+            "description": "The number of items to include in each page of results. Defaults to 10 if not specified.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.GetAllFeedsResponse": {
+        "properties": {
+          "feeds": {
+            "description": "The list of feeds available on the current page sorted by title.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.wires.Feed"
+            },
+            "type": "array"
+          },
+          "next_page": {
+            "description": "The page number of the next set of results, or -1 if there are no more pages.",
+            "type": "integer"
+          },
+          "page": {
+            "description": "The current page number of the results being returned. Reflects the \"page\" value from the request.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.UpdateFeedRequest": {
+        "properties": {
+          "feed": {
+            "$ref": "#/components/schemas/ttab.wires.Feed"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.wires.UpdateFeedResponse": {
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "wires API",
+    "version": "v0.3.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.wires.RssFeed/DeleteFeed": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.wires.DeleteFeedRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.wires.DeleteFeedResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DeleteFeed",
+        "tags": [
+          "RssFeed"
+        ]
+      }
+    },
+    "/twirp/ttab.wires.RssFeed/GetAllFeeds": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.wires.GetAllFeedsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.wires.GetAllFeedsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetAllFeeds",
+        "tags": [
+          "RssFeed"
+        ]
+      }
+    },
+    "/twirp/ttab.wires.RssFeed/UpdateFeed": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.wires.UpdateFeedRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.wires.UpdateFeedResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdateFeed",
+        "tags": [
+          "RssFeed"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://wires.api.tt.se"
+    },
+    {
+      "url": "https://wires.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "RssFeed"
+    }
+  ]
+}
