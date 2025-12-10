@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package ttab.wires;
+
+option go_package = "github.com/ttab/elephant-tt-api/wires";
+
+service RssFeed {
+  rpc GetAllFeeds(GetAllFeedsRequest) returns (GetAllFeedsResponse);
+  rpc UpdateFeed(UpdateFeedRequest) returns (UpdateFeedResponse);
+  rpc DeleteFeed(DeleteFeedRequest) returns (DeleteFeedResponse);
+}
+
+message GetAllFeedsRequest {
+  // The page number to retrieve.
+  // Defaults to 0 if not specified, representing the first page.
+  int64 page      = 1;
+  // The number of items to include in each page of results.
+  // Defaults to 10 if not specified.
+  int64 page_size = 2;
+}
+
+message GetAllFeedsResponse {
+  // The current page number of the results being returned.
+  // Reflects the "page" value from the request.
+  int64 page          = 1;
+  // The page number of the next set of results, or -1 if there are no more pages.
+  int64 next_page     = 2;
+  // The list of feeds available on the current page sorted by title.
+  repeated Feed feeds = 3;
+}
+
+message Feed {
+  // UUIDv5 of the feed, created by using the url.
+  string uuid             = 1;
+  // The human-readable title of the feed.
+  string title            = 2;
+  // The URL from which the feed is sourced.
+  string url              = 3;
+  // Feed type enum. "TYPE_ARTICLE" (default) and "TYPE_PRESSRELEASE".
+  // Use "TYPE_ARTICLE" and "type_exceptions" field for feeds with mixed types.
+  FeedType type               = 4;
+  // A list of exceptions for fine-grained type categorization of feed items.
+  // Primarily used for feeds with mixed content types.
+  repeated ExceptionRule type_exceptions = 10;
+  // Code representing the section of the feed.
+  // Possible values: ["inr", "utr", "eko", "spt", "nojkul"].
+  string section_code     = 5;
+  // Time interval (in seconds) specifying how frequently the feed should be refreshed/imported.
+  int64 refresh_interval  = 6;
+  // Language used in the feed. (BCP 47 standard)
+  string language         = 7;
+  // The timestamp (ISO 8601 format) of the last time the feed was checked for updates.
+  // This field is managed internally by the system and is not settable by clients in update requests.
+  string last_checked     = 8;
+  // The timestamp (ISO 8601 format) of the most recent publication detected in the feed.
+  // This field is managed internally by the system and is not settable by clients in update requests.
+  string last_publication = 9;
+}
+
+enum FeedType {
+  TYPE_UNKNOWN      = 0;
+  TYPE_ARTICLE      = 1;
+  TYPE_PRESSRELEASE = 2;
+}
+
+// One or both fileds can be used in a rule.
+// If one of the fields in a rule matches a feed item, the exception is applied (logical OR).
+message ExceptionRule {
+  // A regex pattern to match against feed item titles.
+  // Example: "^PRESS:" to match titles starting with "PRESS:".
+  string title_pattern = 1;
+  // A category to associate with feed items that match the title pattern.
+  // Example: "Pressmeddelande" or "Pressrelease".
+  string has_category  = 2;
+}
+
+message UpdateFeedRequest {
+  // The feed object containing the updated data.
+  // All fields must be set except intenally mangaged fields.
+  Feed feed = 1;
+}
+
+message UpdateFeedResponse {}
+
+message DeleteFeedRequest {
+  // UUIDv5 of the feed, created by using the url.
+  string uuid = 1;
+}
+
+message DeleteFeedResponse {}
