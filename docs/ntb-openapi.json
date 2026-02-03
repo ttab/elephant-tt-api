@@ -1,0 +1,563 @@
+{
+  "components": {
+    "schemas": {
+      "ttab.ntb.File": {
+        "properties": {
+          "height": {
+            "description": "Height is the height of the media in pixels.",
+            "type": "integer"
+          },
+          "mime_type": {
+            "description": "MimeType is the mimetype of the media.",
+            "type": "string"
+          },
+          "original_filename": {
+            "description": "OriginalFilename is the original name of the file.",
+            "type": "string"
+          },
+          "size": {
+            "description": "Size is the size of the file in bytes.",
+            "type": "integer"
+          },
+          "width": {
+            "description": "Width is the width of the media in pixels.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.FileType": {
+        "enum": [
+          "FILE_TYPE_UNSPECIFIED",
+          "FILE_TYPE_IMAGE",
+          "FILE_TYPE_VIDEO",
+          "FILE_TYPE_PDF",
+          "FILE_TYPE_VECTOR",
+          "FILE_TYPE_PHOTOSHOP"
+        ],
+        "type": "string"
+      },
+      "ttab.ntb.GetItemRequest": {
+        "properties": {
+          "archive": {
+            "description": "Archive to search in.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the item to get.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.GetItemResponse": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/ttab.ntb.MediaItem"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Internal": {
+        "properties": {
+          "item_id": {
+            "description": "ItemID is a non-unique ID of the media provided under upload.",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/ttab.ntb.OriginInfo"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Links": {
+        "properties": {
+          "preview_page": {
+            "description": "PreviewPage is a link to a preview of the media.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Location": {
+        "enum": [
+          "LOCATION_UNSPECIFIED",
+          "LOCATION_IN_GALLERY",
+          "LOCATION_NOT_IN_GALLERY",
+          "LOCATION_IN_COLLECTIONS",
+          "LOCATION_NOT_IN_COLLECTIONS",
+          "LOCATION_ALL_ORGANIZATIONS"
+        ],
+        "type": "string"
+      },
+      "ttab.ntb.MediaItem": {
+        "properties": {
+          "alt_text_accessibility": {
+            "description": "AltTextAccessibility is a textual description for accessibility.",
+            "type": "string"
+          },
+          "archive": {
+            "description": "Archive (mb/ntb/tt).",
+            "type": "string"
+          },
+          "category": {
+            "description": "Category corresponds to IPTC category field.",
+            "type": "string"
+          },
+          "city": {
+            "description": "City corresponds to IPTC field.",
+            "type": "string"
+          },
+          "country": {
+            "description": "Country corresponds to IPTC field.",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Creator contains the name of the photographer or company/org.",
+            "type": "string"
+          },
+          "credit_line": {
+            "description": "CreditLine corresponds to IPTC field.",
+            "type": "string"
+          },
+          "date_archived": {
+            "description": "DateArchived designates the date and time the content was archived.",
+            "type": "string"
+          },
+          "date_created": {
+            "description": "DateCreated designates the date and time the content was created.",
+            "type": "string"
+          },
+          "description": {
+            "description": "Description is a textual description, including captions, of the media.",
+            "type": "string"
+          },
+          "file": {
+            "$ref": "#/components/schemas/ttab.ntb.File"
+          },
+          "headline": {
+            "description": "Headline is a brief synopsis of the caption. Corresponds to IPTC field.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the item.",
+            "type": "string"
+          },
+          "image_rating": {
+            "description": "ImageRating is the rating of the image by its user or supplier (0-5). Using optional to distinguish between unset and 0.",
+            "type": "integer"
+          },
+          "image_supplier_image_id": {
+            "description": "ImageSupplierImageID is an identifier assigned by the Image Supplier.",
+            "type": "string"
+          },
+          "instructions": {
+            "description": "Instructions are any number of instructions from the provider or creator.",
+            "type": "string"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/ttab.ntb.Internal"
+          },
+          "job_id": {
+            "description": "JobID is an identifier related to the job for which the image is supplied.",
+            "type": "string"
+          },
+          "keywords": {
+            "description": "Keywords to express the subject of the image.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "links": {
+            "$ref": "#/components/schemas/ttab.ntb.Links"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/ttab.ntb.Permissions"
+          },
+          "persons_shown": {
+            "description": "PersonsShown are persons in the image.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.Person"
+            },
+            "type": "array"
+          },
+          "previews": {
+            "description": "Previews contains preview URLs and dimensions.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.Preview"
+            },
+            "type": "array"
+          },
+          "restrictions": {
+            "description": "Restrictions indicates whether there are any restrictions noted on the media.",
+            "type": "boolean"
+          },
+          "source": {
+            "description": "Source is the name of a person or party who has a role in the content supply chain.",
+            "type": "string"
+          },
+          "suppliers": {
+            "description": "Suppliers identifies the most recent supplier of the image.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title provides a short human-readable name.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the content type.",
+            "type": "string"
+          },
+          "usage_terms": {
+            "description": "UsageTerms are rights usage terms.",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "UserID is the user ID of user who uploaded the media.",
+            "type": "string"
+          },
+          "version_count": {
+            "description": "VersionCount is the number of available versions.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Orientation": {
+        "enum": [
+          "ORIENTATION_UNSPECIFIED",
+          "ORIENTATION_HORIZONTAL",
+          "ORIENTATION_VERTICAL",
+          "ORIENTATION_SQUARE"
+        ],
+        "type": "string"
+      },
+      "ttab.ntb.Origin": {
+        "enum": [
+          "ORIGIN_UNSPECIFIED",
+          "ORIGIN_UPLOAD",
+          "ORIGIN_GUEST",
+          "ORIGIN_GUESTFTP",
+          "ORIGIN_EMAIL",
+          "ORIGIN_IMPORT",
+          "ORIGIN_FTP",
+          "ORIGIN_LTR",
+          "ORIGIN_PS",
+          "ORIGIN_CMS"
+        ],
+        "type": "string"
+      },
+      "ttab.ntb.OriginInfo": {
+        "properties": {
+          "key": {
+            "description": "Key is the key of the origin.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name is the human readable name of the origin.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Page": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Permissions": {
+        "properties": {
+          "delete": {
+            "description": "Delete indicates if the user can delete this media.",
+            "type": "boolean"
+          },
+          "download": {
+            "description": "Download indicates if the user can download this media.",
+            "type": "boolean"
+          },
+          "edit": {
+            "description": "Edit indicates if the user can edit this media.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Person": {
+        "properties": {
+          "person_description": {
+            "description": "PersonDescription is the description of the person, often their title.",
+            "type": "string"
+          },
+          "person_name": {
+            "description": "PersonName is the name of the person in the image.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Preview": {
+        "properties": {
+          "height": {
+            "description": "Height is the height of the preview image.",
+            "type": "integer"
+          },
+          "url": {
+            "description": "URL is the URL of the preview, can be used to preview the file.",
+            "type": "string"
+          },
+          "width": {
+            "description": "Width is the width of the preview image.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.SearchRequest": {
+        "properties": {
+          "albums": {
+            "description": "Filter on albums.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "archive": {
+            "description": "Archive to search in.",
+            "type": "string"
+          },
+          "categories": {
+            "description": "Filter on categories.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "city": {
+            "description": "City filter.",
+            "type": "string"
+          },
+          "collections": {
+            "description": "Filter on collections.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "country": {
+            "description": "Country filter.",
+            "type": "string"
+          },
+          "created_max": {
+            "description": "Get assets created on and before createdMax.",
+            "type": "string"
+          },
+          "created_min": {
+            "description": "Get assets created on and after createdMin.",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Creator filter (photographer).",
+            "type": "string"
+          },
+          "file_type": {
+            "$ref": "#/components/schemas/ttab.ntb.FileType"
+          },
+          "ids": {
+            "description": "Ids filters by asset ids.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "item_id": {
+            "description": "ItemId - filter by the itemId.",
+            "type": "string"
+          },
+          "job_id": {
+            "description": "Filter on jobId.",
+            "type": "string"
+          },
+          "keywords": {
+            "description": "Keywords filter.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "description": "Search limit, max 200, default: 50.",
+            "type": "integer"
+          },
+          "locations": {
+            "description": "Include/exclude assets based on location.",
+            "type": "string"
+          },
+          "offset": {
+            "description": "Offset - search offset, max 10000, default: 0.",
+            "type": "integer"
+          },
+          "orientation": {
+            "$ref": "#/components/schemas/ttab.ntb.Orientation"
+          },
+          "origins": {
+            "description": "Filter on origins.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.Origin"
+            },
+            "type": "array"
+          },
+          "outside_subscription": {
+            "description": "Set to true to search against items outside of your subscription agreement.",
+            "type": "boolean"
+          },
+          "query": {
+            "description": "Query - freetext query.",
+            "type": "string"
+          },
+          "search_after": {
+            "description": "View results after this point in list.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sort": {
+            "description": "Sort options to the list.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.SearchResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.MediaItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/ttab.ntb.Page"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "ntb API",
+    "version": "v0.3.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.ntb.Media/GetItem": {
+      "post": {
+        "description": "GetItem fetches a single media item.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetItemResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetItem",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Media/Search": {
+      "post": {
+        "description": "Search in a media archive.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.SearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.SearchResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Search",
+        "tags": [
+          "Media"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://ntb.api.tt.se"
+    },
+    {
+      "url": "https://ntb.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Media"
+    }
+  ]
+}
