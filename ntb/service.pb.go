@@ -796,7 +796,8 @@ type MediaItem struct {
 	Archive string `protobuf:"bytes,3,opt,name=archive,proto3" json:"archive,omitempty"`
 	// UserID is the user ID of user who uploaded the media.
 	UserId string `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	// Restrictions indicates whether there are any restrictions noted on the media.
+	// Restrictions indicates whether there are any restrictions noted on the
+	// media.
 	Restrictions bool `protobuf:"varint,5,opt,name=restrictions,proto3" json:"restrictions,omitempty"`
 	// Headline is a brief synopsis of the caption. Corresponds to IPTC field.
 	Headline string `protobuf:"bytes,6,opt,name=headline,proto3" json:"headline,omitempty"`
@@ -819,7 +820,8 @@ type MediaItem struct {
 	Title string `protobuf:"bytes,14,opt,name=title,proto3" json:"title,omitempty"`
 	// DateArchived designates the date and time the content was archived.
 	DateArchived string `protobuf:"bytes,15,opt,name=date_archived,json=dateArchived,proto3" json:"date_archived,omitempty"`
-	// DateCreated designates the date and time the content was created.
+	// DateCreated designates the date and time the content was created. Not
+	// present if the source data is invalid or missing.
 	DateCreated *ImpreciseTimestamp `protobuf:"bytes,16,opt,name=date_created,json=dateCreated,proto3" json:"date_created,omitempty"`
 	// Country corresponds to IPTC field.
 	Country string `protobuf:"bytes,17,opt,name=country,proto3" json:"country,omitempty"`
@@ -833,7 +835,8 @@ type MediaItem struct {
 	Instructions string `protobuf:"bytes,21,opt,name=instructions,proto3" json:"instructions,omitempty"`
 	// UsageTerms are rights usage terms.
 	UsageTerms string `protobuf:"bytes,22,opt,name=usage_terms,json=usageTerms,proto3" json:"usage_terms,omitempty"`
-	// Source is the name of a person or party who has a role in the content supply chain.
+	// Source is the name of a person or party who has a role in the content
+	// supply chain.
 	Source string `protobuf:"bytes,23,opt,name=source,proto3" json:"source,omitempty"`
 	// Suppliers identifies the most recent supplier of the image.
 	Suppliers string `protobuf:"bytes,24,opt,name=suppliers,proto3" json:"suppliers,omitempty"`
@@ -1103,10 +1106,15 @@ func (x *MediaItem) GetInternal() *Internal {
 }
 
 type ImpreciseTimestamp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Time          string                 `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
-	ValidTimezone bool                   `protobuf:"varint,2,opt,name=valid_timezone,json=validTimezone,proto3" json:"valid_timezone,omitempty"`
-	Precision     TimestampPrecision     `protobuf:"varint,3,opt,name=precision,proto3,enum=ttab.ntb.TimestampPrecision" json:"precision,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Time as an RFC3339 timestamp.
+	Time string `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
+	// ValidTimezone is set to true if the timestamp has a valid timezone, if
+	// false the timestamp will use zulu time as a substitute for the unknown
+	// timezone.
+	ValidTimezone bool `protobuf:"varint,2,opt,name=valid_timezone,json=validTimezone,proto3" json:"valid_timezone,omitempty"`
+	// Precision is a hint about the precision of the timestamp.
+	Precision     TimestampPrecision `protobuf:"varint,3,opt,name=precision,proto3,enum=ttab.ntb.TimestampPrecision" json:"precision,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

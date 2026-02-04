@@ -64,9 +64,11 @@
             "$ref": "#/components/schemas/ttab.ntb.TimestampPrecision"
           },
           "time": {
+            "description": "Time as an RFC3339 timestamp.",
             "type": "string"
           },
           "valid_timezone": {
+            "description": "ValidTimezone is set to true if the timestamp has a valid timezone, if false the timestamp will use zulu time as a substitute for the unknown timezone.",
             "type": "boolean"
           }
         },

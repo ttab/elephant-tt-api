@@ -136,7 +136,8 @@ message MediaItem {
   string archive                 = 3;
   // UserID is the user ID of user who uploaded the media.
   string user_id                 = 4;
-  // Restrictions indicates whether there are any restrictions noted on the media.
+  // Restrictions indicates whether there are any restrictions noted on the
+  // media.
   bool restrictions              = 5;
   // Headline is a brief synopsis of the caption. Corresponds to IPTC field.
   string headline                = 6;
@@ -159,7 +160,8 @@ message MediaItem {
   string title                   = 14;
   // DateArchived designates the date and time the content was archived.
   string date_archived           = 15;
-  // DateCreated designates the date and time the content was created.
+  // DateCreated designates the date and time the content was created. Not
+  // present if the source data is invalid or missing.
   ImpreciseTimestamp date_created = 16;
   // Country corresponds to IPTC field.
   string country                 = 17;
@@ -173,7 +175,8 @@ message MediaItem {
   string instructions            = 21;
   // UsageTerms are rights usage terms.
   string usage_terms             = 22;
-  // Source is the name of a person or party who has a role in the content supply chain.
+  // Source is the name of a person or party who has a role in the content
+  // supply chain.
   string source                  = 23;
   // Suppliers identifies the most recent supplier of the image.
   string suppliers               = 24;
@@ -206,8 +209,13 @@ enum TimestampPrecision {
 }
 
 message ImpreciseTimestamp {
+  // Time as an RFC3339 timestamp.
   string time                  = 1;
+  // ValidTimezone is set to true if the timestamp has a valid timezone, if
+  // false the timestamp will use zulu time as a substitute for the unknown
+  // timezone.
   bool valid_timezone          = 2;
+  // Precision is a hint about the precision of the timestamp.
   TimestampPrecision precision = 3;
 }
 
