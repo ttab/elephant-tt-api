@@ -160,7 +160,7 @@ message MediaItem {
   // DateArchived designates the date and time the content was archived.
   string date_archived           = 15;
   // DateCreated designates the date and time the content was created.
-  string date_created            = 16;
+  ImpreciseTimestamp date_created = 16;
   // Country corresponds to IPTC field.
   string country                 = 17;
   // City corresponds to IPTC field.
@@ -191,6 +191,12 @@ message MediaItem {
   map<string, string> links      = 30;
   // Internal contains internal metadata.
   Internal internal              = 31;
+}
+
+message ImpreciseTimestamp {
+  string time           = 1;
+  bool valid_timezone   = 2;
+  string precision_mask = 3;
 }
 
 message Person {

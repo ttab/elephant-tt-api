@@ -58,6 +58,20 @@
         },
         "type": "object"
       },
+      "ttab.ntb.ImpreciseTimestamp": {
+        "properties": {
+          "precision_mask": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "valid_timezone": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.Internal": {
         "properties": {
           "item_id": {
@@ -116,8 +130,7 @@
             "type": "string"
           },
           "date_created": {
-            "description": "DateCreated designates the date and time the content was created.",
-            "type": "string"
+            "$ref": "#/components/schemas/ttab.ntb.ImpreciseTimestamp"
           },
           "description": {
             "description": "Description is a textual description, including captions, of the media.",
