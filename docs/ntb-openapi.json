@@ -60,8 +60,8 @@
       },
       "ttab.ntb.ImpreciseTimestamp": {
         "properties": {
-          "precision_mask": {
-            "type": "string"
+          "precision": {
+            "$ref": "#/components/schemas/ttab.ntb.TimestampPrecision"
           },
           "time": {
             "type": "string"
@@ -462,6 +462,20 @@
           }
         },
         "type": "object"
+      },
+      "ttab.ntb.TimestampPrecision": {
+        "enum": [
+          "TS_PRECISION_UNKNOWN",
+          "TS_PRECISION_FULL",
+          "TS_PRECISION_MINUTE",
+          "TS_PRECISION_HOUR",
+          "TS_PRECISION_DAY",
+          "TS_PRECISION_MONTH",
+          "TS_PRECISION_YEAR",
+          "TS_PRECISION_DECADE",
+          "TS_PRECISION_CENTURY"
+        ],
+        "type": "string"
       }
     },
     "securitySchemes": {
