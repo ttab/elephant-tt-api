@@ -70,15 +70,6 @@
         },
         "type": "object"
       },
-      "ttab.ntb.Links": {
-        "properties": {
-          "preview_page": {
-            "description": "PreviewPage is a link to a preview of the media.",
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "ttab.ntb.Location": {
         "enum": [
           "LOCATION_UNSPECIFIED",
@@ -170,7 +161,11 @@
             "type": "array"
           },
           "links": {
-            "$ref": "#/components/schemas/ttab.ntb.Links"
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Links contains related links.",
+            "type": "object"
           },
           "permissions": {
             "$ref": "#/components/schemas/ttab.ntb.Permissions"

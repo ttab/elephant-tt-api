@@ -188,7 +188,7 @@ message MediaItem {
   // Permissions contains user permissions for this media.
   Permissions permissions        = 29;
   // Links contains related links.
-  Links links                    = 30;
+  map<string, string> links      = 30;
   // Internal contains internal metadata.
   Internal internal              = 31;
 }
@@ -229,11 +229,6 @@ message Permissions {
   bool delete   = 2;
   // Download indicates if the user can download this media.
   bool download = 3;
-}
-
-message Links {
-  // PreviewPage is a link to a preview of the media.
-  string preview_page = 1;
 }
 
 message Internal {
