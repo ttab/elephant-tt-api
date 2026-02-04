@@ -58,6 +58,20 @@
         },
         "type": "object"
       },
+      "ttab.ntb.GetSortFieldsRequest": {
+        "type": "object"
+      },
+      "ttab.ntb.GetSortFieldsResponse": {
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.SortField"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.ImpreciseTimestamp": {
         "properties": {
           "precision": {
@@ -371,11 +385,11 @@
             "type": "string"
           },
           "created_max": {
-            "description": "Get assets created on and before createdMax.",
+            "description": "Get assets created on and before the RFC3339 timestamp.",
             "type": "string"
           },
           "created_min": {
-            "description": "Get assets created on and after createdMin.",
+            "description": "Get assets created on and after the RFC3339 timestamp.",
             "type": "string"
           },
           "creator": {
@@ -445,8 +459,7 @@
             "type": "array"
           },
           "sort": {
-            "description": "Sort options to the list.",
-            "type": "string"
+            "$ref": "#/components/schemas/ttab.ntb.Sort"
           }
         },
         "type": "object"
@@ -461,6 +474,25 @@
           },
           "page": {
             "$ref": "#/components/schemas/ttab.ntb.Page"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.Sort": {
+        "properties": {
+          "descending": {
+            "type": "boolean"
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.SortField": {
+        "properties": {
+          "name": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -527,6 +559,44 @@
           }
         ],
         "summary": "GetItem",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Media/GetSortFields": {
+      "post": {
+        "description": "GetSortFields returns the available sort fields.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetSortFieldsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetSortFieldsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetSortFields",
         "tags": [
           "Media"
         ]

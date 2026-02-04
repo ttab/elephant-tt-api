@@ -9,6 +9,8 @@ service Media {
   rpc Search(SearchRequest) returns (SearchResponse);
   // GetItem fetches a single media item.
   rpc GetItem(GetItemRequest) returns (GetItemResponse);
+  // GetSortFields returns the available sort fields.
+  rpc GetSortFields(GetSortFieldsRequest) returns (GetSortFieldsResponse);
 }
 
 // Enums
@@ -72,7 +74,7 @@ message SearchRequest {
   // Offset - search offset, max 10000, default: 0.
   int32 offset                 = 3;
   // Sort options to the list.
-  string sort                  = 4;
+  Sort sort                    = 4;
   // Query - freetext query.
   string query                 = 5;
   // ItemId - filter by the itemId.
@@ -105,12 +107,17 @@ message SearchRequest {
   repeated Origin origins      = 19;
   // Filter on file type.
   FileType file_type           = 20;
-  // Get assets created on and after createdMin.
+  // Get assets created on and after the RFC3339 timestamp.
   string created_min           = 21;
-  // Get assets created on and before createdMax.
+  // Get assets created on and before the RFC3339 timestamp.
   string created_max           = 22;
   // Set to true to search against items outside of your subscription agreement.
   bool outside_subscription    = 23;
+}
+
+message Sort {
+  string field    = 1;
+  bool descending = 2;
 }
 
 message SearchResponse {
@@ -269,4 +276,14 @@ message OriginInfo {
   string key  = 1;
   // Name is the human readable name of the origin.
   string name = 2;
+}
+
+message GetSortFieldsRequest {}
+
+message GetSortFieldsResponse {
+  repeated SortField fields = 1;
+}
+
+message SortField {
+  string name = 1;
 }
