@@ -217,6 +217,13 @@
             "description": "Restrictions indicates whether there are any restrictions noted on the media.",
             "type": "boolean"
           },
+          "sort_values": {
+            "description": "SortValues can be used for pagination in search results. Only available when the MediaItem was returned as part of a search result.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "source": {
             "description": "Source is the name of a person or party who has a role in the content supply chain.",
             "type": "string"
@@ -295,6 +302,13 @@
           },
           "offset": {
             "type": "integer"
+          },
+          "search_after": {
+            "description": "SearchAfter can be used for pagination in search results.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "total": {
             "type": "integer"

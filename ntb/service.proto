@@ -130,6 +130,8 @@ message Page {
   int32 limit  = 2;
   int32 count  = 3;
   int32 total  = 4;
+  // SearchAfter can be used for pagination in search results.
+  repeated string search_after = 5;
 }
 
 // Media Types
@@ -201,6 +203,9 @@ message MediaItem {
   map<string, string> links      = 30;
   // Internal contains internal metadata.
   Internal internal              = 31;
+  // SortValues can be used for pagination in search results. Only available
+  // when the MediaItem was returned as part of a search result.
+  repeated string sort_values    = 32;
 }
 
 enum TimestampPrecision {
