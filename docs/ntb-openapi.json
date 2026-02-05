@@ -352,6 +352,9 @@
             "description": "Height is the height of the preview image.",
             "type": "integer"
           },
+          "type": {
+            "$ref": "#/components/schemas/ttab.ntb.PreviewType"
+          },
           "url": {
             "description": "URL is the URL of the preview, can be used to preview the file.",
             "type": "string"
@@ -362,6 +365,14 @@
           }
         },
         "type": "object"
+      },
+      "ttab.ntb.PreviewType": {
+        "enum": [
+          "PREVIEW_UNKNOWN",
+          "PREVIEW_IMAGE",
+          "PREVIEW_VIDEO"
+        ],
+        "type": "string"
       },
       "ttab.ntb.SearchRequest": {
         "properties": {

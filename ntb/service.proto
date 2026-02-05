@@ -251,6 +251,12 @@ message File {
   string original_filename = 5;
 }
 
+enum PreviewType {
+  PREVIEW_UNKNOWN = 0;
+  PREVIEW_IMAGE   = 1;
+  PREVIEW_VIDEO   = 2;
+}
+
 message Preview {
   // Width is the width of the preview image.
   int32 width  = 1;
@@ -258,6 +264,8 @@ message Preview {
   int32 height = 2;
   // URL is the URL of the preview, can be used to preview the file.
   string url   = 3;
+  // Type is the media type of the preview.
+  PreviewType type = 4;
 }
 
 message Permissions {
