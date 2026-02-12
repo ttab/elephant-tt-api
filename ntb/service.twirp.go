@@ -31,6 +31,7 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 // Media Interface
 // ===============
 
+// Media service for interacting with the NTB media manager archive. Experimental.
 type Media interface {
 	// Search in a media archive.
 	Search(context.Context, *SearchRequest) (*SearchResponse, error)

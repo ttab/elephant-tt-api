@@ -676,6 +676,7 @@
   ],
   "tags": [
     {
+      "description": "Media service for interacting with the NTB media manager archive. Experimental.",
       "name": "Media"
     }
   ]

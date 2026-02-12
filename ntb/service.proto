@@ -4,6 +4,7 @@ package ttab.ntb;
 
 option go_package = "github.com/ttab/elephant-tt-api/ntb";
 
+// Media service for interacting with the NTB media manager archive. Experimental.
 service Media {
   // Search in a media archive.
   rpc Search(SearchRequest) returns (SearchResponse);
