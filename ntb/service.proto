@@ -1,0 +1,303 @@
+syntax = "proto3";
+
+package ttab.ntb;
+
+option go_package = "github.com/ttab/elephant-tt-api/ntb";
+
+// Media service for interacting with the NTB media manager archive. Experimental.
+service Media {
+  // Search in a media archive.
+  rpc Search(SearchRequest) returns (SearchResponse);
+  // GetItem fetches a single media item.
+  rpc GetItem(GetItemRequest) returns (GetItemResponse);
+  // GetSortFields returns the available sort fields.
+  rpc GetSortFields(GetSortFieldsRequest) returns (GetSortFieldsResponse);
+}
+
+// Enums
+
+enum Orientation {
+  ORIENTATION_UNSPECIFIED = 0;
+  ORIENTATION_HORIZONTAL  = 1;
+  ORIENTATION_VERTICAL    = 2;
+  ORIENTATION_SQUARE      = 3;
+}
+
+enum Location {
+  LOCATION_UNSPECIFIED        = 0;
+  LOCATION_IN_GALLERY         = 1;
+  LOCATION_NOT_IN_GALLERY     = 2;
+  LOCATION_IN_COLLECTIONS     = 3;
+  LOCATION_NOT_IN_COLLECTIONS = 4;
+  LOCATION_ALL_ORGANIZATIONS  = 5;
+}
+
+enum Origin {
+  ORIGIN_UNSPECIFIED = 0;
+  ORIGIN_UPLOAD      = 1;
+  ORIGIN_GUEST       = 2;
+  ORIGIN_GUESTFTP    = 3;
+  ORIGIN_EMAIL       = 4;
+  ORIGIN_IMPORT      = 5;
+  ORIGIN_FTP         = 6;
+  ORIGIN_LTR         = 7;
+  ORIGIN_PS          = 8;
+  ORIGIN_CMS         = 9;
+}
+
+enum FileType {
+  FILE_TYPE_UNSPECIFIED = 0;
+  FILE_TYPE_IMAGE = 1;
+  FILE_TYPE_VIDEO = 2;
+  FILE_TYPE_PDF = 3;
+  FILE_TYPE_VECTOR = 4;
+  FILE_TYPE_PHOTOSHOP = 5;
+}
+
+// Request/Response Messages
+
+message GetItemRequest {
+   // Archive to search in.
+  string archive = 1;
+  // ID of the item to get.
+  string id      = 2;
+}
+
+message GetItemResponse {
+  MediaItem item = 1;
+}
+
+message SearchRequest {
+  // Archive to search in.
+  string archive               = 1;
+  // Search limit, max 200, default: 50.
+  int32 limit                  = 2;
+  // Offset - search offset, max 10000, default: 0.
+  int32 offset                 = 3;
+  // Sort options to the list.
+  Sort sort                    = 4;
+  // Query - freetext query.
+  string query                 = 5;
+  // ItemId - filter by the itemId.
+  string item_id               = 6;
+  // City filter.
+  string city                  = 7;
+  // Country filter.
+  string country               = 8;
+  // Creator filter (photographer).
+  string creator               = 9;
+  // Ids filters by asset ids.
+  repeated string ids          = 10;
+  // Keywords filter.
+  repeated string keywords     = 11;
+  // Filter on collections.
+  repeated int32 collections   = 12;
+  // Filter on albums.
+  repeated int32 albums        = 13;
+  // Filter on categories.
+  repeated string categories   = 14;
+  // Include/exclude assets based on location.
+  string locations             = 15;
+  // Filter on jobId.
+  string job_id                = 16;
+  // Filter on image orientation.
+  Orientation orientation      = 17;
+  // View results after this point in list.
+  repeated string search_after = 18;
+  // Filter on origins.
+  repeated Origin origins      = 19;
+  // Filter on file type.
+  FileType file_type           = 20;
+  // Get assets created on and after the RFC3339 timestamp.
+  string created_min           = 21;
+  // Get assets created on and before the RFC3339 timestamp.
+  string created_max           = 22;
+  // Set to true to search against items outside of your subscription agreement.
+  bool outside_subscription    = 23;
+}
+
+message Sort {
+  string field    = 1;
+  bool descending = 2;
+}
+
+message SearchResponse {
+  Page page               = 1;
+  repeated MediaItem data = 3;
+}
+
+message Page {
+  int32 offset = 1;
+  int32 limit  = 2;
+  int32 count  = 3;
+  int32 total  = 4;
+  // SearchAfter can be used for pagination in search results.
+  repeated string search_after = 5;
+}
+
+// Media Types
+
+message MediaItem {
+  // ID of the item.
+  string id                      = 1;
+  // Type is the content type.
+  string type                    = 2;
+  // Archive (mb/ntb/tt).
+  string archive                 = 3;
+  // UserID is the user ID of user who uploaded the media.
+  string user_id                 = 4;
+  // Restrictions indicates whether there are any restrictions noted on the
+  // media.
+  bool restrictions              = 5;
+  // Headline is a brief synopsis of the caption. Corresponds to IPTC field.
+  string headline                = 6;
+  // Description is a textual description, including captions, of the media.
+  string description             = 7;
+  // AltTextAccessibility is a textual description for accessibility.
+  string alt_text_accessibility  = 8;
+  // Creator contains the name of the photographer or company/org.
+  string creator                 = 9;
+  // Keywords to express the subject of the image.
+  repeated string keywords       = 10;
+  // Category corresponds to IPTC category field.
+  string category                = 11;
+  // PersonsShown are persons in the image.
+  repeated Person persons_shown  = 12;
+  // ImageRating is the rating of the image by its user or supplier (0-5).
+  // Using optional to distinguish between unset and 0.
+  optional int32 image_rating    = 13;
+  // Title provides a short human-readable name.
+  string title                   = 14;
+  // DateArchived designates the date and time the content was archived.
+  string date_archived           = 15;
+  // DateCreated designates the date and time the content was created. Not
+  // present if the source data is invalid or missing.
+  ImpreciseTimestamp date_created = 16;
+  // Country corresponds to IPTC field.
+  string country                 = 17;
+  // City corresponds to IPTC field.
+  string city                    = 18;
+  // CreditLine corresponds to IPTC field.
+  string credit_line             = 19;
+  // VersionCount is the number of available versions.
+  int32 version_count            = 20;
+  // Instructions are any number of instructions from the provider or creator.
+  string instructions            = 21;
+  // UsageTerms are rights usage terms.
+  string usage_terms             = 22;
+  // Source is the name of a person or party who has a role in the content
+  // supply chain.
+  string source                  = 23;
+  // Suppliers identifies the most recent supplier of the image.
+  string suppliers               = 24;
+  // ImageSupplierImageID is an identifier assigned by the Image Supplier.
+  string image_supplier_image_id = 25;
+  // JobID is an identifier related to the job for which the image is supplied.
+  string job_id                  = 26;
+  // File contains file information.
+  File file                      = 27;
+  // Previews contains preview URLs and dimensions.
+  repeated Preview previews      = 28;
+  // Permissions contains user permissions for this media.
+  Permissions permissions        = 29;
+  // Links contains related links.
+  map<string, string> links      = 30;
+  // Internal contains internal metadata.
+  Internal internal              = 31;
+  // SortValues can be used for pagination in search results. Only available
+  // when the MediaItem was returned as part of a search result.
+  repeated string sort_values    = 32;
+}
+
+enum TimestampPrecision {
+  TS_PRECISION_UNKNOWN = 0;
+  TS_PRECISION_FULL    = 1;
+  TS_PRECISION_MINUTE  = 2;
+  TS_PRECISION_HOUR    = 3;
+  TS_PRECISION_DAY     = 4;
+  TS_PRECISION_MONTH   = 5;
+  TS_PRECISION_YEAR    = 6;
+  TS_PRECISION_DECADE  = 7;
+  TS_PRECISION_CENTURY = 8;
+}
+
+message ImpreciseTimestamp {
+  // Time as an RFC3339 timestamp.
+  string time                  = 1;
+  // ValidTimezone is set to true if the timestamp has a valid timezone, if
+  // false the timestamp will use zulu time as a substitute for the unknown
+  // timezone.
+  bool valid_timezone          = 2;
+  // Precision is a hint about the precision of the timestamp.
+  TimestampPrecision precision = 3;
+}
+
+message Person {
+  // PersonName is the name of the person in the image.
+  string person_name        = 1;
+  // PersonDescription is the description of the person, often their title.
+  string person_description = 2;
+}
+
+message File {
+  // Size is the size of the file in bytes.
+  int64 size               = 1;
+  // Height is the height of the media in pixels.
+  int32 height             = 2;
+  // Width is the width of the media in pixels.
+  int32 width              = 3;
+  // MimeType is the mimetype of the media.
+  string mime_type         = 4;
+  // OriginalFilename is the original name of the file.
+  string original_filename = 5;
+}
+
+enum PreviewType {
+  PREVIEW_UNKNOWN = 0;
+  PREVIEW_IMAGE   = 1;
+  PREVIEW_VIDEO   = 2;
+}
+
+message Preview {
+  // Width is the width of the preview image.
+  int32 width  = 1;
+  // Height is the height of the preview image.
+  int32 height = 2;
+  // URL is the URL of the preview, can be used to preview the file.
+  string url   = 3;
+  // Type is the media type of the preview.
+  PreviewType type = 4;
+}
+
+message Permissions {
+  // Edit indicates if the user can edit this media.
+  bool edit     = 1;
+  // Delete indicates if the user can delete this media.
+  bool delete   = 2;
+  // Download indicates if the user can download this media.
+  bool download = 3;
+}
+
+message Internal {
+  // Origin contains information about the origin of the media.
+  OriginInfo origin = 1;
+  // ItemID is a non-unique ID of the media provided under upload.
+  string item_id    = 2;
+}
+
+message OriginInfo {
+  // Key is the key of the origin.
+  string key  = 1;
+  // Name is the human readable name of the origin.
+  string name = 2;
+}
+
+message GetSortFieldsRequest {}
+
+message GetSortFieldsResponse {
+  repeated SortField fields = 1;
+}
+
+message SortField {
+  string name = 1;
+}
