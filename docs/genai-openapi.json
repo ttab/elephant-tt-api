@@ -429,7 +429,7 @@
   },
   "info": {
     "title": "genai API",
-    "version": "v0.4.1"
+    "version": "v0.4.2"
   },
   "openapi": "3.0.0",
   "paths": {
