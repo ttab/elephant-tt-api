@@ -4,6 +4,22 @@ package ttab.ntb;
 
 option go_package = "github.com/ttab/elephant-tt-api/ntb";
 
+// Metadata service for retrieving assignment metadata.
+service Metadata {
+  // GetAssignment returns metadata for a specific assignment.
+  rpc GetAssignment(GetAssignmentRequest) returns (GetAssignmentResponse);
+}
+
+message GetAssignmentRequest {
+  // The assignee is identified by their commission code.
+  string commission_code = 1;
+}
+
+message GetAssignmentResponse {
+  string planning_uuid   = 1;
+  string assignment_uuid = 2;
+}
+
 // Media service for interacting with the NTB media manager archive. Experimental.
 service Media {
   // Search in a media archive.
@@ -47,11 +63,11 @@ enum Origin {
 
 enum FileType {
   FILE_TYPE_UNSPECIFIED = 0;
-  FILE_TYPE_IMAGE = 1;
-  FILE_TYPE_VIDEO = 2;
-  FILE_TYPE_PDF = 3;
-  FILE_TYPE_VECTOR = 4;
-  FILE_TYPE_PHOTOSHOP = 5;
+  FILE_TYPE_IMAGE       = 1;
+  FILE_TYPE_VIDEO       = 2;
+  FILE_TYPE_PDF         = 3;
+  FILE_TYPE_VECTOR      = 4;
+  FILE_TYPE_PHOTOSHOP   = 5;
 }
 
 // Request/Response Messages
