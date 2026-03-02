@@ -37,6 +37,26 @@
         ],
         "type": "string"
       },
+      "ttab.ntb.GetAssignmentRequest": {
+        "properties": {
+          "commission_code": {
+            "description": "The assignee is identified by their commission code.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.GetAssignmentResponse": {
+        "properties": {
+          "assignment_uuid": {
+            "type": "string"
+          },
+          "planning_uuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.GetItemRequest": {
         "properties": {
           "archive": {
@@ -664,6 +684,44 @@
           "Media"
         ]
       }
+    },
+    "/twirp/ttab.ntb.Metadata/GetAssignment": {
+      "post": {
+        "description": "GetAssignment returns metadata for a specific assignment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetAssignmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetAssignmentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetAssignment",
+        "tags": [
+          "Metadata"
+        ]
+      }
     }
   },
   "servers": [
@@ -675,6 +733,10 @@
     }
   ],
   "tags": [
+    {
+      "description": "Metadata service for retrieving assignment metadata.",
+      "name": "Metadata"
+    },
     {
       "description": "Media service for interacting with the NTB media manager archive. Experimental.",
       "name": "Media"
