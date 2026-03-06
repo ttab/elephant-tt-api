@@ -2,10 +2,11 @@ syntax = "proto3";
 
 import "newsdoc/newsdoc.proto";
 
-package ttab.genai;
+package ttab.intelligence;
 
-option go_package = "github.com/ttab/elephant-tt-api/genai";
+option go_package = "github.com/ttab/elephant-tt-api/intelligence";
 
+// Generate provides AI-powered content generation from text inputs.
 service Generate {
   // DocumentFromText creates a document from an input text.
   rpc DocumentFromText(DocumentFromTextRequest) returns (DocumentFromTextResponse);
@@ -22,6 +23,49 @@ service Generate {
   rpc WaitForJobs(WaitForJobsRequest) returns (WaitForJobsResponse);
   // GetResult returns the result for a job.
   rpc GetResult(GetResultRequest) returns (GetResultResponse);
+}
+
+// Translate manages translation models and their configuration.
+service Translate {
+  // GetTranslationModels lists all available translation models.
+  rpc GetTranslationModels(GetTranslationModelsRequest) returns (GetTranslationModelsResponse);
+  // ConfigureGenerativeTranslator creates or updates a generative translation
+  // model configuration.
+  rpc ConfigureGenerativeTranslator(ConfigureGenerativeTranslatorRequest) returns (ConfigureGenerativeTranslatorResponse);
+  // RemoveGenerativeTranslator removes a generative translation model
+  // configuration.
+  rpc RemoveGenerativeTranslator(RemoveGenerativeTranslatorRequest) returns (RemoveGenerativeTranslatorResponse);
+}
+
+message ConfigureGenerativeTranslatorRequest {
+  // Name of the translation model.
+  string name  = 1;
+  // Model is the URI of the model to use.
+  string model = 2;
+}
+
+message ConfigureGenerativeTranslatorResponse {}
+
+message RemoveGenerativeTranslatorRequest {
+  // Name of the translation model.
+  string name  = 1;
+}
+
+message RemoveGenerativeTranslatorResponse {}
+
+message GetTranslationModelsRequest {}
+
+message GetTranslationModelsResponse {
+  // Available translation models.
+  repeated TranslationModelInfo models = 1;
+}
+
+// TranslationModelInfo describes a configured translation model.
+message TranslationModelInfo {
+  // Name of the translation model.
+  string name = 1;
+  // Model used for translation.
+  string model = 2;
 }
 
 message DocumentFromTextRequest {
@@ -114,7 +158,7 @@ message TextResponse {
   int64 job_id = 1;
   // Text is the generated text.
   string text  = 2;
-  // Contet blocks generated from the text.
+  // Content blocks generated from the text.
   repeated newsdoc.Block content = 3;
 }
 
@@ -124,6 +168,7 @@ message ListJobsRequest {
 }
 
 message ListJobsResponse {
+  // Jobs matching the list request.
   repeated JobReference jobs = 1;
 }
 
@@ -142,34 +187,56 @@ message WaitForJobsResponse {
 }
 
 message GetResultRequest {
+  // ID of the job to get the result for.
   int64 id = 1;
 }
 
+// JobStatus describes the current state of a job.
 enum JobStatus {
+  // STATUS_UNKNOWN is the default zero value.
   STATUS_UNKNOWN = 0;
+  // STATUS_DONE indicates that the job completed successfully.
   STATUS_DONE    = 1;
+  // STATUS_FAILED indicates that the job failed.
   STATUS_FAILED  = 2;
 }
 
+// JobType identifies what kind of generation job was requested.
 enum JobType {
+  // JOB_TYPE_UNKNOWN is the default zero value.
   JOB_TYPE_UNKNOWN  = 0;
+  // JOB_TYPE_DOCUMENT is a DocumentFromText job.
   JOB_TYPE_DOCUMENT = 1;
+  // JOB_TYPE_FEEDBACK is a LanguageFeedback job.
   JOB_TYPE_FEEDBACK = 2;
+  // JOB_TYPE_TEXT is a Text generation job.
   JOB_TYPE_TEXT     = 3;
 }
 
+// JobReference is a summary of a job's current state.
 message JobReference {
+  // ID of the job.
   int64 id          = 1;
+  // Status of the job.
   JobStatus status  = 2;
 }
 
+// GetResultResponse contains the full result of a completed job.
 message GetResultResponse {
+  // ID of the job.
   int64 id          = 1;
+  // Model URI that was used.
   string model     = 2;
+  // Type of the job.
   JobType type      = 3;
+  // Status of the job.
   JobStatus status  = 4;
+  // ErrorCode is set when the job failed.
   string error_code = 5;
+  // Error message when the job failed.
   string error      = 6;
+  // Document result, set for JOB_TYPE_DOCUMENT jobs.
   newsdoc.Document document = 7;
+  // Feedback result, set for JOB_TYPE_FEEDBACK jobs.
   LanguageFeedback feedback = 8;
 }
