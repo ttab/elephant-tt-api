@@ -134,7 +134,23 @@
         },
         "type": "object"
       },
-      "ttab.genai.DocumentFromTextRequest": {
+      "ttab.intelligence.ConfigureGenerativeTranslatorRequest": {
+        "properties": {
+          "model": {
+            "description": "Model is the URI of the model to use.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the translation model.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.ConfigureGenerativeTranslatorResponse": {
+        "type": "object"
+      },
+      "ttab.intelligence.DocumentFromTextRequest": {
         "properties": {
           "additionalLinks": {
             "description": "AdditionalLinks that should be added to the generated document.",
@@ -173,7 +189,7 @@
         },
         "type": "object"
       },
-      "ttab.genai.DocumentFromTextResponse": {
+      "ttab.intelligence.DocumentFromTextResponse": {
         "properties": {
           "document": {
             "$ref": "#/components/schemas/newsdoc.Document"
@@ -185,55 +201,79 @@
         },
         "type": "object"
       },
-      "ttab.genai.GetResultRequest": {
+      "ttab.intelligence.GetResultRequest": {
         "properties": {
           "id": {
+            "description": "ID of the job to get the result for.",
             "type": "integer"
           }
         },
         "type": "object"
       },
-      "ttab.genai.GetResultResponse": {
+      "ttab.intelligence.GetResultResponse": {
+        "description": "GetResultResponse contains the full result of a completed job.",
         "properties": {
           "document": {
             "$ref": "#/components/schemas/newsdoc.Document"
           },
           "error": {
+            "description": "Error message when the job failed.",
             "type": "string"
           },
           "error_code": {
+            "description": "ErrorCode is set when the job failed.",
             "type": "string"
           },
           "feedback": {
-            "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
+            "$ref": "#/components/schemas/ttab.intelligence.LanguageFeedback"
           },
           "id": {
+            "description": "ID of the job.",
             "type": "integer"
           },
           "model": {
+            "description": "Model URI that was used.",
             "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+            "$ref": "#/components/schemas/ttab.intelligence.JobStatus"
           },
           "type": {
-            "$ref": "#/components/schemas/ttab.genai.JobType"
+            "$ref": "#/components/schemas/ttab.intelligence.JobType"
           }
         },
         "type": "object"
       },
-      "ttab.genai.JobReference": {
+      "ttab.intelligence.GetTranslationModelsRequest": {
+        "type": "object"
+      },
+      "ttab.intelligence.GetTranslationModelsResponse": {
+        "properties": {
+          "models": {
+            "description": "Available translation models.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.TranslationModelInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.JobReference": {
+        "description": "JobReference is a summary of a job's current state.",
         "properties": {
           "id": {
+            "description": "ID of the job.",
             "type": "integer"
           },
           "status": {
-            "$ref": "#/components/schemas/ttab.genai.JobStatus"
+            "$ref": "#/components/schemas/ttab.intelligence.JobStatus"
           }
         },
         "type": "object"
       },
-      "ttab.genai.JobStatus": {
+      "ttab.intelligence.JobStatus": {
+        "description": "JobStatus describes the current state of a job.",
         "enum": [
           "STATUS_UNKNOWN",
           "STATUS_DONE",
@@ -241,7 +281,8 @@
         ],
         "type": "string"
       },
-      "ttab.genai.JobType": {
+      "ttab.intelligence.JobType": {
+        "description": "JobType identifies what kind of generation job was requested.",
         "enum": [
           "JOB_TYPE_UNKNOWN",
           "JOB_TYPE_DOCUMENT",
@@ -250,7 +291,7 @@
         ],
         "type": "string"
       },
-      "ttab.genai.LanguageFeedback": {
+      "ttab.intelligence.LanguageFeedback": {
         "properties": {
           "motivation": {
             "description": "Motivation for the change.",
@@ -275,7 +316,7 @@
         },
         "type": "object"
       },
-      "ttab.genai.LanguageFeedbackRequest": {
+      "ttab.intelligence.LanguageFeedbackRequest": {
         "properties": {
           "async_timeout_seconds": {
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
@@ -302,12 +343,12 @@
         },
         "type": "object"
       },
-      "ttab.genai.LanguageFeedbackResponse": {
+      "ttab.intelligence.LanguageFeedbackResponse": {
         "properties": {
           "feedback": {
             "description": "Feedback items.",
             "items": {
-              "$ref": "#/components/schemas/ttab.genai.LanguageFeedback"
+              "$ref": "#/components/schemas/ttab.intelligence.LanguageFeedback"
             },
             "type": "array"
           },
@@ -325,7 +366,7 @@
         },
         "type": "object"
       },
-      "ttab.genai.ListJobsRequest": {
+      "ttab.intelligence.ListJobsRequest": {
         "properties": {
           "after": {
             "description": "After lists jobs after the given ID. Optional, omit to get latest.",
@@ -334,18 +375,31 @@
         },
         "type": "object"
       },
-      "ttab.genai.ListJobsResponse": {
+      "ttab.intelligence.ListJobsResponse": {
         "properties": {
           "jobs": {
+            "description": "Jobs matching the list request.",
             "items": {
-              "$ref": "#/components/schemas/ttab.genai.JobReference"
+              "$ref": "#/components/schemas/ttab.intelligence.JobReference"
             },
             "type": "array"
           }
         },
         "type": "object"
       },
-      "ttab.genai.TextRequest": {
+      "ttab.intelligence.RemoveGenerativeTranslatorRequest": {
+        "properties": {
+          "name": {
+            "description": "Name of the translation model.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.RemoveGenerativeTranslatorResponse": {
+        "type": "object"
+      },
+      "ttab.intelligence.TextRequest": {
         "properties": {
           "async_timeout_seconds": {
             "description": "AsyncTimeoutSeconds is the time after which a JobID will be returned instead of a direct result. Optional, defaults to no timeout.",
@@ -370,10 +424,10 @@
         },
         "type": "object"
       },
-      "ttab.genai.TextResponse": {
+      "ttab.intelligence.TextResponse": {
         "properties": {
           "content": {
-            "description": "Contet blocks generated from the text.",
+            "description": "Content blocks generated from the text.",
             "items": {
               "$ref": "#/components/schemas/newsdoc.Block"
             },
@@ -390,7 +444,21 @@
         },
         "type": "object"
       },
-      "ttab.genai.WaitForJobsRequest": {
+      "ttab.intelligence.TranslationModelInfo": {
+        "description": "TranslationModelInfo describes a configured translation model.",
+        "properties": {
+          "model": {
+            "description": "Model used for translation.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the translation model.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.WaitForJobsRequest": {
         "properties": {
           "jobs": {
             "additionalProperties": {
@@ -406,12 +474,12 @@
         },
         "type": "object"
       },
-      "ttab.genai.WaitForJobsResponse": {
+      "ttab.intelligence.WaitForJobsResponse": {
         "properties": {
           "updated": {
             "description": "Updated jobs, can be empty if the wait timed out without any updates.",
             "items": {
-              "$ref": "#/components/schemas/ttab.genai.JobReference"
+              "$ref": "#/components/schemas/ttab.intelligence.JobReference"
             },
             "type": "array"
           }
@@ -428,19 +496,19 @@
     }
   },
   "info": {
-    "title": "genai API",
+    "title": "intelligence API",
     "version": "v0.4.2"
   },
   "openapi": "3.0.0",
   "paths": {
-    "/twirp/ttab.genai.Generate/DocumentFromText": {
+    "/twirp/ttab.intelligence.Generate/DocumentFromText": {
       "post": {
         "description": "DocumentFromText creates a document from an input text.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.DocumentFromTextRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.DocumentFromTextRequest"
               }
             }
           }
@@ -450,7 +518,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.DocumentFromTextResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.DocumentFromTextResponse"
                 }
               }
             },
@@ -471,14 +539,14 @@
         ]
       }
     },
-    "/twirp/ttab.genai.Generate/GetResult": {
+    "/twirp/ttab.intelligence.Generate/GetResult": {
       "post": {
         "description": "GetResult returns the result for a job.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.GetResultRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.GetResultRequest"
               }
             }
           }
@@ -488,7 +556,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.GetResultResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.GetResultResponse"
                 }
               }
             },
@@ -509,14 +577,14 @@
         ]
       }
     },
-    "/twirp/ttab.genai.Generate/LanguageFeedback": {
+    "/twirp/ttab.intelligence.Generate/LanguageFeedback": {
       "post": {
         "description": "LanguageFeedback gives feedback on a text.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.LanguageFeedbackRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.LanguageFeedbackRequest"
               }
             }
           }
@@ -526,7 +594,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.LanguageFeedbackResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.LanguageFeedbackResponse"
                 }
               }
             },
@@ -547,14 +615,14 @@
         ]
       }
     },
-    "/twirp/ttab.genai.Generate/ListJobs": {
+    "/twirp/ttab.intelligence.Generate/ListJobs": {
       "post": {
         "description": "ListJobs that have been submitted.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.ListJobsRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.ListJobsRequest"
               }
             }
           }
@@ -564,7 +632,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.ListJobsResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.ListJobsResponse"
                 }
               }
             },
@@ -585,14 +653,14 @@
         ]
       }
     },
-    "/twirp/ttab.genai.Generate/Text": {
+    "/twirp/ttab.intelligence.Generate/Text": {
       "post": {
         "description": "Text generates text from a input.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.TextRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.TextRequest"
               }
             }
           }
@@ -602,7 +670,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.TextResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.TextResponse"
                 }
               }
             },
@@ -623,14 +691,14 @@
         ]
       }
     },
-    "/twirp/ttab.genai.Generate/WaitForJobs": {
+    "/twirp/ttab.intelligence.Generate/WaitForJobs": {
       "post": {
         "description": "WaitForJobs is used to wait for status updates for a set of jobs.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.genai.WaitForJobsRequest"
+                "$ref": "#/components/schemas/ttab.intelligence.WaitForJobsRequest"
               }
             }
           }
@@ -640,7 +708,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.genai.WaitForJobsResponse"
+                  "$ref": "#/components/schemas/ttab.intelligence.WaitForJobsResponse"
                 }
               }
             },
@@ -660,19 +728,138 @@
           "Generate"
         ]
       }
+    },
+    "/twirp/ttab.intelligence.Translate/ConfigureGenerativeTranslator": {
+      "post": {
+        "description": "ConfigureGenerativeTranslator creates or updates a generative translation model configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.ConfigureGenerativeTranslatorRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.ConfigureGenerativeTranslatorResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ConfigureGenerativeTranslator",
+        "tags": [
+          "Translate"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Translate/GetTranslationModels": {
+      "post": {
+        "description": "GetTranslationModels lists all available translation models.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.GetTranslationModelsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.GetTranslationModelsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetTranslationModels",
+        "tags": [
+          "Translate"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Translate/RemoveGenerativeTranslator": {
+      "post": {
+        "description": "RemoveGenerativeTranslator removes a generative translation model configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.RemoveGenerativeTranslatorRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.RemoveGenerativeTranslatorResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RemoveGenerativeTranslator",
+        "tags": [
+          "Translate"
+        ]
+      }
     }
   },
   "servers": [
     {
-      "url": "https://genai.api.tt.se"
+      "url": "https://intelligence.api.tt.se"
     },
     {
-      "url": "https://genai.api.stage.tt.se"
+      "url": "https://intelligence.api.stage.tt.se"
     }
   ],
   "tags": [
     {
+      "description": "Generate provides AI-powered content generation from text inputs.",
       "name": "Generate"
+    },
+    {
+      "description": "Translate manages translation models and their configuration.",
+      "name": "Translate"
     }
   ]
 }
