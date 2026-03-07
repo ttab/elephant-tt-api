@@ -201,6 +201,34 @@
         },
         "type": "object"
       },
+      "ttab.intelligence.GetPromptRequest": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the prompt document to retrieve.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.GetPromptResponse": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "rendered_prompt": {
+            "description": "RenderedPrompt is the prompt text with all snippet includes resolved.",
+            "type": "string"
+          },
+          "variables": {
+            "description": "Variables are the template variable names found in the prompt.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.intelligence.GetResultRequest": {
         "properties": {
           "id": {
@@ -387,6 +415,38 @@
         },
         "type": "object"
       },
+      "ttab.intelligence.ListPromptsRequest": {
+        "type": "object"
+      },
+      "ttab.intelligence.ListPromptsResponse": {
+        "properties": {
+          "prompts": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.PromptInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.PromptInfo": {
+        "description": "PromptInfo is a summary of a prompt document.",
+        "properties": {
+          "model": {
+            "description": "Model URI configured for the prompt.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title of the prompt.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the prompt document.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.intelligence.RemoveGenerativeTranslatorRequest": {
         "properties": {
           "name": {
@@ -397,6 +457,113 @@
         "type": "object"
       },
       "ttab.intelligence.RemoveGenerativeTranslatorResponse": {
+        "type": "object"
+      },
+      "ttab.intelligence.SemanticSearchRequest": {
+        "properties": {
+          "content_block_types": {
+            "description": "ContentBlockTypes to filter by (e.g. \"core/factbox\").",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "document_types": {
+            "description": "DocumentTypes to filter by (e.g. \"core/article\", \"tt/wire\").",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "hot_only": {
+            "description": "HotOnly restricts search to the hot (recent) table.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Limit is the maximum number of results to return.",
+            "type": "integer"
+          },
+          "nprobes": {
+            "description": "Nprobes controls IVFFlat probe count for cold index queries. Higher values improve recall at the cost of latency. Optional, defaults to server-configured value.",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Query text to find similar documents for.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.SemanticSearchResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.SemanticSearchResult"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.SemanticSearchResult": {
+        "properties": {
+          "content_block_types": {
+            "description": "Content block types present in the document.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "document_type": {
+            "description": "Type of the document (e.g. \"core/article\").",
+            "type": "string"
+          },
+          "document_uuid": {
+            "description": "UUID of the matching document.",
+            "type": "string"
+          },
+          "score": {
+            "description": "Cosine similarity score.",
+            "type": "number"
+          },
+          "title": {
+            "description": "Title of the document.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.TestPromptRequest": {
+        "properties": {
+          "model": {
+            "description": "Model override. Optional, uses the prompt's configured model if empty.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the prompt document to test.",
+            "type": "string"
+          },
+          "variables": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Variables to substitute into the prompt template.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.TestPromptResponse": {
+        "properties": {
+          "rendered_prompt": {
+            "description": "RenderedPrompt is the prompt that was sent to the model after variable substitution.",
+            "type": "string"
+          },
+          "result": {
+            "description": "Result is the raw model output.",
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "ttab.intelligence.TextRequest": {
@@ -440,6 +607,34 @@
           "text": {
             "description": "Text is the generated text.",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.TranslateDocumentRequest": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "model": {
+            "description": "Model name to use for translation (maps to DeepL or a generative translator).",
+            "type": "string"
+          },
+          "target_language": {
+            "description": "TargetLanguage is the BCP47 language tag to translate to.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.TranslateDocumentResponse": {
+        "properties": {
+          "detected_source_language": {
+            "description": "DetectedSourceLanguage is the language detected in the source content.",
+            "type": "string"
+          },
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
           }
         },
         "type": "object"
@@ -501,6 +696,44 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/twirp/ttab.intelligence.Embeddings/Search": {
+      "post": {
+        "description": "Search performs a semantic search across embedded documents.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.SemanticSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.SemanticSearchResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Search",
+        "tags": [
+          "Embeddings"
+        ]
+      }
+    },
     "/twirp/ttab.intelligence.Generate/DocumentFromText": {
       "post": {
         "description": "DocumentFromText creates a document from an input text.",
@@ -729,6 +962,120 @@
         ]
       }
     },
+    "/twirp/ttab.intelligence.Prompts/GetPrompt": {
+      "post": {
+        "description": "GetPrompt retrieves a prompt document with its rendered content.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.GetPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.GetPromptResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetPrompt",
+        "tags": [
+          "Prompts"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Prompts/ListPrompts": {
+      "post": {
+        "description": "ListPrompts lists prompt documents from the repository.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.ListPromptsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.ListPromptsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListPrompts",
+        "tags": [
+          "Prompts"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Prompts/TestPrompt": {
+      "post": {
+        "description": "TestPrompt runs a prompt with test input and returns the result.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.TestPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.TestPromptResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "TestPrompt",
+        "tags": [
+          "Prompts"
+        ]
+      }
+    },
     "/twirp/ttab.intelligence.Translate/ConfigureGenerativeTranslator": {
       "post": {
         "description": "ConfigureGenerativeTranslator creates or updates a generative translation model configuration.",
@@ -842,6 +1189,44 @@
           "Translate"
         ]
       }
+    },
+    "/twirp/ttab.intelligence.Translate/TranslateDocument": {
+      "post": {
+        "description": "TranslateDocument translates the content of a document to a target language. Returns the translated document with original content preserved in a meta block.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.TranslateDocumentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.TranslateDocumentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "TranslateDocument",
+        "tags": [
+          "Translate"
+        ]
+      }
     }
   },
   "servers": [
@@ -860,6 +1245,14 @@
     {
       "description": "Translate manages translation models and their configuration.",
       "name": "Translate"
+    },
+    {
+      "description": "Embeddings provides semantic search across embedded documents.",
+      "name": "Embeddings"
+    },
+    {
+      "description": "Prompts provides management and testing of prompt documents.",
+      "name": "Prompts"
     }
   ]
 }

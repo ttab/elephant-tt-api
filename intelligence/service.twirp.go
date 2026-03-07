@@ -1939,6 +1939,11 @@ type Translate interface {
 	// RemoveGenerativeTranslator removes a generative translation model
 	// configuration.
 	RemoveGenerativeTranslator(context.Context, *RemoveGenerativeTranslatorRequest) (*RemoveGenerativeTranslatorResponse, error)
+
+	// TranslateDocument translates the content of a document to a target
+	// language. Returns the translated document with original content
+	// preserved in a meta block.
+	TranslateDocument(context.Context, *TranslateDocumentRequest) (*TranslateDocumentResponse, error)
 }
 
 // =========================
@@ -1947,7 +1952,7 @@ type Translate interface {
 
 type translateProtobufClient struct {
 	client      HTTPClient
-	urls        [3]string
+	urls        [4]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -1975,10 +1980,11 @@ func NewTranslateProtobufClient(baseURL string, client HTTPClient, opts ...twirp
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Translate")
-	urls := [3]string{
+	urls := [4]string{
 		serviceURL + "GetTranslationModels",
 		serviceURL + "ConfigureGenerativeTranslator",
 		serviceURL + "RemoveGenerativeTranslator",
+		serviceURL + "TranslateDocument",
 	}
 
 	return &translateProtobufClient{
@@ -2127,13 +2133,59 @@ func (c *translateProtobufClient) callRemoveGenerativeTranslator(ctx context.Con
 	return out, nil
 }
 
+func (c *translateProtobufClient) TranslateDocument(ctx context.Context, in *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Translate")
+	ctx = ctxsetters.WithMethodName(ctx, "TranslateDocument")
+	caller := c.callTranslateDocument
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TranslateDocumentRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TranslateDocumentRequest) when calling interceptor")
+					}
+					return c.callTranslateDocument(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TranslateDocumentResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TranslateDocumentResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *translateProtobufClient) callTranslateDocument(ctx context.Context, in *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+	out := new(TranslateDocumentResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // =====================
 // Translate JSON Client
 // =====================
 
 type translateJSONClient struct {
 	client      HTTPClient
-	urls        [3]string
+	urls        [4]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -2161,10 +2213,11 @@ func NewTranslateJSONClient(baseURL string, client HTTPClient, opts ...twirp.Cli
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Translate")
-	urls := [3]string{
+	urls := [4]string{
 		serviceURL + "GetTranslationModels",
 		serviceURL + "ConfigureGenerativeTranslator",
 		serviceURL + "RemoveGenerativeTranslator",
+		serviceURL + "TranslateDocument",
 	}
 
 	return &translateJSONClient{
@@ -2313,6 +2366,52 @@ func (c *translateJSONClient) callRemoveGenerativeTranslator(ctx context.Context
 	return out, nil
 }
 
+func (c *translateJSONClient) TranslateDocument(ctx context.Context, in *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Translate")
+	ctx = ctxsetters.WithMethodName(ctx, "TranslateDocument")
+	caller := c.callTranslateDocument
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TranslateDocumentRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TranslateDocumentRequest) when calling interceptor")
+					}
+					return c.callTranslateDocument(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TranslateDocumentResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TranslateDocumentResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *translateJSONClient) callTranslateDocument(ctx context.Context, in *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+	out := new(TranslateDocumentResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // ========================
 // Translate Server Handler
 // ========================
@@ -2418,6 +2517,9 @@ func (s *translateServer) ServeHTTP(resp http.ResponseWriter, req *http.Request)
 		return
 	case "RemoveGenerativeTranslator":
 		s.serveRemoveGenerativeTranslator(ctx, resp, req)
+		return
+	case "TranslateDocument":
+		s.serveTranslateDocument(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -2966,6 +3068,186 @@ func (s *translateServer) serveRemoveGenerativeTranslatorProtobuf(ctx context.Co
 	callResponseSent(ctx, s.hooks)
 }
 
+func (s *translateServer) serveTranslateDocument(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveTranslateDocumentJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveTranslateDocumentProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *translateServer) serveTranslateDocumentJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "TranslateDocument")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(TranslateDocumentRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Translate.TranslateDocument
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TranslateDocumentRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TranslateDocumentRequest) when calling interceptor")
+					}
+					return s.Translate.TranslateDocument(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TranslateDocumentResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TranslateDocumentResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *TranslateDocumentResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *TranslateDocumentResponse and nil error while calling TranslateDocument. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *translateServer) serveTranslateDocumentProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "TranslateDocument")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(TranslateDocumentRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Translate.TranslateDocument
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *TranslateDocumentRequest) (*TranslateDocumentResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TranslateDocumentRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TranslateDocumentRequest) when calling interceptor")
+					}
+					return s.Translate.TranslateDocument(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TranslateDocumentResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TranslateDocumentResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *TranslateDocumentResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *TranslateDocumentResponse and nil error while calling TranslateDocument. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
 func (s *translateServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor0, 1
 }
@@ -2979,6 +3261,1558 @@ func (s *translateServer) ProtocGenTwirpVersion() string {
 // for example to identify the requests that are targeted to this service in a mux.
 func (s *translateServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "ttab.intelligence", "Translate")
+}
+
+// ====================
+// Embeddings Interface
+// ====================
+
+// Embeddings provides semantic search across embedded documents.
+type Embeddings interface {
+	// Search performs a semantic search across embedded documents.
+	Search(context.Context, *SemanticSearchRequest) (*SemanticSearchResponse, error)
+}
+
+// ==========================
+// Embeddings Protobuf Client
+// ==========================
+
+type embeddingsProtobufClient struct {
+	client      HTTPClient
+	urls        [1]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewEmbeddingsProtobufClient creates a Protobuf client that implements the Embeddings interface.
+// It communicates using Protobuf and can be configured with a custom HTTPClient.
+func NewEmbeddingsProtobufClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) Embeddings {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Embeddings")
+	urls := [1]string{
+		serviceURL + "Search",
+	}
+
+	return &embeddingsProtobufClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *embeddingsProtobufClient) Search(ctx context.Context, in *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Embeddings")
+	ctx = ctxsetters.WithMethodName(ctx, "Search")
+	caller := c.callSearch
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*SemanticSearchRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*SemanticSearchRequest) when calling interceptor")
+					}
+					return c.callSearch(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SemanticSearchResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SemanticSearchResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *embeddingsProtobufClient) callSearch(ctx context.Context, in *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+	out := new(SemanticSearchResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ======================
+// Embeddings JSON Client
+// ======================
+
+type embeddingsJSONClient struct {
+	client      HTTPClient
+	urls        [1]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewEmbeddingsJSONClient creates a JSON client that implements the Embeddings interface.
+// It communicates using JSON and can be configured with a custom HTTPClient.
+func NewEmbeddingsJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) Embeddings {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Embeddings")
+	urls := [1]string{
+		serviceURL + "Search",
+	}
+
+	return &embeddingsJSONClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *embeddingsJSONClient) Search(ctx context.Context, in *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Embeddings")
+	ctx = ctxsetters.WithMethodName(ctx, "Search")
+	caller := c.callSearch
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*SemanticSearchRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*SemanticSearchRequest) when calling interceptor")
+					}
+					return c.callSearch(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SemanticSearchResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SemanticSearchResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *embeddingsJSONClient) callSearch(ctx context.Context, in *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+	out := new(SemanticSearchResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// =========================
+// Embeddings Server Handler
+// =========================
+
+type embeddingsServer struct {
+	Embeddings
+	interceptor      twirp.Interceptor
+	hooks            *twirp.ServerHooks
+	pathPrefix       string // prefix for routing
+	jsonSkipDefaults bool   // do not include unpopulated fields (default values) in the response
+	jsonCamelCase    bool   // JSON fields are serialized as lowerCamelCase rather than keeping the original proto names
+}
+
+// NewEmbeddingsServer builds a TwirpServer that can be used as an http.Handler to handle
+// HTTP requests that are routed to the right method in the provided svc implementation.
+// The opts are twirp.ServerOption modifiers, for example twirp.WithServerHooks(hooks).
+func NewEmbeddingsServer(svc Embeddings, opts ...interface{}) TwirpServer {
+	serverOpts := newServerOpts(opts)
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	jsonSkipDefaults := false
+	_ = serverOpts.ReadOpt("jsonSkipDefaults", &jsonSkipDefaults)
+	jsonCamelCase := false
+	_ = serverOpts.ReadOpt("jsonCamelCase", &jsonCamelCase)
+	var pathPrefix string
+	if ok := serverOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	return &embeddingsServer{
+		Embeddings:       svc,
+		hooks:            serverOpts.Hooks,
+		interceptor:      twirp.ChainInterceptors(serverOpts.Interceptors...),
+		pathPrefix:       pathPrefix,
+		jsonSkipDefaults: jsonSkipDefaults,
+		jsonCamelCase:    jsonCamelCase,
+	}
+}
+
+// writeError writes an HTTP response with a valid Twirp error format, and triggers hooks.
+// If err is not a twirp.Error, it will get wrapped with twirp.InternalErrorWith(err)
+func (s *embeddingsServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
+	writeError(ctx, resp, err, s.hooks)
+}
+
+// handleRequestBodyError is used to handle error when the twirp server cannot read request
+func (s *embeddingsServer) handleRequestBodyError(ctx context.Context, resp http.ResponseWriter, msg string, err error) {
+	if context.Canceled == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.Canceled, "failed to read request: context canceled"))
+		return
+	}
+	if context.DeadlineExceeded == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.DeadlineExceeded, "failed to read request: deadline exceeded"))
+		return
+	}
+	s.writeError(ctx, resp, twirp.WrapError(malformedRequestError(msg), err))
+}
+
+// EmbeddingsPathPrefix is a convenience constant that may identify URL paths.
+// Should be used with caution, it only matches routes generated by Twirp Go clients,
+// with the default "/twirp" prefix and default CamelCase service and method names.
+// More info: https://twitchtv.github.io/twirp/docs/routing.html
+const EmbeddingsPathPrefix = "/twirp/ttab.intelligence.Embeddings/"
+
+func (s *embeddingsServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Embeddings")
+	ctx = ctxsetters.WithResponseWriter(ctx, resp)
+
+	var err error
+	ctx, err = callRequestReceived(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	if req.Method != "POST" {
+		msg := fmt.Sprintf("unsupported method %q (only POST is allowed)", req.Method)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	// Verify path format: [<prefix>]/<package>.<Service>/<Method>
+	prefix, pkgService, method := parseTwirpPath(req.URL.Path)
+	if pkgService != "ttab.intelligence.Embeddings" {
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+	if prefix != s.pathPrefix {
+		msg := fmt.Sprintf("invalid path prefix %q, expected %q, on path %q", prefix, s.pathPrefix, req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	switch method {
+	case "Search":
+		s.serveSearch(ctx, resp, req)
+		return
+	default:
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+}
+
+func (s *embeddingsServer) serveSearch(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveSearchJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveSearchProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *embeddingsServer) serveSearchJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Search")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(SemanticSearchRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Embeddings.Search
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*SemanticSearchRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*SemanticSearchRequest) when calling interceptor")
+					}
+					return s.Embeddings.Search(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SemanticSearchResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SemanticSearchResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SemanticSearchResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SemanticSearchResponse and nil error while calling Search. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *embeddingsServer) serveSearchProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Search")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(SemanticSearchRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Embeddings.Search
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *SemanticSearchRequest) (*SemanticSearchResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*SemanticSearchRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*SemanticSearchRequest) when calling interceptor")
+					}
+					return s.Embeddings.Search(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SemanticSearchResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SemanticSearchResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SemanticSearchResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SemanticSearchResponse and nil error while calling Search. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *embeddingsServer) ServiceDescriptor() ([]byte, int) {
+	return twirpFileDescriptor0, 2
+}
+
+func (s *embeddingsServer) ProtocGenTwirpVersion() string {
+	return "v8.1.3"
+}
+
+// PathPrefix returns the base service path, in the form: "/<prefix>/<package>.<Service>/"
+// that is everything in a Twirp route except for the <Method>. This can be used for routing,
+// for example to identify the requests that are targeted to this service in a mux.
+func (s *embeddingsServer) PathPrefix() string {
+	return baseServicePath(s.pathPrefix, "ttab.intelligence", "Embeddings")
+}
+
+// =================
+// Prompts Interface
+// =================
+
+// Prompts provides management and testing of prompt documents.
+type Prompts interface {
+	// ListPrompts lists prompt documents from the repository.
+	ListPrompts(context.Context, *ListPromptsRequest) (*ListPromptsResponse, error)
+
+	// GetPrompt retrieves a prompt document with its rendered content.
+	GetPrompt(context.Context, *GetPromptRequest) (*GetPromptResponse, error)
+
+	// TestPrompt runs a prompt with test input and returns the result.
+	TestPrompt(context.Context, *TestPromptRequest) (*TestPromptResponse, error)
+}
+
+// =======================
+// Prompts Protobuf Client
+// =======================
+
+type promptsProtobufClient struct {
+	client      HTTPClient
+	urls        [3]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewPromptsProtobufClient creates a Protobuf client that implements the Prompts interface.
+// It communicates using Protobuf and can be configured with a custom HTTPClient.
+func NewPromptsProtobufClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) Prompts {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Prompts")
+	urls := [3]string{
+		serviceURL + "ListPrompts",
+		serviceURL + "GetPrompt",
+		serviceURL + "TestPrompt",
+	}
+
+	return &promptsProtobufClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *promptsProtobufClient) ListPrompts(ctx context.Context, in *ListPromptsRequest) (*ListPromptsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPrompts")
+	caller := c.callListPrompts
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListPromptsRequest) (*ListPromptsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListPromptsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListPromptsRequest) when calling interceptor")
+					}
+					return c.callListPrompts(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListPromptsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPromptsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsProtobufClient) callListPrompts(ctx context.Context, in *ListPromptsRequest) (*ListPromptsResponse, error) {
+	out := new(ListPromptsResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *promptsProtobufClient) GetPrompt(ctx context.Context, in *GetPromptRequest) (*GetPromptResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "GetPrompt")
+	caller := c.callGetPrompt
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetPromptRequest) (*GetPromptResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetPromptRequest) when calling interceptor")
+					}
+					return c.callGetPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsProtobufClient) callGetPrompt(ctx context.Context, in *GetPromptRequest) (*GetPromptResponse, error) {
+	out := new(GetPromptResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *promptsProtobufClient) TestPrompt(ctx context.Context, in *TestPromptRequest) (*TestPromptResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "TestPrompt")
+	caller := c.callTestPrompt
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *TestPromptRequest) (*TestPromptResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TestPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TestPromptRequest) when calling interceptor")
+					}
+					return c.callTestPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TestPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TestPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsProtobufClient) callTestPrompt(ctx context.Context, in *TestPromptRequest) (*TestPromptResponse, error) {
+	out := new(TestPromptResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ===================
+// Prompts JSON Client
+// ===================
+
+type promptsJSONClient struct {
+	client      HTTPClient
+	urls        [3]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewPromptsJSONClient creates a JSON client that implements the Prompts interface.
+// It communicates using JSON and can be configured with a custom HTTPClient.
+func NewPromptsJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) Prompts {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "ttab.intelligence", "Prompts")
+	urls := [3]string{
+		serviceURL + "ListPrompts",
+		serviceURL + "GetPrompt",
+		serviceURL + "TestPrompt",
+	}
+
+	return &promptsJSONClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *promptsJSONClient) ListPrompts(ctx context.Context, in *ListPromptsRequest) (*ListPromptsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPrompts")
+	caller := c.callListPrompts
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListPromptsRequest) (*ListPromptsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListPromptsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListPromptsRequest) when calling interceptor")
+					}
+					return c.callListPrompts(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListPromptsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPromptsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsJSONClient) callListPrompts(ctx context.Context, in *ListPromptsRequest) (*ListPromptsResponse, error) {
+	out := new(ListPromptsResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *promptsJSONClient) GetPrompt(ctx context.Context, in *GetPromptRequest) (*GetPromptResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "GetPrompt")
+	caller := c.callGetPrompt
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetPromptRequest) (*GetPromptResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetPromptRequest) when calling interceptor")
+					}
+					return c.callGetPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsJSONClient) callGetPrompt(ctx context.Context, in *GetPromptRequest) (*GetPromptResponse, error) {
+	out := new(GetPromptResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *promptsJSONClient) TestPrompt(ctx context.Context, in *TestPromptRequest) (*TestPromptResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithMethodName(ctx, "TestPrompt")
+	caller := c.callTestPrompt
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *TestPromptRequest) (*TestPromptResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TestPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TestPromptRequest) when calling interceptor")
+					}
+					return c.callTestPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TestPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TestPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *promptsJSONClient) callTestPrompt(ctx context.Context, in *TestPromptRequest) (*TestPromptResponse, error) {
+	out := new(TestPromptResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ======================
+// Prompts Server Handler
+// ======================
+
+type promptsServer struct {
+	Prompts
+	interceptor      twirp.Interceptor
+	hooks            *twirp.ServerHooks
+	pathPrefix       string // prefix for routing
+	jsonSkipDefaults bool   // do not include unpopulated fields (default values) in the response
+	jsonCamelCase    bool   // JSON fields are serialized as lowerCamelCase rather than keeping the original proto names
+}
+
+// NewPromptsServer builds a TwirpServer that can be used as an http.Handler to handle
+// HTTP requests that are routed to the right method in the provided svc implementation.
+// The opts are twirp.ServerOption modifiers, for example twirp.WithServerHooks(hooks).
+func NewPromptsServer(svc Prompts, opts ...interface{}) TwirpServer {
+	serverOpts := newServerOpts(opts)
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	jsonSkipDefaults := false
+	_ = serverOpts.ReadOpt("jsonSkipDefaults", &jsonSkipDefaults)
+	jsonCamelCase := false
+	_ = serverOpts.ReadOpt("jsonCamelCase", &jsonCamelCase)
+	var pathPrefix string
+	if ok := serverOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	return &promptsServer{
+		Prompts:          svc,
+		hooks:            serverOpts.Hooks,
+		interceptor:      twirp.ChainInterceptors(serverOpts.Interceptors...),
+		pathPrefix:       pathPrefix,
+		jsonSkipDefaults: jsonSkipDefaults,
+		jsonCamelCase:    jsonCamelCase,
+	}
+}
+
+// writeError writes an HTTP response with a valid Twirp error format, and triggers hooks.
+// If err is not a twirp.Error, it will get wrapped with twirp.InternalErrorWith(err)
+func (s *promptsServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
+	writeError(ctx, resp, err, s.hooks)
+}
+
+// handleRequestBodyError is used to handle error when the twirp server cannot read request
+func (s *promptsServer) handleRequestBodyError(ctx context.Context, resp http.ResponseWriter, msg string, err error) {
+	if context.Canceled == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.Canceled, "failed to read request: context canceled"))
+		return
+	}
+	if context.DeadlineExceeded == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.DeadlineExceeded, "failed to read request: deadline exceeded"))
+		return
+	}
+	s.writeError(ctx, resp, twirp.WrapError(malformedRequestError(msg), err))
+}
+
+// PromptsPathPrefix is a convenience constant that may identify URL paths.
+// Should be used with caution, it only matches routes generated by Twirp Go clients,
+// with the default "/twirp" prefix and default CamelCase service and method names.
+// More info: https://twitchtv.github.io/twirp/docs/routing.html
+const PromptsPathPrefix = "/twirp/ttab.intelligence.Prompts/"
+
+func (s *promptsServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.intelligence")
+	ctx = ctxsetters.WithServiceName(ctx, "Prompts")
+	ctx = ctxsetters.WithResponseWriter(ctx, resp)
+
+	var err error
+	ctx, err = callRequestReceived(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	if req.Method != "POST" {
+		msg := fmt.Sprintf("unsupported method %q (only POST is allowed)", req.Method)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	// Verify path format: [<prefix>]/<package>.<Service>/<Method>
+	prefix, pkgService, method := parseTwirpPath(req.URL.Path)
+	if pkgService != "ttab.intelligence.Prompts" {
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+	if prefix != s.pathPrefix {
+		msg := fmt.Sprintf("invalid path prefix %q, expected %q, on path %q", prefix, s.pathPrefix, req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	switch method {
+	case "ListPrompts":
+		s.serveListPrompts(ctx, resp, req)
+		return
+	case "GetPrompt":
+		s.serveGetPrompt(ctx, resp, req)
+		return
+	case "TestPrompt":
+		s.serveTestPrompt(ctx, resp, req)
+		return
+	default:
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+}
+
+func (s *promptsServer) serveListPrompts(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListPromptsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListPromptsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *promptsServer) serveListPromptsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListPrompts")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListPromptsRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Prompts.ListPrompts
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListPromptsRequest) (*ListPromptsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListPromptsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListPromptsRequest) when calling interceptor")
+					}
+					return s.Prompts.ListPrompts(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListPromptsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPromptsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListPromptsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPromptsResponse and nil error while calling ListPrompts. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) serveListPromptsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListPrompts")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListPromptsRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Prompts.ListPrompts
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListPromptsRequest) (*ListPromptsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListPromptsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListPromptsRequest) when calling interceptor")
+					}
+					return s.Prompts.ListPrompts(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListPromptsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPromptsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListPromptsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPromptsResponse and nil error while calling ListPrompts. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) serveGetPrompt(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetPromptJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetPromptProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *promptsServer) serveGetPromptJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetPrompt")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(GetPromptRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Prompts.GetPrompt
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetPromptRequest) (*GetPromptResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetPromptRequest) when calling interceptor")
+					}
+					return s.Prompts.GetPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetPromptResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPromptResponse and nil error while calling GetPrompt. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) serveGetPromptProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetPrompt")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(GetPromptRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Prompts.GetPrompt
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetPromptRequest) (*GetPromptResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetPromptRequest) when calling interceptor")
+					}
+					return s.Prompts.GetPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetPromptResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPromptResponse and nil error while calling GetPrompt. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) serveTestPrompt(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveTestPromptJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveTestPromptProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *promptsServer) serveTestPromptJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "TestPrompt")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(TestPromptRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Prompts.TestPrompt
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *TestPromptRequest) (*TestPromptResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TestPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TestPromptRequest) when calling interceptor")
+					}
+					return s.Prompts.TestPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TestPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TestPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *TestPromptResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *TestPromptResponse and nil error while calling TestPrompt. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) serveTestPromptProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "TestPrompt")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(TestPromptRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Prompts.TestPrompt
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *TestPromptRequest) (*TestPromptResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*TestPromptRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*TestPromptRequest) when calling interceptor")
+					}
+					return s.Prompts.TestPrompt(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*TestPromptResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*TestPromptResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *TestPromptResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *TestPromptResponse and nil error while calling TestPrompt. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *promptsServer) ServiceDescriptor() ([]byte, int) {
+	return twirpFileDescriptor0, 3
+}
+
+func (s *promptsServer) ProtocGenTwirpVersion() string {
+	return "v8.1.3"
+}
+
+// PathPrefix returns the base service path, in the form: "/<prefix>/<package>.<Service>/"
+// that is everything in a Twirp route except for the <Method>. This can be used for routing,
+// for example to identify the requests that are targeted to this service in a mux.
+func (s *promptsServer) PathPrefix() string {
+	return baseServicePath(s.pathPrefix, "ttab.intelligence", "Prompts")
 }
 
 // =====
@@ -3547,82 +5381,115 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 1232 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x57, 0xdd, 0x52, 0xdb, 0x46,
-	0x14, 0xae, 0x6c, 0x63, 0xec, 0x63, 0x62, 0xc4, 0x06, 0x26, 0x1e, 0x35, 0x3f, 0x44, 0x49, 0x0a,
-	0x43, 0x1b, 0x7b, 0xc6, 0x49, 0x1b, 0xda, 0x9b, 0x14, 0x8c, 0x61, 0x20, 0xfc, 0x8d, 0x6c, 0x9a,
-	0xb6, 0xd3, 0x19, 0x67, 0x2d, 0x2d, 0x46, 0xd8, 0xd6, 0xba, 0xd2, 0x8a, 0x9f, 0x47, 0xe8, 0x55,
-	0x67, 0xf2, 0x0e, 0xbd, 0xee, 0x45, 0x7b, 0xd1, 0x07, 0xe8, 0x3b, 0xf4, 0x75, 0x3a, 0xbb, 0x5a,
-	0x09, 0x61, 0x64, 0x63, 0x72, 0x25, 0xed, 0xf9, 0xf9, 0xf6, 0x9c, 0x6f, 0xcf, 0x39, 0x5a, 0x81,
-	0x66, 0x3b, 0x8c, 0xf4, 0x7a, 0x76, 0x87, 0x38, 0x26, 0xa9, 0x78, 0xc4, 0x3d, 0xb3, 0x4d, 0x52,
-	0x1e, 0xb8, 0x94, 0x51, 0x34, 0xc7, 0x18, 0x6e, 0x97, 0xe3, 0x06, 0xda, 0x82, 0x43, 0xce, 0x3d,
-	0x8b, 0x9a, 0x15, 0xf9, 0x0c, 0x2c, 0xf5, 0x43, 0x78, 0x5e, 0xa3, 0xce, 0xb1, 0xdd, 0xf1, 0x5d,
-	0xb2, 0x45, 0x1c, 0xe2, 0x62, 0x66, 0x9f, 0x91, 0xa6, 0x8b, 0x1d, 0xaf, 0x87, 0x19, 0x75, 0x0d,
-	0xf2, 0xab, 0x4f, 0x3c, 0x86, 0x10, 0x64, 0x1c, 0xdc, 0x27, 0x25, 0x65, 0x51, 0x59, 0xce, 0x1b,
-	0xe2, 0x1d, 0xcd, 0xc3, 0x54, 0x9f, 0x5a, 0xa4, 0x57, 0x4a, 0x09, 0x61, 0xb0, 0xd0, 0x97, 0xe0,
-	0xc5, 0x2d, 0x88, 0xde, 0x80, 0x3a, 0x1e, 0xd1, 0xdf, 0xc0, 0x53, 0x83, 0xf4, 0xe9, 0xd9, 0x5d,
-	0xf7, 0xd5, 0x9f, 0x83, 0x3e, 0xce, 0x51, 0xc2, 0x3f, 0x82, 0xcf, 0xb7, 0x08, 0x0b, 0x15, 0x36,
-	0x75, 0xf6, 0x78, 0x78, 0x9e, 0x04, 0xd6, 0x5b, 0xf0, 0x30, 0x59, 0x1d, 0xb8, 0xa3, 0xb7, 0x90,
-	0x15, 0xf9, 0x78, 0x25, 0x65, 0x31, 0xbd, 0x5c, 0xa8, 0x2e, 0x95, 0x6f, 0x70, 0x5a, 0x1e, 0xf6,
-	0xde, 0x76, 0x8e, 0xa9, 0x21, 0xdd, 0xf4, 0xef, 0x61, 0x3e, 0x49, 0x7f, 0x07, 0x26, 0x7f, 0x4f,
-	0xc1, 0x83, 0x0d, 0x6a, 0xfa, 0x7d, 0xe2, 0xb0, 0x4d, 0x97, 0xf6, 0x9b, 0xe4, 0x82, 0x85, 0xbc,
-	0x44, 0x1e, 0x4a, 0xcc, 0x83, 0x63, 0x33, 0x72, 0xc1, 0x24, 0x8c, 0x78, 0xe7, 0x32, 0xdf, 0xb7,
-	0xad, 0x52, 0x3a, 0x90, 0xf1, 0x77, 0xa4, 0x42, 0xda, 0x77, 0xed, 0x52, 0x46, 0x88, 0xf8, 0x2b,
-	0x5a, 0x85, 0x59, 0x6c, 0x59, 0x36, 0x0f, 0x15, 0xf7, 0x76, 0x6d, 0xa7, 0xeb, 0x95, 0xa6, 0x44,
-	0xde, 0xc5, 0x72, 0x58, 0x30, 0xeb, 0x3d, 0x6a, 0x76, 0x8d, 0x61, 0x33, 0xf4, 0x0d, 0x14, 0xaf,
-	0x44, 0x7b, 0x84, 0xe1, 0x52, 0x36, 0xd1, 0x71, 0xc8, 0x0a, 0x55, 0x61, 0x01, 0x7b, 0x97, 0x8e,
-	0xd9, 0x62, 0x76, 0x9f, 0x50, 0x9f, 0xb5, 0x3c, 0x62, 0x52, 0xc7, 0xf2, 0x4a, 0xd3, 0x8b, 0xca,
-	0x72, 0xda, 0xb8, 0x2f, 0x94, 0xcd, 0x40, 0xd7, 0x08, 0x54, 0xfa, 0x07, 0x28, 0xdd, 0x24, 0x44,
-	0x1e, 0xd8, 0x02, 0x64, 0x4f, 0x69, 0xbb, 0x65, 0x5b, 0x82, 0x92, 0xb4, 0x31, 0x75, 0x4a, 0xdb,
-	0xdb, 0x16, 0x7a, 0x09, 0x39, 0x4b, 0xba, 0x08, 0x5a, 0x0a, 0xd5, 0xb9, 0x28, 0xb0, 0x10, 0xcb,
-	0x88, 0x4c, 0xf4, 0xff, 0x14, 0x78, 0xb0, 0x8b, 0x9d, 0x8e, 0x8f, 0x3b, 0x64, 0x93, 0x10, 0xab,
-	0x8d, 0xcd, 0xee, 0x78, 0xce, 0x1f, 0x03, 0x0c, 0xb0, 0x8b, 0x3b, 0x2e, 0x1e, 0x9c, 0x78, 0xa5,
-	0xd4, 0x62, 0x7a, 0x39, 0x6f, 0xc4, 0x24, 0xe8, 0x19, 0xdc, 0x0b, 0xd1, 0x5b, 0xb1, 0x83, 0x98,
-	0x09, 0x85, 0x47, 0xfc, 0x40, 0xe2, 0x51, 0x66, 0x6e, 0x8d, 0x72, 0x34, 0x77, 0x53, 0xa3, 0xb9,
-	0xfb, 0xa8, 0x40, 0xe9, 0x66, 0x66, 0xe3, 0xc9, 0x7b, 0x0b, 0xb9, 0x63, 0x69, 0x2a, 0x32, 0x2b,
-	0x54, 0x9f, 0x25, 0xb4, 0xc1, 0x0d, 0xd4, 0xc8, 0x69, 0x88, 0x9c, 0xf4, 0x30, 0x39, 0xfa, 0x9f,
-	0x0a, 0xa8, 0xc3, 0xee, 0xe8, 0x21, 0xe4, 0x23, 0x13, 0x19, 0xcf, 0x95, 0x00, 0x69, 0x90, 0xa3,
-	0xae, 0xdd, 0xb1, 0x1d, 0x1c, 0xb6, 0x4b, 0xb4, 0xe6, 0xdb, 0x79, 0x7e, 0xa7, 0x43, 0x3c, 0x5e,
-	0x67, 0xb2, 0xbc, 0x63, 0x12, 0xae, 0xef, 0x53, 0x66, 0x9f, 0x89, 0x96, 0x14, 0x64, 0xe5, 0x8d,
-	0x98, 0x04, 0x3d, 0x85, 0x99, 0x68, 0x23, 0x4e, 0x46, 0x56, 0x58, 0x14, 0x22, 0xd9, 0xb6, 0xa5,
-	0xff, 0xa5, 0x40, 0xe1, 0xd3, 0x1a, 0xf1, 0x91, 0xe0, 0xc2, 0x23, 0x2d, 0xa1, 0xe1, 0x55, 0x90,
-	0x13, 0x79, 0x79, 0x84, 0xe3, 0xa1, 0x25, 0x98, 0x35, 0x4f, 0xb0, 0x8b, 0x4d, 0x46, 0xdc, 0x96,
-	0x49, 0x7d, 0x59, 0x09, 0x53, 0x46, 0x31, 0x12, 0xd7, 0xb8, 0xf4, 0x93, 0x0e, 0xdf, 0x84, 0x99,
-	0x49, 0x9a, 0x25, 0x29, 0xec, 0x65, 0x98, 0x36, 0xa9, 0xc3, 0x78, 0x65, 0xa6, 0x13, 0x1b, 0x3b,
-	0x54, 0xeb, 0x4b, 0x30, 0xbb, 0x6b, 0x7b, 0x6c, 0x87, 0xb6, 0xbd, 0x18, 0x3b, 0xf8, 0x98, 0x11,
-	0x37, 0xdc, 0x46, 0x2c, 0xf4, 0x2d, 0x50, 0xaf, 0x0c, 0x65, 0x44, 0xaf, 0x20, 0x73, 0x4a, 0xdb,
-	0xe1, 0xb4, 0x7d, 0x92, 0x50, 0x66, 0x3b, 0xb4, 0x6d, 0x90, 0x63, 0xe2, 0xf2, 0x85, 0x21, 0x8c,
-	0xf5, 0xbf, 0x15, 0x40, 0xef, 0xb1, 0xcd, 0x36, 0xa9, 0x1b, 0xdf, 0xb5, 0x76, 0x0d, 0xab, 0x92,
-	0x80, 0x75, 0xd3, 0x89, 0xc3, 0x7b, 0x75, 0x87, 0xb9, 0x97, 0x01, 0x36, 0x5a, 0x84, 0x99, 0x3e,
-	0xbe, 0x68, 0x9d, 0x63, 0x5b, 0x30, 0x2c, 0x38, 0x49, 0x1b, 0xd0, 0xc7, 0x17, 0xdc, 0xb9, 0x41,
-	0x4c, 0xed, 0x0d, 0xe4, 0x23, 0x27, 0x3e, 0x52, 0xbb, 0xe4, 0x52, 0xe6, 0xc9, 0x5f, 0x79, 0xee,
-	0x67, 0xb8, 0xe7, 0x13, 0xe9, 0x19, 0x2c, 0xbe, 0x4b, 0xad, 0x2a, 0xfa, 0x21, 0xdc, 0xbf, 0x16,
-	0x80, 0xa4, 0xe0, 0x5b, 0x98, 0xf6, 0x07, 0x16, 0x66, 0xc4, 0x9a, 0x94, 0x85, 0xd0, 0x5e, 0xd7,
-	0x41, 0xdd, 0x22, 0xfc, 0x78, 0xfd, 0x5e, 0x54, 0x99, 0x45, 0x48, 0x45, 0xe7, 0x9b, 0xb2, 0x2d,
-	0xbd, 0x09, 0x33, 0x71, 0xe7, 0x61, 0x3d, 0x7a, 0x0d, 0x59, 0x8f, 0x61, 0xe6, 0x7b, 0x22, 0xe0,
-	0x62, 0xf5, 0x61, 0xf2, 0xee, 0x0d, 0x61, 0x63, 0x48, 0x5b, 0xfd, 0xdf, 0x14, 0xcc, 0xc5, 0xb6,
-	0x96, 0xa9, 0x0c, 0x63, 0x27, 0x7e, 0xe0, 0x50, 0x19, 0x32, 0xec, 0x72, 0x40, 0x44, 0x2f, 0x14,
-	0xab, 0x5a, 0xf2, 0x7e, 0xcd, 0xcb, 0x01, 0x31, 0x84, 0x5d, 0x2c, 0xc2, 0xcc, 0xe4, 0x11, 0xf2,
-	0xbe, 0x23, 0xae, 0x4b, 0x79, 0x53, 0x59, 0x44, 0x36, 0x7d, 0x5e, 0x48, 0x6a, 0xd4, 0x12, 0xdf,
-	0x5e, 0xb1, 0x90, 0xcd, 0x1e, 0x2c, 0xae, 0x0d, 0xe4, 0xe9, 0xdb, 0x07, 0x72, 0x7c, 0x50, 0xe6,
-	0x84, 0xf9, 0xdd, 0x06, 0xe5, 0x4a, 0x4d, 0xd4, 0x52, 0x10, 0x39, 0x42, 0x50, 0x6c, 0x34, 0xd7,
-	0x9a, 0x47, 0x8d, 0xd6, 0xd1, 0xfe, 0xbb, 0xfd, 0x83, 0xf7, 0xfb, 0xea, 0x67, 0x68, 0x16, 0x0a,
-	0x52, 0xb6, 0x71, 0xb0, 0x5f, 0x57, 0x15, 0x34, 0x07, 0xf7, 0xa4, 0x60, 0x73, 0x6d, 0x7b, 0xb7,
-	0xbe, 0xa1, 0xa6, 0x56, 0x3e, 0xc0, 0xb4, 0x24, 0x0c, 0xcd, 0x83, 0xba, 0x73, 0xb0, 0xde, 0x6a,
-	0xfe, 0x74, 0x58, 0x8f, 0x81, 0x2c, 0xc0, 0x5c, 0x24, 0xdd, 0x38, 0xa8, 0x1d, 0xed, 0xd5, 0xf7,
-	0x9b, 0xaa, 0x72, 0x4d, 0xbc, 0x59, 0xaf, 0x6f, 0xac, 0xaf, 0xd5, 0xde, 0xa9, 0x29, 0xbe, 0x43,
-	0x24, 0x6e, 0xd6, 0x7f, 0x6c, 0xaa, 0xe9, 0xea, 0x3f, 0x19, 0xc8, 0xc9, 0x5b, 0x17, 0x41, 0x5d,
-	0x50, 0x87, 0xbf, 0xc6, 0x68, 0x25, 0x21, 0xed, 0x11, 0x77, 0x18, 0xed, 0xcb, 0x89, 0x6c, 0x65,
-	0x45, 0x75, 0x13, 0x3e, 0x14, 0x2b, 0x93, 0x70, 0x3c, 0x66, 0xb3, 0x91, 0x9f, 0xc3, 0x2d, 0xc8,
-	0x88, 0x6c, 0x1e, 0x27, 0x5d, 0xfa, 0x62, 0x19, 0x3c, 0x19, 0xa9, 0x97, 0x40, 0x0d, 0xc8, 0x85,
-	0x93, 0x0e, 0xe9, 0x49, 0x11, 0x5c, 0x9f, 0x97, 0xda, 0xb3, 0xb1, 0x36, 0x12, 0xf4, 0x17, 0x28,
-	0xc4, 0xc6, 0x07, 0x7a, 0x31, 0xd1, 0x7c, 0xd3, 0xbe, 0xb8, 0xcd, 0x4c, 0xa2, 0xff, 0x00, 0xf9,
-	0xa8, 0x9f, 0x51, 0x52, 0x3c, 0xc3, 0x83, 0x46, 0x7b, 0x3e, 0xde, 0x28, 0xc0, 0xad, 0xfe, 0x91,
-	0x86, 0x7c, 0x78, 0x21, 0x26, 0xe8, 0x1c, 0xe6, 0x93, 0xae, 0xdf, 0xa8, 0x9c, 0x8c, 0x35, 0xea,
-	0x1a, 0xaf, 0x55, 0x26, 0xb6, 0x97, 0xe9, 0x7d, 0x54, 0xe0, 0xd1, 0xd8, 0xff, 0x13, 0xf4, 0x26,
-	0x01, 0x72, 0x92, 0x7f, 0x24, 0x6d, 0xf5, 0xee, 0x8e, 0x32, 0xa8, 0xdf, 0x14, 0xd0, 0x46, 0xff,
-	0xd2, 0xa0, 0xd7, 0x09, 0xc0, 0xb7, 0xfe, 0x3a, 0x69, 0x5f, 0xdf, 0xd1, 0x2b, 0x88, 0x65, 0xbd,
-	0xfc, 0xf3, 0x57, 0x1d, 0x9b, 0x9d, 0xf8, 0xed, 0xb2, 0x49, 0xfb, 0x15, 0x0e, 0x51, 0x21, 0x3d,
-	0x32, 0x38, 0xc1, 0x0e, 0x7b, 0xc9, 0xd8, 0x4b, 0x3c, 0xb0, 0x2b, 0x71, 0xc8, 0x76, 0x56, 0xfc,
-	0x48, 0xbe, 0xfa, 0x3f, 0x00, 0x00, 0xff, 0xff, 0xbb, 0x86, 0x44, 0xfd, 0x90, 0x0e, 0x00, 0x00,
+	// 1753 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x58, 0x4b, 0x73, 0xe3, 0xc6,
+	0x11, 0x0e, 0x08, 0x8a, 0x8f, 0xa6, 0xcc, 0x25, 0x67, 0xa5, 0x35, 0x8d, 0xec, 0xda, 0x32, 0x56,
+	0xb2, 0x18, 0xd9, 0x4b, 0x55, 0x71, 0x9d, 0x48, 0x49, 0xa5, 0xca, 0xd1, 0x83, 0x52, 0x69, 0xad,
+	0x95, 0x14, 0x90, 0xb2, 0xe3, 0x3c, 0x8a, 0x1e, 0x02, 0x23, 0x0a, 0x2b, 0x10, 0x43, 0x03, 0x03,
+	0xad, 0x74, 0xcf, 0x21, 0x3e, 0xa5, 0xca, 0x55, 0xb9, 0xe4, 0x4f, 0xe4, 0x90, 0x1c, 0x72, 0xc8,
+	0x31, 0xe7, 0xe4, 0x98, 0xbf, 0x93, 0xc2, 0x60, 0x00, 0x82, 0x20, 0xf8, 0xd0, 0x9e, 0xc8, 0xe9,
+	0x77, 0x7f, 0x33, 0xdd, 0xe8, 0x19, 0x50, 0x4c, 0x9b, 0x11, 0xcb, 0x32, 0xfb, 0xc4, 0xd6, 0xc9,
+	0xb6, 0x4b, 0x9c, 0x5b, 0x53, 0x27, 0x8d, 0xa1, 0x43, 0x19, 0x45, 0x55, 0xc6, 0x70, 0xaf, 0x11,
+	0x17, 0x50, 0x56, 0x6d, 0xf2, 0xd6, 0x35, 0xa8, 0xbe, 0x2d, 0x7e, 0x03, 0x49, 0xf5, 0xbf, 0x12,
+	0xac, 0xb6, 0xc9, 0x00, 0xdb, 0xcc, 0xd4, 0xdb, 0x04, 0x3b, 0xfa, 0xb5, 0x46, 0xbe, 0xf3, 0x88,
+	0xcb, 0xd0, 0x0a, 0x2c, 0x7d, 0xe7, 0x11, 0xe7, 0xbe, 0x26, 0xad, 0x49, 0xf5, 0xa2, 0x16, 0x2c,
+	0xd0, 0x06, 0x94, 0x0d, 0xaa, 0x7b, 0x03, 0x62, 0xb3, 0x2e, 0xbb, 0x1f, 0x12, 0xb7, 0x96, 0x59,
+	0x93, 0xeb, 0x45, 0xed, 0xbd, 0x90, 0xda, 0xf1, 0x89, 0xa8, 0x01, 0x8f, 0x75, 0x6a, 0x33, 0x5f,
+	0xaa, 0x67, 0x51, 0xfd, 0x46, 0xc8, 0xca, 0x5c, 0xb6, 0x2a, 0x58, 0xfb, 0x3e, 0x27, 0x90, 0x5f,
+	0x81, 0x25, 0xcb, 0x1c, 0x98, 0xac, 0x96, 0x5d, 0x93, 0xea, 0x4b, 0x5a, 0xb0, 0x40, 0x1f, 0x40,
+	0xe1, 0x9a, 0xb2, 0x2e, 0xb5, 0xad, 0xfb, 0xda, 0xd2, 0x9a, 0x54, 0x2f, 0x68, 0xf9, 0x6b, 0xca,
+	0xce, 0x6d, 0xeb, 0x1e, 0xd5, 0x20, 0x6f, 0x0f, 0x1d, 0xda, 0x23, 0x6e, 0x2d, 0xc7, 0x55, 0xc2,
+	0xa5, 0xfa, 0x3b, 0x78, 0x92, 0x4c, 0xc8, 0x1d, 0x52, 0xdb, 0x25, 0x68, 0x0f, 0xf2, 0x0e, 0x71,
+	0x3d, 0x8b, 0xb9, 0x35, 0x69, 0x4d, 0xae, 0x97, 0x9a, 0x9b, 0x8d, 0x09, 0x9c, 0x1a, 0x13, 0xba,
+	0x9e, 0xc5, 0xb4, 0x50, 0x4f, 0xfd, 0x97, 0x04, 0x2b, 0x69, 0x12, 0xe8, 0x39, 0x44, 0x08, 0x74,
+	0x3d, 0xcf, 0x34, 0x04, 0x6a, 0xcb, 0x21, 0xf1, 0xd2, 0x33, 0x8d, 0x31, 0x21, 0x1f, 0x90, 0x5a,
+	0x66, 0x5c, 0xc8, 0xc7, 0xc2, 0x87, 0x82, 0x99, 0xcc, 0x22, 0x35, 0x39, 0xc0, 0x9d, 0x2f, 0x7c,
+	0xaa, 0xab, 0x53, 0x87, 0x70, 0x80, 0x32, 0x5a, 0xb0, 0x98, 0x06, 0xf3, 0xd2, 0x14, 0x98, 0xd5,
+	0x15, 0x40, 0xa7, 0xa6, 0xcb, 0x2e, 0x1c, 0x3a, 0x18, 0x32, 0x57, 0xec, 0xb4, 0x7a, 0x06, 0x8f,
+	0xc7, 0xa8, 0x02, 0xae, 0x1d, 0xc8, 0x0f, 0x03, 0x92, 0x80, 0xeb, 0x59, 0x0a, 0x5c, 0x81, 0xd2,
+	0x89, 0x7d, 0x45, 0xb5, 0x50, 0x5a, 0x3d, 0x05, 0x18, 0x91, 0x11, 0x82, 0x6c, 0x0c, 0x10, 0xfe,
+	0x7f, 0x94, 0x63, 0x26, 0x91, 0xe3, 0x80, 0x1a, 0xc4, 0x0a, 0x33, 0xe7, 0x0b, 0xf5, 0x13, 0xa8,
+	0x1c, 0x13, 0x11, 0x5c, 0x78, 0x36, 0x53, 0x6c, 0xaa, 0xdf, 0x4b, 0x50, 0x8d, 0x09, 0x8a, 0x24,
+	0x5e, 0x40, 0x21, 0x44, 0x97, 0x4b, 0x97, 0x9a, 0xd5, 0x46, 0x58, 0x01, 0x87, 0x82, 0xa1, 0x45,
+	0x22, 0x68, 0x13, 0x1e, 0x39, 0xc4, 0x36, 0x88, 0x43, 0x8c, 0x6e, 0x90, 0x8e, 0x08, 0xb1, 0x1c,
+	0x92, 0x03, 0xfb, 0xe8, 0x29, 0x14, 0x6f, 0xb1, 0x63, 0xe2, 0x9e, 0x15, 0x1d, 0xeb, 0x11, 0x41,
+	0xfd, 0x8f, 0x04, 0xd5, 0x0e, 0x71, 0xe7, 0x47, 0x3d, 0xca, 0x39, 0x13, 0xcb, 0x19, 0xfd, 0x3a,
+	0x69, 0xbd, 0xd4, 0x7c, 0x99, 0x02, 0xfe, 0x84, 0x8b, 0xc6, 0x57, 0xa1, 0x56, 0xcb, 0x66, 0xce,
+	0x7d, 0x2c, 0x24, 0xe5, 0x97, 0x50, 0x1e, 0x67, 0xa2, 0x0a, 0xc8, 0x37, 0x24, 0x2c, 0x6f, 0xff,
+	0xaf, 0x1f, 0xcc, 0x2d, 0xb6, 0xbc, 0x68, 0x5b, 0xf8, 0xe2, 0x17, 0x99, 0x5d, 0x49, 0xbd, 0x04,
+	0x14, 0x77, 0x26, 0xc0, 0x7d, 0x02, 0xb9, 0xa0, 0x30, 0x84, 0x11, 0xb1, 0x5a, 0x18, 0x45, 0xf5,
+	0x4f, 0x12, 0xd4, 0x3a, 0x0e, 0xb6, 0x5d, 0x0b, 0x33, 0x12, 0x6d, 0xc7, 0xa8, 0x01, 0x05, 0xd0,
+	0x48, 0x71, 0x68, 0xe2, 0x1b, 0x9a, 0x59, 0x68, 0x43, 0x19, 0x76, 0xfa, 0x84, 0x75, 0x2d, 0x6c,
+	0xf7, 0x3d, 0xdc, 0x0f, 0xeb, 0xaa, 0x1c, 0x90, 0x4f, 0x05, 0x55, 0xfd, 0xa3, 0x04, 0x1f, 0xa4,
+	0x84, 0xf2, 0x6e, 0xc7, 0x68, 0x17, 0x6a, 0x06, 0x61, 0x44, 0x67, 0xc4, 0xe8, 0xba, 0xd4, 0x73,
+	0x74, 0x32, 0x72, 0x1f, 0x20, 0xf1, 0x24, 0xe4, 0xb7, 0x39, 0x3b, 0x0a, 0xe3, 0x02, 0xd6, 0x0f,
+	0xa8, 0x7d, 0x65, 0xf6, 0x3d, 0x87, 0x1c, 0x13, 0x9b, 0x38, 0x98, 0x99, 0xb7, 0x24, 0x0c, 0x8c,
+	0x3a, 0xb1, 0xb3, 0x64, 0xe3, 0x01, 0x09, 0xcf, 0x92, 0xff, 0x3f, 0xfd, 0x2c, 0xa9, 0x9b, 0xb0,
+	0x31, 0xc7, 0x62, 0x90, 0xa3, 0xba, 0x03, 0x1f, 0x6b, 0x64, 0x40, 0x6f, 0x1f, 0xea, 0x57, 0x5d,
+	0x07, 0x75, 0x96, 0xa2, 0x30, 0xff, 0x0c, 0x7e, 0x7c, 0x4c, 0x58, 0xc8, 0x30, 0xa9, 0xfd, 0xda,
+	0x0f, 0x2f, 0x6a, 0x42, 0x5d, 0x78, 0x9a, 0xce, 0x16, 0x3b, 0xf0, 0x05, 0xe4, 0x78, 0x3e, 0xb3,
+	0x7a, 0x77, 0x52, 0x9b, 0xb7, 0x25, 0xa1, 0xa6, 0xfe, 0x0a, 0x56, 0xd2, 0xf8, 0x0f, 0x40, 0xf2,
+	0xcf, 0x19, 0x78, 0x3f, 0xdc, 0xec, 0x23, 0x87, 0x0e, 0x3a, 0xe4, 0x6e, 0xce, 0x61, 0x45, 0x90,
+	0x65, 0xe4, 0x2e, 0x3c, 0xfd, 0xfc, 0x7f, 0xd4, 0x05, 0xe4, 0x58, 0x17, 0xa8, 0x80, 0xec, 0x39,
+	0x26, 0xef, 0xed, 0x45, 0xcd, 0xff, 0x8b, 0x76, 0xe1, 0x11, 0x36, 0x0c, 0xd3, 0x0f, 0x15, 0x5b,
+	0xa7, 0xa6, 0x7d, 0x13, 0x74, 0xf5, 0x52, 0xb3, 0x1c, 0x9d, 0x3b, 0xde, 0xd7, 0xb5, 0xa4, 0x18,
+	0xfa, 0x19, 0x94, 0x47, 0xa4, 0xd7, 0x84, 0xe1, 0x5a, 0x2e, 0x55, 0x31, 0x21, 0x85, 0x9a, 0xb0,
+	0x8a, 0xdd, 0x7b, 0x5b, 0xef, 0x32, 0x73, 0x40, 0xa8, 0xc7, 0xba, 0x2e, 0xd1, 0xa9, 0x6d, 0xb8,
+	0xb5, 0xfc, 0x9a, 0x54, 0x97, 0xb5, 0xc7, 0x9c, 0xd9, 0x09, 0x78, 0xed, 0x80, 0xa5, 0x7e, 0x0b,
+	0xb5, 0x49, 0x40, 0xc4, 0x86, 0xad, 0x42, 0xee, 0x0d, 0xed, 0x75, 0x45, 0xbf, 0x93, 0xb5, 0xa5,
+	0x37, 0xb4, 0x77, 0x62, 0x3c, 0xb0, 0x7e, 0xd5, 0xff, 0x49, 0xf0, 0x7e, 0x58, 0x1c, 0x47, 0x84,
+	0x18, 0x3d, 0xac, 0xdf, 0xcc, 0xc6, 0xfc, 0x43, 0x80, 0x21, 0x76, 0x70, 0xdf, 0xc1, 0xc3, 0xeb,
+	0x70, 0x3a, 0x89, 0x51, 0x26, 0xbf, 0xd4, 0x72, 0xca, 0x97, 0x3a, 0x1e, 0x65, 0x76, 0x7e, 0xbd,
+	0x4f, 0xc5, 0x6e, 0x69, 0x3a, 0x76, 0x3f, 0x48, 0x50, 0x9b, 0xcc, 0x6c, 0x36, 0x78, 0x5f, 0x40,
+	0xe1, 0x4a, 0x88, 0xf2, 0xcc, 0x4a, 0xcd, 0xe7, 0x29, 0x65, 0x30, 0x61, 0x35, 0x52, 0x4a, 0x80,
+	0x23, 0x27, 0xc1, 0x51, 0xff, 0x26, 0x41, 0x25, 0xa9, 0xee, 0x7f, 0xeb, 0x22, 0x11, 0x11, 0xcf,
+	0x88, 0x80, 0x14, 0x28, 0x50, 0xc7, 0xec, 0x9b, 0x36, 0x0e, 0xcb, 0x25, 0x5a, 0xfb, 0xee, 0x5c,
+	0xaf, 0xdf, 0x27, 0xae, 0x7f, 0xce, 0xc4, 0xf1, 0x8e, 0x51, 0x7c, 0xfe, 0x80, 0x32, 0xf3, 0x96,
+	0x97, 0x24, 0x07, 0xab, 0xa8, 0xc5, 0x28, 0xe8, 0x63, 0x58, 0x8e, 0x1c, 0xf9, 0x60, 0xe4, 0xb8,
+	0x44, 0x29, 0xa2, 0x9d, 0x18, 0xea, 0xdf, 0x25, 0x28, 0xbd, 0x5b, 0x21, 0x3e, 0xe3, 0x58, 0xb8,
+	0xa4, 0xcb, 0x39, 0x32, 0x9f, 0x2f, 0x8b, 0x9c, 0xe2, 0xdb, 0xf3, 0xbf, 0x1c, 0xfa, 0x35, 0x76,
+	0xb0, 0xce, 0x88, 0xd3, 0xd5, 0xa9, 0x67, 0x87, 0xc3, 0x69, 0x39, 0x22, 0x1f, 0xf8, 0xd4, 0x77,
+	0xda, 0x7c, 0x1d, 0x96, 0x17, 0x29, 0x96, 0xb4, 0xb0, 0xeb, 0x90, 0x17, 0x83, 0x9d, 0x98, 0x0c,
+	0x92, 0x85, 0x1d, 0xb2, 0xd5, 0x4d, 0x78, 0xe4, 0xcf, 0x75, 0xaf, 0x68, 0xcf, 0x8d, 0xa1, 0x83,
+	0xaf, 0x18, 0x71, 0x42, 0x37, 0x7c, 0xa1, 0x1e, 0x43, 0x65, 0x24, 0x28, 0x22, 0x7a, 0x09, 0xd9,
+	0x37, 0xb4, 0x17, 0x76, 0xdb, 0x8f, 0x52, 0x8e, 0xd9, 0x2b, 0xda, 0xd3, 0xc8, 0x15, 0x71, 0xfc,
+	0x85, 0xc6, 0x85, 0xd5, 0x7f, 0x48, 0x80, 0xbe, 0xc6, 0x26, 0x3b, 0xa2, 0x4e, 0xdc, 0xeb, 0xc1,
+	0x98, 0xad, 0xed, 0x14, 0x5b, 0x93, 0x4a, 0xbe, 0x79, 0x31, 0xc5, 0x70, 0x65, 0xb4, 0x06, 0xcb,
+	0x03, 0x7c, 0xd7, 0x7d, 0x8b, 0x4d, 0x8e, 0x30, 0xc7, 0x44, 0xd6, 0x60, 0x80, 0xef, 0x7c, 0xe5,
+	0x36, 0xd1, 0x95, 0x1d, 0x28, 0x46, 0x4a, 0xf1, 0xe9, 0x46, 0x4e, 0x99, 0x6e, 0xe4, 0xf8, 0x74,
+	0x73, 0x01, 0x8f, 0xc7, 0x02, 0x10, 0x10, 0xfc, 0x1c, 0xf2, 0xde, 0xd0, 0xc0, 0x8c, 0x18, 0x8b,
+	0xa2, 0x10, 0xca, 0xab, 0x2a, 0x1f, 0x5a, 0xc5, 0xed, 0x41, 0xa0, 0x50, 0x86, 0x4c, 0xb4, 0xbf,
+	0x19, 0xd3, 0x50, 0x3b, 0xb0, 0x1c, 0x57, 0x4e, 0xf2, 0xd1, 0xe7, 0x90, 0x73, 0x19, 0x66, 0x9e,
+	0xcb, 0x03, 0x2e, 0x37, 0x9f, 0xa6, 0x7b, 0x6f, 0x73, 0x19, 0x4d, 0xc8, 0xaa, 0xff, 0xce, 0xf0,
+	0x31, 0x38, 0x74, 0x2d, 0x52, 0x49, 0xda, 0x4e, 0x1f, 0x3b, 0x1b, 0x90, 0xe5, 0xd7, 0x12, 0x99,
+	0xfb, 0x53, 0xd2, 0xfd, 0xf9, 0x37, 0x09, 0x8d, 0xcb, 0xc5, 0x22, 0xcc, 0x2e, 0x1e, 0xa1, 0x5f,
+	0x77, 0xc4, 0x71, 0xa8, 0x5f, 0x54, 0x06, 0x11, 0x45, 0x5f, 0xe4, 0x94, 0x03, 0x6a, 0xf0, 0x6f,
+	0x2f, 0x5f, 0x88, 0x62, 0x0f, 0x16, 0x63, 0x0d, 0x39, 0x3f, 0xbf, 0x21, 0xc7, 0x1b, 0x65, 0x81,
+	0x8b, 0x3f, 0xac, 0x51, 0x6e, 0x1d, 0xf0, 0xb3, 0x14, 0x44, 0x8e, 0x10, 0x94, 0xdb, 0x9d, 0xbd,
+	0xce, 0x65, 0xbb, 0x7b, 0x79, 0xf6, 0xe5, 0xd9, 0xf9, 0xd7, 0x67, 0x95, 0x1f, 0xa1, 0x47, 0x50,
+	0x12, 0xb4, 0xc3, 0xf3, 0xb3, 0x56, 0x45, 0x42, 0x55, 0x78, 0x4f, 0x10, 0x8e, 0xf6, 0x4e, 0x4e,
+	0x5b, 0x87, 0x95, 0xcc, 0xd6, 0xb7, 0x90, 0x17, 0x80, 0xa1, 0x15, 0xa8, 0xbc, 0x3a, 0xdf, 0xef,
+	0x76, 0xbe, 0xb9, 0x68, 0xc5, 0x8c, 0xac, 0x42, 0x35, 0xa2, 0x1e, 0x9e, 0x1f, 0x5c, 0xbe, 0x6e,
+	0x9d, 0x75, 0x2a, 0xd2, 0x18, 0xf9, 0xa8, 0xd5, 0x3a, 0xdc, 0xdf, 0x3b, 0xf8, 0xb2, 0x92, 0xf1,
+	0x3d, 0x44, 0xe4, 0x4e, 0xeb, 0x37, 0x9d, 0x8a, 0xdc, 0xfc, 0x67, 0x16, 0x0a, 0x62, 0xea, 0x22,
+	0xe8, 0x06, 0x2a, 0xc9, 0xaf, 0x31, 0xda, 0x4a, 0x49, 0x7b, 0xca, 0x0c, 0xa3, 0x7c, 0xba, 0x90,
+	0xac, 0x38, 0x51, 0x37, 0x29, 0x1f, 0x8a, 0xad, 0x45, 0x30, 0x9e, 0xe1, 0x6c, 0xea, 0xe7, 0xf0,
+	0x18, 0xb2, 0x3c, 0x9b, 0x0f, 0x53, 0x2f, 0x41, 0xa3, 0x0c, 0x3e, 0x9a, 0xca, 0x17, 0x86, 0xda,
+	0x50, 0x08, 0x3b, 0x1d, 0x52, 0xd3, 0x22, 0x18, 0xef, 0x97, 0xca, 0xf3, 0x99, 0x32, 0xc2, 0xe8,
+	0xef, 0xa1, 0x14, 0x6b, 0x1f, 0x68, 0x63, 0xa1, 0xfe, 0xa6, 0x7c, 0x32, 0x4f, 0x4c, 0x58, 0xff,
+	0x0a, 0x8a, 0x51, 0x3d, 0xa3, 0xb4, 0x78, 0x92, 0x8d, 0x46, 0x59, 0x9f, 0x2d, 0x14, 0xd8, 0x6d,
+	0xfe, 0x25, 0x0b, 0xc5, 0xe8, 0xc2, 0x83, 0xde, 0xc2, 0x4a, 0xda, 0xf8, 0x8d, 0x1a, 0xe9, 0xb6,
+	0xa6, 0x8d, 0xf1, 0xca, 0xf6, 0xc2, 0xf2, 0x22, 0xbd, 0x1f, 0x24, 0x78, 0x36, 0xf3, 0x7e, 0x82,
+	0x76, 0x52, 0x4c, 0x2e, 0x72, 0x47, 0x52, 0x76, 0x1f, 0xae, 0x28, 0x82, 0xfa, 0x5e, 0x02, 0x65,
+	0xfa, 0x95, 0x06, 0x7d, 0x9e, 0x62, 0x78, 0xee, 0xd5, 0x49, 0xf9, 0xe9, 0x03, 0xb5, 0x44, 0x2c,
+	0x36, 0x54, 0x27, 0xee, 0xa5, 0xe8, 0xd3, 0x19, 0xb7, 0x9f, 0xe4, 0x45, 0x5a, 0xf9, 0x6c, 0x31,
+	0x61, 0x71, 0x2e, 0x6e, 0x00, 0x5a, 0x83, 0x1e, 0x31, 0x0c, 0xd3, 0xee, 0xbb, 0xe8, 0x0f, 0x90,
+	0x0b, 0xde, 0xb9, 0x50, 0x7d, 0x81, 0xc7, 0xb2, 0xc0, 0xdf, 0x4f, 0x16, 0x79, 0x56, 0x0b, 0x9c,
+	0xfd, 0x35, 0x03, 0x79, 0xf1, 0xee, 0xe4, 0x97, 0x51, 0xec, 0x19, 0x2a, 0xb5, 0x8c, 0x26, 0x1f,
+	0xaf, 0x52, 0xcb, 0x28, 0xed, 0x35, 0x2b, 0x28, 0x23, 0xf1, 0x7a, 0x33, 0xa5, 0x8c, 0xc6, 0xde,
+	0x52, 0xa6, 0x95, 0x51, 0xe2, 0x0d, 0xe4, 0x1b, 0x80, 0xd1, 0xcb, 0x08, 0x5a, 0x5f, 0xe4, 0x95,
+	0x46, 0xd9, 0x98, 0x23, 0x15, 0x98, 0xde, 0x6f, 0xfc, 0xf6, 0xb3, 0xbe, 0xc9, 0xae, 0xbd, 0x5e,
+	0x43, 0xa7, 0x83, 0x6d, 0x5f, 0x65, 0x9b, 0x58, 0x64, 0x78, 0x8d, 0x6d, 0xf6, 0x82, 0xb1, 0x17,
+	0x78, 0x68, 0x6e, 0xc7, 0x4d, 0xf4, 0x72, 0xfc, 0x49, 0xf7, 0xe5, 0xff, 0x03, 0x00, 0x00, 0xff,
+	0xff, 0x39, 0xa5, 0xc4, 0x74, 0x1a, 0x16, 0x00, 0x00,
 }
