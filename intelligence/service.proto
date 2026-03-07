@@ -35,6 +35,127 @@ service Translate {
   // RemoveGenerativeTranslator removes a generative translation model
   // configuration.
   rpc RemoveGenerativeTranslator(RemoveGenerativeTranslatorRequest) returns (RemoveGenerativeTranslatorResponse);
+
+  // TranslateDocument translates the content of a document to a target
+  // language. Returns the translated document with original content
+  // preserved in a meta block.
+  rpc TranslateDocument(TranslateDocumentRequest) returns (TranslateDocumentResponse);
+}
+
+// Embeddings provides semantic search across embedded documents.
+service Embeddings {
+  // Search performs a semantic search across embedded documents.
+  rpc Search(SemanticSearchRequest) returns (SemanticSearchResponse);
+}
+
+message SemanticSearchRequest {
+  // Query text to find similar documents for.
+  string query = 1;
+  // DocumentTypes to filter by (e.g. "core/article", "tt/wire").
+  repeated string document_types = 2;
+  // ContentBlockTypes to filter by (e.g. "core/factbox").
+  repeated string content_block_types = 3;
+  // Limit is the maximum number of results to return.
+  int32 limit = 4;
+  // HotOnly restricts search to the hot (recent) table.
+  bool hot_only = 5;
+  // Nprobes controls IVFFlat probe count for cold index queries.
+  // Higher values improve recall at the cost of latency. Optional,
+  // defaults to server-configured value.
+  int32 nprobes = 6;
+}
+
+message SemanticSearchResponse {
+  repeated SemanticSearchResult results = 1;
+}
+
+message SemanticSearchResult {
+  // UUID of the matching document.
+  string document_uuid = 1;
+  // Type of the document (e.g. "core/article").
+  string document_type = 2;
+  // Title of the document.
+  string title = 3;
+  // Cosine similarity score.
+  float score = 4;
+  // Content block types present in the document.
+  repeated string content_block_types = 5;
+}
+
+// Prompts provides management and testing of prompt documents.
+service Prompts {
+  // ListPrompts lists prompt documents from the repository.
+  rpc ListPrompts(ListPromptsRequest) returns (ListPromptsResponse);
+  // GetPrompt retrieves a prompt document with its rendered content.
+  rpc GetPrompt(GetPromptRequest) returns (GetPromptResponse);
+  // TestPrompt runs a prompt with test input and returns the result.
+  rpc TestPrompt(TestPromptRequest) returns (TestPromptResponse);
+}
+
+message ListPromptsRequest {}
+
+message ListPromptsResponse {
+  repeated PromptInfo prompts = 1;
+}
+
+// PromptInfo is a summary of a prompt document.
+message PromptInfo {
+  // UUID of the prompt document.
+  string uuid = 1;
+  // Title of the prompt.
+  string title = 2;
+  // Model URI configured for the prompt.
+  string model = 3;
+}
+
+message GetPromptRequest {
+  // UUID of the prompt document to retrieve.
+  string uuid = 1;
+}
+
+message GetPromptResponse {
+  // Document is the prompt document.
+  newsdoc.Document document = 1;
+  // RenderedPrompt is the prompt text with all snippet includes resolved.
+  string rendered_prompt = 2;
+  // Variables are the template variable names found in the prompt.
+  repeated string variables = 3;
+}
+
+message TestPromptRequest {
+  // UUID of the prompt document to test.
+  string uuid = 1;
+  // Model override. Optional, uses the prompt's configured model if empty.
+  string model = 2;
+  // Variables to substitute into the prompt template.
+  map<string, string> variables = 3;
+}
+
+message TestPromptResponse {
+  // Result is the raw model output.
+  string result = 1;
+  // RenderedPrompt is the prompt that was sent to the model after variable
+  // substitution.
+  string rendered_prompt = 2;
+}
+
+message TranslateDocumentRequest {
+  // Model name to use for translation (maps to DeepL or a generative
+  // translator).
+  string model = 1;
+  // Document to translate.
+  newsdoc.Document document = 2;
+  // TargetLanguage is the BCP47 language tag to translate to.
+  string target_language = 3;
+}
+
+message TranslateDocumentResponse {
+  // Document with translated content blocks and originals stored in a
+  // meta block.
+  newsdoc.Document document = 1;
+  // DetectedSourceLanguage is the language detected in the source
+  // content.
+  string detected_source_language = 2;
 }
 
 message ConfigureGenerativeTranslatorRequest {

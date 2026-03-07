@@ -131,6 +131,713 @@ func (JobType) EnumDescriptor() ([]byte, []int) {
 	return file_intelligence_service_proto_rawDescGZIP(), []int{1}
 }
 
+type SemanticSearchRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Query text to find similar documents for.
+	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	// DocumentTypes to filter by (e.g. "core/article", "tt/wire").
+	DocumentTypes []string `protobuf:"bytes,2,rep,name=document_types,json=documentTypes,proto3" json:"document_types,omitempty"`
+	// ContentBlockTypes to filter by (e.g. "core/factbox").
+	ContentBlockTypes []string `protobuf:"bytes,3,rep,name=content_block_types,json=contentBlockTypes,proto3" json:"content_block_types,omitempty"`
+	// Limit is the maximum number of results to return.
+	Limit int32 `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// HotOnly restricts search to the hot (recent) table.
+	HotOnly bool `protobuf:"varint,5,opt,name=hot_only,json=hotOnly,proto3" json:"hot_only,omitempty"`
+	// Nprobes controls IVFFlat probe count for cold index queries.
+	// Higher values improve recall at the cost of latency. Optional,
+	// defaults to server-configured value.
+	Nprobes       int32 `protobuf:"varint,6,opt,name=nprobes,proto3" json:"nprobes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SemanticSearchRequest) Reset() {
+	*x = SemanticSearchRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticSearchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticSearchRequest) ProtoMessage() {}
+
+func (x *SemanticSearchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticSearchRequest.ProtoReflect.Descriptor instead.
+func (*SemanticSearchRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SemanticSearchRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *SemanticSearchRequest) GetDocumentTypes() []string {
+	if x != nil {
+		return x.DocumentTypes
+	}
+	return nil
+}
+
+func (x *SemanticSearchRequest) GetContentBlockTypes() []string {
+	if x != nil {
+		return x.ContentBlockTypes
+	}
+	return nil
+}
+
+func (x *SemanticSearchRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *SemanticSearchRequest) GetHotOnly() bool {
+	if x != nil {
+		return x.HotOnly
+	}
+	return false
+}
+
+func (x *SemanticSearchRequest) GetNprobes() int32 {
+	if x != nil {
+		return x.Nprobes
+	}
+	return 0
+}
+
+type SemanticSearchResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Results       []*SemanticSearchResult `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SemanticSearchResponse) Reset() {
+	*x = SemanticSearchResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticSearchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticSearchResponse) ProtoMessage() {}
+
+func (x *SemanticSearchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticSearchResponse.ProtoReflect.Descriptor instead.
+func (*SemanticSearchResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *SemanticSearchResponse) GetResults() []*SemanticSearchResult {
+	if x != nil {
+		return x.Results
+	}
+	return nil
+}
+
+type SemanticSearchResult struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the matching document.
+	DocumentUuid string `protobuf:"bytes,1,opt,name=document_uuid,json=documentUuid,proto3" json:"document_uuid,omitempty"`
+	// Type of the document (e.g. "core/article").
+	DocumentType string `protobuf:"bytes,2,opt,name=document_type,json=documentType,proto3" json:"document_type,omitempty"`
+	// Title of the document.
+	Title string `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	// Cosine similarity score.
+	Score float32 `protobuf:"fixed32,4,opt,name=score,proto3" json:"score,omitempty"`
+	// Content block types present in the document.
+	ContentBlockTypes []string `protobuf:"bytes,5,rep,name=content_block_types,json=contentBlockTypes,proto3" json:"content_block_types,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *SemanticSearchResult) Reset() {
+	*x = SemanticSearchResult{}
+	mi := &file_intelligence_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticSearchResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticSearchResult) ProtoMessage() {}
+
+func (x *SemanticSearchResult) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticSearchResult.ProtoReflect.Descriptor instead.
+func (*SemanticSearchResult) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SemanticSearchResult) GetDocumentUuid() string {
+	if x != nil {
+		return x.DocumentUuid
+	}
+	return ""
+}
+
+func (x *SemanticSearchResult) GetDocumentType() string {
+	if x != nil {
+		return x.DocumentType
+	}
+	return ""
+}
+
+func (x *SemanticSearchResult) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *SemanticSearchResult) GetScore() float32 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *SemanticSearchResult) GetContentBlockTypes() []string {
+	if x != nil {
+		return x.ContentBlockTypes
+	}
+	return nil
+}
+
+type ListPromptsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPromptsRequest) Reset() {
+	*x = ListPromptsRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPromptsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPromptsRequest) ProtoMessage() {}
+
+func (x *ListPromptsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPromptsRequest.ProtoReflect.Descriptor instead.
+func (*ListPromptsRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{3}
+}
+
+type ListPromptsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompts       []*PromptInfo          `protobuf:"bytes,1,rep,name=prompts,proto3" json:"prompts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPromptsResponse) Reset() {
+	*x = ListPromptsResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPromptsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPromptsResponse) ProtoMessage() {}
+
+func (x *ListPromptsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPromptsResponse.ProtoReflect.Descriptor instead.
+func (*ListPromptsResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListPromptsResponse) GetPrompts() []*PromptInfo {
+	if x != nil {
+		return x.Prompts
+	}
+	return nil
+}
+
+// PromptInfo is a summary of a prompt document.
+type PromptInfo struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the prompt document.
+	Uuid string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	// Title of the prompt.
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Model URI configured for the prompt.
+	Model         string `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptInfo) Reset() {
+	*x = PromptInfo{}
+	mi := &file_intelligence_service_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptInfo) ProtoMessage() {}
+
+func (x *PromptInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptInfo.ProtoReflect.Descriptor instead.
+func (*PromptInfo) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PromptInfo) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *PromptInfo) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *PromptInfo) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+type GetPromptRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the prompt document to retrieve.
+	Uuid          string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPromptRequest) Reset() {
+	*x = GetPromptRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPromptRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPromptRequest) ProtoMessage() {}
+
+func (x *GetPromptRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPromptRequest.ProtoReflect.Descriptor instead.
+func (*GetPromptRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetPromptRequest) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+type GetPromptResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Document is the prompt document.
+	Document *newsdoc.Document `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
+	// RenderedPrompt is the prompt text with all snippet includes resolved.
+	RenderedPrompt string `protobuf:"bytes,2,opt,name=rendered_prompt,json=renderedPrompt,proto3" json:"rendered_prompt,omitempty"`
+	// Variables are the template variable names found in the prompt.
+	Variables     []string `protobuf:"bytes,3,rep,name=variables,proto3" json:"variables,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPromptResponse) Reset() {
+	*x = GetPromptResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPromptResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPromptResponse) ProtoMessage() {}
+
+func (x *GetPromptResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPromptResponse.ProtoReflect.Descriptor instead.
+func (*GetPromptResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetPromptResponse) GetDocument() *newsdoc.Document {
+	if x != nil {
+		return x.Document
+	}
+	return nil
+}
+
+func (x *GetPromptResponse) GetRenderedPrompt() string {
+	if x != nil {
+		return x.RenderedPrompt
+	}
+	return ""
+}
+
+func (x *GetPromptResponse) GetVariables() []string {
+	if x != nil {
+		return x.Variables
+	}
+	return nil
+}
+
+type TestPromptRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the prompt document to test.
+	Uuid string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	// Model override. Optional, uses the prompt's configured model if empty.
+	Model string `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	// Variables to substitute into the prompt template.
+	Variables     map[string]string `protobuf:"bytes,3,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TestPromptRequest) Reset() {
+	*x = TestPromptRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestPromptRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestPromptRequest) ProtoMessage() {}
+
+func (x *TestPromptRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestPromptRequest.ProtoReflect.Descriptor instead.
+func (*TestPromptRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *TestPromptRequest) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *TestPromptRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *TestPromptRequest) GetVariables() map[string]string {
+	if x != nil {
+		return x.Variables
+	}
+	return nil
+}
+
+type TestPromptResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Result is the raw model output.
+	Result string `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	// RenderedPrompt is the prompt that was sent to the model after variable
+	// substitution.
+	RenderedPrompt string `protobuf:"bytes,2,opt,name=rendered_prompt,json=renderedPrompt,proto3" json:"rendered_prompt,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TestPromptResponse) Reset() {
+	*x = TestPromptResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestPromptResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestPromptResponse) ProtoMessage() {}
+
+func (x *TestPromptResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestPromptResponse.ProtoReflect.Descriptor instead.
+func (*TestPromptResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *TestPromptResponse) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
+func (x *TestPromptResponse) GetRenderedPrompt() string {
+	if x != nil {
+		return x.RenderedPrompt
+	}
+	return ""
+}
+
+type TranslateDocumentRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Model name to use for translation (maps to DeepL or a generative
+	// translator).
+	Model string `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
+	// Document to translate.
+	Document *newsdoc.Document `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
+	// TargetLanguage is the BCP47 language tag to translate to.
+	TargetLanguage string `protobuf:"bytes,3,opt,name=target_language,json=targetLanguage,proto3" json:"target_language,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TranslateDocumentRequest) Reset() {
+	*x = TranslateDocumentRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TranslateDocumentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TranslateDocumentRequest) ProtoMessage() {}
+
+func (x *TranslateDocumentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TranslateDocumentRequest.ProtoReflect.Descriptor instead.
+func (*TranslateDocumentRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *TranslateDocumentRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *TranslateDocumentRequest) GetDocument() *newsdoc.Document {
+	if x != nil {
+		return x.Document
+	}
+	return nil
+}
+
+func (x *TranslateDocumentRequest) GetTargetLanguage() string {
+	if x != nil {
+		return x.TargetLanguage
+	}
+	return ""
+}
+
+type TranslateDocumentResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Document with translated content blocks and originals stored in a
+	// meta block.
+	Document *newsdoc.Document `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
+	// DetectedSourceLanguage is the language detected in the source
+	// content.
+	DetectedSourceLanguage string `protobuf:"bytes,2,opt,name=detected_source_language,json=detectedSourceLanguage,proto3" json:"detected_source_language,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *TranslateDocumentResponse) Reset() {
+	*x = TranslateDocumentResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TranslateDocumentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TranslateDocumentResponse) ProtoMessage() {}
+
+func (x *TranslateDocumentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TranslateDocumentResponse.ProtoReflect.Descriptor instead.
+func (*TranslateDocumentResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *TranslateDocumentResponse) GetDocument() *newsdoc.Document {
+	if x != nil {
+		return x.Document
+	}
+	return nil
+}
+
+func (x *TranslateDocumentResponse) GetDetectedSourceLanguage() string {
+	if x != nil {
+		return x.DetectedSourceLanguage
+	}
+	return ""
+}
+
 type ConfigureGenerativeTranslatorRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the translation model.
@@ -143,7 +850,7 @@ type ConfigureGenerativeTranslatorRequest struct {
 
 func (x *ConfigureGenerativeTranslatorRequest) Reset() {
 	*x = ConfigureGenerativeTranslatorRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[0]
+	mi := &file_intelligence_service_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -155,7 +862,7 @@ func (x *ConfigureGenerativeTranslatorRequest) String() string {
 func (*ConfigureGenerativeTranslatorRequest) ProtoMessage() {}
 
 func (x *ConfigureGenerativeTranslatorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[0]
+	mi := &file_intelligence_service_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -168,7 +875,7 @@ func (x *ConfigureGenerativeTranslatorRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use ConfigureGenerativeTranslatorRequest.ProtoReflect.Descriptor instead.
 func (*ConfigureGenerativeTranslatorRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{0}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ConfigureGenerativeTranslatorRequest) GetName() string {
@@ -193,7 +900,7 @@ type ConfigureGenerativeTranslatorResponse struct {
 
 func (x *ConfigureGenerativeTranslatorResponse) Reset() {
 	*x = ConfigureGenerativeTranslatorResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[1]
+	mi := &file_intelligence_service_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -205,7 +912,7 @@ func (x *ConfigureGenerativeTranslatorResponse) String() string {
 func (*ConfigureGenerativeTranslatorResponse) ProtoMessage() {}
 
 func (x *ConfigureGenerativeTranslatorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[1]
+	mi := &file_intelligence_service_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -218,7 +925,7 @@ func (x *ConfigureGenerativeTranslatorResponse) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use ConfigureGenerativeTranslatorResponse.ProtoReflect.Descriptor instead.
 func (*ConfigureGenerativeTranslatorResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{1}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{13}
 }
 
 type RemoveGenerativeTranslatorRequest struct {
@@ -231,7 +938,7 @@ type RemoveGenerativeTranslatorRequest struct {
 
 func (x *RemoveGenerativeTranslatorRequest) Reset() {
 	*x = RemoveGenerativeTranslatorRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[2]
+	mi := &file_intelligence_service_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -243,7 +950,7 @@ func (x *RemoveGenerativeTranslatorRequest) String() string {
 func (*RemoveGenerativeTranslatorRequest) ProtoMessage() {}
 
 func (x *RemoveGenerativeTranslatorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[2]
+	mi := &file_intelligence_service_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -256,7 +963,7 @@ func (x *RemoveGenerativeTranslatorRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use RemoveGenerativeTranslatorRequest.ProtoReflect.Descriptor instead.
 func (*RemoveGenerativeTranslatorRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{2}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RemoveGenerativeTranslatorRequest) GetName() string {
@@ -274,7 +981,7 @@ type RemoveGenerativeTranslatorResponse struct {
 
 func (x *RemoveGenerativeTranslatorResponse) Reset() {
 	*x = RemoveGenerativeTranslatorResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[3]
+	mi := &file_intelligence_service_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -286,7 +993,7 @@ func (x *RemoveGenerativeTranslatorResponse) String() string {
 func (*RemoveGenerativeTranslatorResponse) ProtoMessage() {}
 
 func (x *RemoveGenerativeTranslatorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[3]
+	mi := &file_intelligence_service_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +1006,7 @@ func (x *RemoveGenerativeTranslatorResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use RemoveGenerativeTranslatorResponse.ProtoReflect.Descriptor instead.
 func (*RemoveGenerativeTranslatorResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{3}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{15}
 }
 
 type GetTranslationModelsRequest struct {
@@ -310,7 +1017,7 @@ type GetTranslationModelsRequest struct {
 
 func (x *GetTranslationModelsRequest) Reset() {
 	*x = GetTranslationModelsRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[4]
+	mi := &file_intelligence_service_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -322,7 +1029,7 @@ func (x *GetTranslationModelsRequest) String() string {
 func (*GetTranslationModelsRequest) ProtoMessage() {}
 
 func (x *GetTranslationModelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[4]
+	mi := &file_intelligence_service_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -335,7 +1042,7 @@ func (x *GetTranslationModelsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTranslationModelsRequest.ProtoReflect.Descriptor instead.
 func (*GetTranslationModelsRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{4}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{16}
 }
 
 type GetTranslationModelsResponse struct {
@@ -348,7 +1055,7 @@ type GetTranslationModelsResponse struct {
 
 func (x *GetTranslationModelsResponse) Reset() {
 	*x = GetTranslationModelsResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[5]
+	mi := &file_intelligence_service_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -360,7 +1067,7 @@ func (x *GetTranslationModelsResponse) String() string {
 func (*GetTranslationModelsResponse) ProtoMessage() {}
 
 func (x *GetTranslationModelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[5]
+	mi := &file_intelligence_service_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -373,7 +1080,7 @@ func (x *GetTranslationModelsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTranslationModelsResponse.ProtoReflect.Descriptor instead.
 func (*GetTranslationModelsResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{5}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetTranslationModelsResponse) GetModels() []*TranslationModelInfo {
@@ -396,7 +1103,7 @@ type TranslationModelInfo struct {
 
 func (x *TranslationModelInfo) Reset() {
 	*x = TranslationModelInfo{}
-	mi := &file_intelligence_service_proto_msgTypes[6]
+	mi := &file_intelligence_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -408,7 +1115,7 @@ func (x *TranslationModelInfo) String() string {
 func (*TranslationModelInfo) ProtoMessage() {}
 
 func (x *TranslationModelInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[6]
+	mi := &file_intelligence_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -421,7 +1128,7 @@ func (x *TranslationModelInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranslationModelInfo.ProtoReflect.Descriptor instead.
 func (*TranslationModelInfo) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{6}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *TranslationModelInfo) GetName() string {
@@ -461,7 +1168,7 @@ type DocumentFromTextRequest struct {
 
 func (x *DocumentFromTextRequest) Reset() {
 	*x = DocumentFromTextRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[7]
+	mi := &file_intelligence_service_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -473,7 +1180,7 @@ func (x *DocumentFromTextRequest) String() string {
 func (*DocumentFromTextRequest) ProtoMessage() {}
 
 func (x *DocumentFromTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[7]
+	mi := &file_intelligence_service_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -486,7 +1193,7 @@ func (x *DocumentFromTextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentFromTextRequest.ProtoReflect.Descriptor instead.
 func (*DocumentFromTextRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{7}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DocumentFromTextRequest) GetModel() string {
@@ -550,7 +1257,7 @@ type DocumentFromTextResponse struct {
 
 func (x *DocumentFromTextResponse) Reset() {
 	*x = DocumentFromTextResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[8]
+	mi := &file_intelligence_service_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -562,7 +1269,7 @@ func (x *DocumentFromTextResponse) String() string {
 func (*DocumentFromTextResponse) ProtoMessage() {}
 
 func (x *DocumentFromTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[8]
+	mi := &file_intelligence_service_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -575,7 +1282,7 @@ func (x *DocumentFromTextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentFromTextResponse.ProtoReflect.Descriptor instead.
 func (*DocumentFromTextResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{8}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *DocumentFromTextResponse) GetJobId() int64 {
@@ -619,7 +1326,7 @@ type LanguageFeedbackRequest struct {
 
 func (x *LanguageFeedbackRequest) Reset() {
 	*x = LanguageFeedbackRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[9]
+	mi := &file_intelligence_service_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -631,7 +1338,7 @@ func (x *LanguageFeedbackRequest) String() string {
 func (*LanguageFeedbackRequest) ProtoMessage() {}
 
 func (x *LanguageFeedbackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[9]
+	mi := &file_intelligence_service_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -644,7 +1351,7 @@ func (x *LanguageFeedbackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedbackRequest.ProtoReflect.Descriptor instead.
 func (*LanguageFeedbackRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{9}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LanguageFeedbackRequest) GetModel() string {
@@ -696,7 +1403,7 @@ type LanguageFeedbackResponse struct {
 
 func (x *LanguageFeedbackResponse) Reset() {
 	*x = LanguageFeedbackResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[10]
+	mi := &file_intelligence_service_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -708,7 +1415,7 @@ func (x *LanguageFeedbackResponse) String() string {
 func (*LanguageFeedbackResponse) ProtoMessage() {}
 
 func (x *LanguageFeedbackResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[10]
+	mi := &file_intelligence_service_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -721,7 +1428,7 @@ func (x *LanguageFeedbackResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedbackResponse.ProtoReflect.Descriptor instead.
 func (*LanguageFeedbackResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{10}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *LanguageFeedbackResponse) GetJobId() int64 {
@@ -765,7 +1472,7 @@ type LanguageFeedback struct {
 
 func (x *LanguageFeedback) Reset() {
 	*x = LanguageFeedback{}
-	mi := &file_intelligence_service_proto_msgTypes[11]
+	mi := &file_intelligence_service_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -777,7 +1484,7 @@ func (x *LanguageFeedback) String() string {
 func (*LanguageFeedback) ProtoMessage() {}
 
 func (x *LanguageFeedback) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[11]
+	mi := &file_intelligence_service_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +1497,7 @@ func (x *LanguageFeedback) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedback.ProtoReflect.Descriptor instead.
 func (*LanguageFeedback) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{11}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *LanguageFeedback) GetParagraph() int64 {
@@ -847,7 +1554,7 @@ type TextRequest struct {
 
 func (x *TextRequest) Reset() {
 	*x = TextRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[12]
+	mi := &file_intelligence_service_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -859,7 +1566,7 @@ func (x *TextRequest) String() string {
 func (*TextRequest) ProtoMessage() {}
 
 func (x *TextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[12]
+	mi := &file_intelligence_service_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -872,7 +1579,7 @@ func (x *TextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TextRequest.ProtoReflect.Descriptor instead.
 func (*TextRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{12}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *TextRequest) GetModel() string {
@@ -924,7 +1631,7 @@ type TextResponse struct {
 
 func (x *TextResponse) Reset() {
 	*x = TextResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[13]
+	mi := &file_intelligence_service_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -936,7 +1643,7 @@ func (x *TextResponse) String() string {
 func (*TextResponse) ProtoMessage() {}
 
 func (x *TextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[13]
+	mi := &file_intelligence_service_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -949,7 +1656,7 @@ func (x *TextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TextResponse.ProtoReflect.Descriptor instead.
 func (*TextResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{13}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *TextResponse) GetJobId() int64 {
@@ -983,7 +1690,7 @@ type ListJobsRequest struct {
 
 func (x *ListJobsRequest) Reset() {
 	*x = ListJobsRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[14]
+	mi := &file_intelligence_service_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -995,7 +1702,7 @@ func (x *ListJobsRequest) String() string {
 func (*ListJobsRequest) ProtoMessage() {}
 
 func (x *ListJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[14]
+	mi := &file_intelligence_service_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1008,7 +1715,7 @@ func (x *ListJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListJobsRequest.ProtoReflect.Descriptor instead.
 func (*ListJobsRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{14}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ListJobsRequest) GetAfter() int64 {
@@ -1028,7 +1735,7 @@ type ListJobsResponse struct {
 
 func (x *ListJobsResponse) Reset() {
 	*x = ListJobsResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[15]
+	mi := &file_intelligence_service_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1040,7 +1747,7 @@ func (x *ListJobsResponse) String() string {
 func (*ListJobsResponse) ProtoMessage() {}
 
 func (x *ListJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[15]
+	mi := &file_intelligence_service_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1053,7 +1760,7 @@ func (x *ListJobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListJobsResponse.ProtoReflect.Descriptor instead.
 func (*ListJobsResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{15}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListJobsResponse) GetJobs() []*JobReference {
@@ -1077,7 +1784,7 @@ type WaitForJobsRequest struct {
 
 func (x *WaitForJobsRequest) Reset() {
 	*x = WaitForJobsRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[16]
+	mi := &file_intelligence_service_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1089,7 +1796,7 @@ func (x *WaitForJobsRequest) String() string {
 func (*WaitForJobsRequest) ProtoMessage() {}
 
 func (x *WaitForJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[16]
+	mi := &file_intelligence_service_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1102,7 +1809,7 @@ func (x *WaitForJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaitForJobsRequest.ProtoReflect.Descriptor instead.
 func (*WaitForJobsRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{16}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *WaitForJobsRequest) GetJobs() map[int64]int64 {
@@ -1129,7 +1836,7 @@ type WaitForJobsResponse struct {
 
 func (x *WaitForJobsResponse) Reset() {
 	*x = WaitForJobsResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[17]
+	mi := &file_intelligence_service_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1141,7 +1848,7 @@ func (x *WaitForJobsResponse) String() string {
 func (*WaitForJobsResponse) ProtoMessage() {}
 
 func (x *WaitForJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[17]
+	mi := &file_intelligence_service_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1154,7 +1861,7 @@ func (x *WaitForJobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaitForJobsResponse.ProtoReflect.Descriptor instead.
 func (*WaitForJobsResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{17}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *WaitForJobsResponse) GetUpdated() []*JobReference {
@@ -1174,7 +1881,7 @@ type GetResultRequest struct {
 
 func (x *GetResultRequest) Reset() {
 	*x = GetResultRequest{}
-	mi := &file_intelligence_service_proto_msgTypes[18]
+	mi := &file_intelligence_service_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1186,7 +1893,7 @@ func (x *GetResultRequest) String() string {
 func (*GetResultRequest) ProtoMessage() {}
 
 func (x *GetResultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[18]
+	mi := &file_intelligence_service_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1199,7 +1906,7 @@ func (x *GetResultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResultRequest.ProtoReflect.Descriptor instead.
 func (*GetResultRequest) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{18}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetResultRequest) GetId() int64 {
@@ -1222,7 +1929,7 @@ type JobReference struct {
 
 func (x *JobReference) Reset() {
 	*x = JobReference{}
-	mi := &file_intelligence_service_proto_msgTypes[19]
+	mi := &file_intelligence_service_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1234,7 +1941,7 @@ func (x *JobReference) String() string {
 func (*JobReference) ProtoMessage() {}
 
 func (x *JobReference) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[19]
+	mi := &file_intelligence_service_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1247,7 +1954,7 @@ func (x *JobReference) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobReference.ProtoReflect.Descriptor instead.
 func (*JobReference) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{19}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *JobReference) GetId() int64 {
@@ -1289,7 +1996,7 @@ type GetResultResponse struct {
 
 func (x *GetResultResponse) Reset() {
 	*x = GetResultResponse{}
-	mi := &file_intelligence_service_proto_msgTypes[20]
+	mi := &file_intelligence_service_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1301,7 +2008,7 @@ func (x *GetResultResponse) String() string {
 func (*GetResultResponse) ProtoMessage() {}
 
 func (x *GetResultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_intelligence_service_proto_msgTypes[20]
+	mi := &file_intelligence_service_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1314,7 +2021,7 @@ func (x *GetResultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResultResponse.ProtoReflect.Descriptor instead.
 func (*GetResultResponse) Descriptor() ([]byte, []int) {
-	return file_intelligence_service_proto_rawDescGZIP(), []int{20}
+	return file_intelligence_service_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetResultResponse) GetId() int64 {
@@ -1380,7 +2087,96 @@ var file_intelligence_service_proto_rawDesc = []byte{
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x11, 0x74, 0x74,
 	0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x1a,
 	0x15, 0x6e, 0x65, 0x77, 0x73, 0x64, 0x6f, 0x63, 0x2f, 0x6e, 0x65, 0x77, 0x73, 0x64, 0x6f, 0x63,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x50, 0x0a, 0x24, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xcf, 0x01, 0x0a, 0x15, 0x53, 0x65, 0x6d, 0x61, 0x6e,
+	0x74, 0x69, 0x63, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x14, 0x0a, 0x05, 0x71, 0x75, 0x65, 0x72, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x71, 0x75, 0x65, 0x72, 0x79, 0x12, 0x25, 0x0a, 0x0e, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65,
+	0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d,
+	0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x73, 0x12, 0x2e, 0x0a,
+	0x13, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74,
+	0x79, 0x70, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x11, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x73, 0x12, 0x14, 0x0a,
+	0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69,
+	0x6d, 0x69, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x68, 0x6f, 0x74, 0x5f, 0x6f, 0x6e, 0x6c, 0x79, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x68, 0x6f, 0x74, 0x4f, 0x6e, 0x6c, 0x79, 0x12, 0x18,
+	0x0a, 0x07, 0x6e, 0x70, 0x72, 0x6f, 0x62, 0x65, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x07, 0x6e, 0x70, 0x72, 0x6f, 0x62, 0x65, 0x73, 0x22, 0x5b, 0x0a, 0x16, 0x53, 0x65, 0x6d, 0x61,
+	0x6e, 0x74, 0x69, 0x63, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x41, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c,
+	0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x6d, 0x61, 0x6e, 0x74, 0x69, 0x63,
+	0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x73, 0x22, 0xbc, 0x01, 0x0a, 0x14, 0x53, 0x65, 0x6d, 0x61, 0x6e, 0x74,
+	0x69, 0x63, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x23,
+	0x0a, 0x0d, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x55,
+	0x75, 0x69, 0x64, 0x12, 0x23, 0x0a, 0x0d, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x5f,
+	0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x64, 0x6f, 0x63, 0x75,
+	0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x14,
+	0x0a, 0x05, 0x73, 0x63, 0x6f, 0x72, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x73,
+	0x63, 0x6f, 0x72, 0x65, 0x12, 0x2e, 0x0a, 0x13, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f,
+	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28,
+	0x09, 0x52, 0x11, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x54,
+	0x79, 0x70, 0x65, 0x73, 0x22, 0x14, 0x0a, 0x12, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d,
+	0x70, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x4e, 0x0a, 0x13, 0x4c, 0x69,
+	0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x37, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c,
+	0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73, 0x22, 0x4c, 0x0a, 0x0a, 0x50, 0x72,
+	0x6f, 0x6d, 0x70, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05,
+	0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74,
+	0x6c, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x22, 0x26, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x50,
+	0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04,
+	0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64,
+	0x22, 0x89, 0x01, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65,
+	0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x64,
+	0x6f, 0x63, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x72, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65,
+	0x64, 0x5f, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e,
+	0x72, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x64, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x12, 0x1c,
+	0x0a, 0x09, 0x76, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
+	0x09, 0x52, 0x09, 0x76, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x22, 0xce, 0x01, 0x0a,
+	0x11, 0x54, 0x65, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x12, 0x51, 0x0a, 0x09,
+	0x76, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x33, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65,
+	0x6e, 0x63, 0x65, 0x2e, 0x54, 0x65, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x45,
+	0x6e, 0x74, 0x72, 0x79, 0x52, 0x09, 0x76, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x1a,
+	0x3c, 0x0a, 0x0e, 0x56, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72,
+	0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x55, 0x0a,
+	0x12, 0x54, 0x65, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x72,
+	0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x64, 0x5f, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x72, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x64, 0x50, 0x72,
+	0x6f, 0x6d, 0x70, 0x74, 0x22, 0x88, 0x01, 0x0a, 0x18, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61,
+	0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x14, 0x0a, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x12, 0x2d, 0x0a, 0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d,
+	0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6e, 0x65, 0x77, 0x73,
+	0x64, 0x6f, 0x63, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x6f,
+	0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74,
+	0x5f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0e, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x22,
+	0x84, 0x01, 0x0a, 0x19, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a,
+	0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x11, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x64, 0x6f, 0x63, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65,
+	0x6e, 0x74, 0x52, 0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x38, 0x0a, 0x18,
+	0x64, 0x65, 0x74, 0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f,
+	0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x16,
+	0x64, 0x65, 0x74, 0x65, 0x63, 0x74, 0x65, 0x64, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x4c, 0x61,
+	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x22, 0x50, 0x0a, 0x24, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
 	0x75, 0x72, 0x65, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x69, 0x76, 0x65, 0x54, 0x72, 0x61,
 	0x6e, 0x73, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12,
 	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
@@ -1579,7 +2375,7 @@ var file_intelligence_service_proto_rawDesc = []byte{
 	0x75, 0x6c, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x74, 0x74, 0x61,
 	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47,
 	0x65, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x32, 0xa5, 0x03, 0x0a, 0x09, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x77,
+	0x32, 0x95, 0x04, 0x0a, 0x09, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x77,
 	0x0a, 0x14, 0x47, 0x65, 0x74, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x73, 0x12, 0x2e, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e,
 	0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x72,
@@ -1605,10 +2401,42 @@ var file_intelligence_service_proto_rawDesc = []byte{
 	0x74, 0x1a, 0x35, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69,
 	0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x47, 0x65, 0x6e, 0x65,
 	0x72, 0x61, 0x74, 0x69, 0x76, 0x65, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x6f, 0x72,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x2e, 0x5a, 0x2c, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x74, 0x61, 0x62, 0x2f, 0x65, 0x6c, 0x65, 0x70,
-	0x68, 0x61, 0x6e, 0x74, 0x2d, 0x74, 0x74, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65,
-	0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6e, 0x0a, 0x11, 0x54, 0x72, 0x61, 0x6e,
+	0x73, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x2b, 0x2e,
+	0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63,
+	0x65, 0x2e, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d,
+	0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x74, 0x74, 0x61,
+	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x54,
+	0x72, 0x61, 0x6e, 0x73, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x6b, 0x0a, 0x0a, 0x45, 0x6d, 0x62, 0x65,
+	0x64, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x5d, 0x0a, 0x06, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68,
+	0x12, 0x28, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67,
+	0x65, 0x6e, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x6d, 0x61, 0x6e, 0x74, 0x69, 0x63, 0x53, 0x65, 0x61,
+	0x72, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x74, 0x74, 0x61,
+	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x53,
+	0x65, 0x6d, 0x61, 0x6e, 0x74, 0x69, 0x63, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x9a, 0x02, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74,
+	0x73, 0x12, 0x5c, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73,
+	0x12, 0x25, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67,
+	0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69,
+	0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74,
+	0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x56, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x12, 0x23, 0x2e, 0x74,
+	0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65,
+	0x2e, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x24, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69,
+	0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x59, 0x0a, 0x0a, 0x54, 0x65, 0x73, 0x74, 0x50,
+	0x72, 0x6f, 0x6d, 0x70, 0x74, 0x12, 0x24, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74,
+	0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x54, 0x65, 0x73, 0x74, 0x50, 0x72,
+	0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x74, 0x74,
+	0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e,
+	0x54, 0x65, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x42, 0x2e, 0x5a, 0x2c, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x74, 0x74, 0x61, 0x62, 0x2f, 0x65, 0x6c, 0x65, 0x70, 0x68, 0x61, 0x6e, 0x74, 0x2d, 0x74,
+	0x74, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e,
+	0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1624,74 +2452,103 @@ func file_intelligence_service_proto_rawDescGZIP() []byte {
 }
 
 var file_intelligence_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_intelligence_service_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_intelligence_service_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_intelligence_service_proto_goTypes = []any{
-	(JobStatus)(0), // 0: ttab.intelligence.JobStatus
-	(JobType)(0),   // 1: ttab.intelligence.JobType
-	(*ConfigureGenerativeTranslatorRequest)(nil),  // 2: ttab.intelligence.ConfigureGenerativeTranslatorRequest
-	(*ConfigureGenerativeTranslatorResponse)(nil), // 3: ttab.intelligence.ConfigureGenerativeTranslatorResponse
-	(*RemoveGenerativeTranslatorRequest)(nil),     // 4: ttab.intelligence.RemoveGenerativeTranslatorRequest
-	(*RemoveGenerativeTranslatorResponse)(nil),    // 5: ttab.intelligence.RemoveGenerativeTranslatorResponse
-	(*GetTranslationModelsRequest)(nil),           // 6: ttab.intelligence.GetTranslationModelsRequest
-	(*GetTranslationModelsResponse)(nil),          // 7: ttab.intelligence.GetTranslationModelsResponse
-	(*TranslationModelInfo)(nil),                  // 8: ttab.intelligence.TranslationModelInfo
-	(*DocumentFromTextRequest)(nil),               // 9: ttab.intelligence.DocumentFromTextRequest
-	(*DocumentFromTextResponse)(nil),              // 10: ttab.intelligence.DocumentFromTextResponse
-	(*LanguageFeedbackRequest)(nil),               // 11: ttab.intelligence.LanguageFeedbackRequest
-	(*LanguageFeedbackResponse)(nil),              // 12: ttab.intelligence.LanguageFeedbackResponse
-	(*LanguageFeedback)(nil),                      // 13: ttab.intelligence.LanguageFeedback
-	(*TextRequest)(nil),                           // 14: ttab.intelligence.TextRequest
-	(*TextResponse)(nil),                          // 15: ttab.intelligence.TextResponse
-	(*ListJobsRequest)(nil),                       // 16: ttab.intelligence.ListJobsRequest
-	(*ListJobsResponse)(nil),                      // 17: ttab.intelligence.ListJobsResponse
-	(*WaitForJobsRequest)(nil),                    // 18: ttab.intelligence.WaitForJobsRequest
-	(*WaitForJobsResponse)(nil),                   // 19: ttab.intelligence.WaitForJobsResponse
-	(*GetResultRequest)(nil),                      // 20: ttab.intelligence.GetResultRequest
-	(*JobReference)(nil),                          // 21: ttab.intelligence.JobReference
-	(*GetResultResponse)(nil),                     // 22: ttab.intelligence.GetResultResponse
-	nil,                                           // 23: ttab.intelligence.WaitForJobsRequest.JobsEntry
-	(*newsdoc.Block)(nil),                         // 24: newsdoc.Block
-	(*newsdoc.Document)(nil),                      // 25: newsdoc.Document
+	(JobStatus)(0),                                // 0: ttab.intelligence.JobStatus
+	(JobType)(0),                                  // 1: ttab.intelligence.JobType
+	(*SemanticSearchRequest)(nil),                 // 2: ttab.intelligence.SemanticSearchRequest
+	(*SemanticSearchResponse)(nil),                // 3: ttab.intelligence.SemanticSearchResponse
+	(*SemanticSearchResult)(nil),                  // 4: ttab.intelligence.SemanticSearchResult
+	(*ListPromptsRequest)(nil),                    // 5: ttab.intelligence.ListPromptsRequest
+	(*ListPromptsResponse)(nil),                   // 6: ttab.intelligence.ListPromptsResponse
+	(*PromptInfo)(nil),                            // 7: ttab.intelligence.PromptInfo
+	(*GetPromptRequest)(nil),                      // 8: ttab.intelligence.GetPromptRequest
+	(*GetPromptResponse)(nil),                     // 9: ttab.intelligence.GetPromptResponse
+	(*TestPromptRequest)(nil),                     // 10: ttab.intelligence.TestPromptRequest
+	(*TestPromptResponse)(nil),                    // 11: ttab.intelligence.TestPromptResponse
+	(*TranslateDocumentRequest)(nil),              // 12: ttab.intelligence.TranslateDocumentRequest
+	(*TranslateDocumentResponse)(nil),             // 13: ttab.intelligence.TranslateDocumentResponse
+	(*ConfigureGenerativeTranslatorRequest)(nil),  // 14: ttab.intelligence.ConfigureGenerativeTranslatorRequest
+	(*ConfigureGenerativeTranslatorResponse)(nil), // 15: ttab.intelligence.ConfigureGenerativeTranslatorResponse
+	(*RemoveGenerativeTranslatorRequest)(nil),     // 16: ttab.intelligence.RemoveGenerativeTranslatorRequest
+	(*RemoveGenerativeTranslatorResponse)(nil),    // 17: ttab.intelligence.RemoveGenerativeTranslatorResponse
+	(*GetTranslationModelsRequest)(nil),           // 18: ttab.intelligence.GetTranslationModelsRequest
+	(*GetTranslationModelsResponse)(nil),          // 19: ttab.intelligence.GetTranslationModelsResponse
+	(*TranslationModelInfo)(nil),                  // 20: ttab.intelligence.TranslationModelInfo
+	(*DocumentFromTextRequest)(nil),               // 21: ttab.intelligence.DocumentFromTextRequest
+	(*DocumentFromTextResponse)(nil),              // 22: ttab.intelligence.DocumentFromTextResponse
+	(*LanguageFeedbackRequest)(nil),               // 23: ttab.intelligence.LanguageFeedbackRequest
+	(*LanguageFeedbackResponse)(nil),              // 24: ttab.intelligence.LanguageFeedbackResponse
+	(*LanguageFeedback)(nil),                      // 25: ttab.intelligence.LanguageFeedback
+	(*TextRequest)(nil),                           // 26: ttab.intelligence.TextRequest
+	(*TextResponse)(nil),                          // 27: ttab.intelligence.TextResponse
+	(*ListJobsRequest)(nil),                       // 28: ttab.intelligence.ListJobsRequest
+	(*ListJobsResponse)(nil),                      // 29: ttab.intelligence.ListJobsResponse
+	(*WaitForJobsRequest)(nil),                    // 30: ttab.intelligence.WaitForJobsRequest
+	(*WaitForJobsResponse)(nil),                   // 31: ttab.intelligence.WaitForJobsResponse
+	(*GetResultRequest)(nil),                      // 32: ttab.intelligence.GetResultRequest
+	(*JobReference)(nil),                          // 33: ttab.intelligence.JobReference
+	(*GetResultResponse)(nil),                     // 34: ttab.intelligence.GetResultResponse
+	nil,                                           // 35: ttab.intelligence.TestPromptRequest.VariablesEntry
+	nil,                                           // 36: ttab.intelligence.WaitForJobsRequest.JobsEntry
+	(*newsdoc.Document)(nil),                      // 37: newsdoc.Document
+	(*newsdoc.Block)(nil),                         // 38: newsdoc.Block
 }
 var file_intelligence_service_proto_depIdxs = []int32{
-	8,  // 0: ttab.intelligence.GetTranslationModelsResponse.models:type_name -> ttab.intelligence.TranslationModelInfo
-	24, // 1: ttab.intelligence.DocumentFromTextRequest.additionalLinks:type_name -> newsdoc.Block
-	24, // 2: ttab.intelligence.DocumentFromTextRequest.additionalMeta:type_name -> newsdoc.Block
-	25, // 3: ttab.intelligence.DocumentFromTextResponse.document:type_name -> newsdoc.Document
-	25, // 4: ttab.intelligence.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
-	13, // 5: ttab.intelligence.LanguageFeedbackResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
-	24, // 6: ttab.intelligence.TextResponse.content:type_name -> newsdoc.Block
-	21, // 7: ttab.intelligence.ListJobsResponse.jobs:type_name -> ttab.intelligence.JobReference
-	23, // 8: ttab.intelligence.WaitForJobsRequest.jobs:type_name -> ttab.intelligence.WaitForJobsRequest.JobsEntry
-	21, // 9: ttab.intelligence.WaitForJobsResponse.updated:type_name -> ttab.intelligence.JobReference
-	0,  // 10: ttab.intelligence.JobReference.status:type_name -> ttab.intelligence.JobStatus
-	1,  // 11: ttab.intelligence.GetResultResponse.type:type_name -> ttab.intelligence.JobType
-	0,  // 12: ttab.intelligence.GetResultResponse.status:type_name -> ttab.intelligence.JobStatus
-	25, // 13: ttab.intelligence.GetResultResponse.document:type_name -> newsdoc.Document
-	13, // 14: ttab.intelligence.GetResultResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
-	9,  // 15: ttab.intelligence.Generate.DocumentFromText:input_type -> ttab.intelligence.DocumentFromTextRequest
-	11, // 16: ttab.intelligence.Generate.LanguageFeedback:input_type -> ttab.intelligence.LanguageFeedbackRequest
-	14, // 17: ttab.intelligence.Generate.Text:input_type -> ttab.intelligence.TextRequest
-	16, // 18: ttab.intelligence.Generate.ListJobs:input_type -> ttab.intelligence.ListJobsRequest
-	18, // 19: ttab.intelligence.Generate.WaitForJobs:input_type -> ttab.intelligence.WaitForJobsRequest
-	20, // 20: ttab.intelligence.Generate.GetResult:input_type -> ttab.intelligence.GetResultRequest
-	6,  // 21: ttab.intelligence.Translate.GetTranslationModels:input_type -> ttab.intelligence.GetTranslationModelsRequest
-	2,  // 22: ttab.intelligence.Translate.ConfigureGenerativeTranslator:input_type -> ttab.intelligence.ConfigureGenerativeTranslatorRequest
-	4,  // 23: ttab.intelligence.Translate.RemoveGenerativeTranslator:input_type -> ttab.intelligence.RemoveGenerativeTranslatorRequest
-	10, // 24: ttab.intelligence.Generate.DocumentFromText:output_type -> ttab.intelligence.DocumentFromTextResponse
-	12, // 25: ttab.intelligence.Generate.LanguageFeedback:output_type -> ttab.intelligence.LanguageFeedbackResponse
-	15, // 26: ttab.intelligence.Generate.Text:output_type -> ttab.intelligence.TextResponse
-	17, // 27: ttab.intelligence.Generate.ListJobs:output_type -> ttab.intelligence.ListJobsResponse
-	19, // 28: ttab.intelligence.Generate.WaitForJobs:output_type -> ttab.intelligence.WaitForJobsResponse
-	22, // 29: ttab.intelligence.Generate.GetResult:output_type -> ttab.intelligence.GetResultResponse
-	7,  // 30: ttab.intelligence.Translate.GetTranslationModels:output_type -> ttab.intelligence.GetTranslationModelsResponse
-	3,  // 31: ttab.intelligence.Translate.ConfigureGenerativeTranslator:output_type -> ttab.intelligence.ConfigureGenerativeTranslatorResponse
-	5,  // 32: ttab.intelligence.Translate.RemoveGenerativeTranslator:output_type -> ttab.intelligence.RemoveGenerativeTranslatorResponse
-	24, // [24:33] is the sub-list for method output_type
-	15, // [15:24] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	4,  // 0: ttab.intelligence.SemanticSearchResponse.results:type_name -> ttab.intelligence.SemanticSearchResult
+	7,  // 1: ttab.intelligence.ListPromptsResponse.prompts:type_name -> ttab.intelligence.PromptInfo
+	37, // 2: ttab.intelligence.GetPromptResponse.document:type_name -> newsdoc.Document
+	35, // 3: ttab.intelligence.TestPromptRequest.variables:type_name -> ttab.intelligence.TestPromptRequest.VariablesEntry
+	37, // 4: ttab.intelligence.TranslateDocumentRequest.document:type_name -> newsdoc.Document
+	37, // 5: ttab.intelligence.TranslateDocumentResponse.document:type_name -> newsdoc.Document
+	20, // 6: ttab.intelligence.GetTranslationModelsResponse.models:type_name -> ttab.intelligence.TranslationModelInfo
+	38, // 7: ttab.intelligence.DocumentFromTextRequest.additionalLinks:type_name -> newsdoc.Block
+	38, // 8: ttab.intelligence.DocumentFromTextRequest.additionalMeta:type_name -> newsdoc.Block
+	37, // 9: ttab.intelligence.DocumentFromTextResponse.document:type_name -> newsdoc.Document
+	37, // 10: ttab.intelligence.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
+	25, // 11: ttab.intelligence.LanguageFeedbackResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
+	38, // 12: ttab.intelligence.TextResponse.content:type_name -> newsdoc.Block
+	33, // 13: ttab.intelligence.ListJobsResponse.jobs:type_name -> ttab.intelligence.JobReference
+	36, // 14: ttab.intelligence.WaitForJobsRequest.jobs:type_name -> ttab.intelligence.WaitForJobsRequest.JobsEntry
+	33, // 15: ttab.intelligence.WaitForJobsResponse.updated:type_name -> ttab.intelligence.JobReference
+	0,  // 16: ttab.intelligence.JobReference.status:type_name -> ttab.intelligence.JobStatus
+	1,  // 17: ttab.intelligence.GetResultResponse.type:type_name -> ttab.intelligence.JobType
+	0,  // 18: ttab.intelligence.GetResultResponse.status:type_name -> ttab.intelligence.JobStatus
+	37, // 19: ttab.intelligence.GetResultResponse.document:type_name -> newsdoc.Document
+	25, // 20: ttab.intelligence.GetResultResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
+	21, // 21: ttab.intelligence.Generate.DocumentFromText:input_type -> ttab.intelligence.DocumentFromTextRequest
+	23, // 22: ttab.intelligence.Generate.LanguageFeedback:input_type -> ttab.intelligence.LanguageFeedbackRequest
+	26, // 23: ttab.intelligence.Generate.Text:input_type -> ttab.intelligence.TextRequest
+	28, // 24: ttab.intelligence.Generate.ListJobs:input_type -> ttab.intelligence.ListJobsRequest
+	30, // 25: ttab.intelligence.Generate.WaitForJobs:input_type -> ttab.intelligence.WaitForJobsRequest
+	32, // 26: ttab.intelligence.Generate.GetResult:input_type -> ttab.intelligence.GetResultRequest
+	18, // 27: ttab.intelligence.Translate.GetTranslationModels:input_type -> ttab.intelligence.GetTranslationModelsRequest
+	14, // 28: ttab.intelligence.Translate.ConfigureGenerativeTranslator:input_type -> ttab.intelligence.ConfigureGenerativeTranslatorRequest
+	16, // 29: ttab.intelligence.Translate.RemoveGenerativeTranslator:input_type -> ttab.intelligence.RemoveGenerativeTranslatorRequest
+	12, // 30: ttab.intelligence.Translate.TranslateDocument:input_type -> ttab.intelligence.TranslateDocumentRequest
+	2,  // 31: ttab.intelligence.Embeddings.Search:input_type -> ttab.intelligence.SemanticSearchRequest
+	5,  // 32: ttab.intelligence.Prompts.ListPrompts:input_type -> ttab.intelligence.ListPromptsRequest
+	8,  // 33: ttab.intelligence.Prompts.GetPrompt:input_type -> ttab.intelligence.GetPromptRequest
+	10, // 34: ttab.intelligence.Prompts.TestPrompt:input_type -> ttab.intelligence.TestPromptRequest
+	22, // 35: ttab.intelligence.Generate.DocumentFromText:output_type -> ttab.intelligence.DocumentFromTextResponse
+	24, // 36: ttab.intelligence.Generate.LanguageFeedback:output_type -> ttab.intelligence.LanguageFeedbackResponse
+	27, // 37: ttab.intelligence.Generate.Text:output_type -> ttab.intelligence.TextResponse
+	29, // 38: ttab.intelligence.Generate.ListJobs:output_type -> ttab.intelligence.ListJobsResponse
+	31, // 39: ttab.intelligence.Generate.WaitForJobs:output_type -> ttab.intelligence.WaitForJobsResponse
+	34, // 40: ttab.intelligence.Generate.GetResult:output_type -> ttab.intelligence.GetResultResponse
+	19, // 41: ttab.intelligence.Translate.GetTranslationModels:output_type -> ttab.intelligence.GetTranslationModelsResponse
+	15, // 42: ttab.intelligence.Translate.ConfigureGenerativeTranslator:output_type -> ttab.intelligence.ConfigureGenerativeTranslatorResponse
+	17, // 43: ttab.intelligence.Translate.RemoveGenerativeTranslator:output_type -> ttab.intelligence.RemoveGenerativeTranslatorResponse
+	13, // 44: ttab.intelligence.Translate.TranslateDocument:output_type -> ttab.intelligence.TranslateDocumentResponse
+	3,  // 45: ttab.intelligence.Embeddings.Search:output_type -> ttab.intelligence.SemanticSearchResponse
+	6,  // 46: ttab.intelligence.Prompts.ListPrompts:output_type -> ttab.intelligence.ListPromptsResponse
+	9,  // 47: ttab.intelligence.Prompts.GetPrompt:output_type -> ttab.intelligence.GetPromptResponse
+	11, // 48: ttab.intelligence.Prompts.TestPrompt:output_type -> ttab.intelligence.TestPromptResponse
+	35, // [35:49] is the sub-list for method output_type
+	21, // [21:35] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_intelligence_service_proto_init() }
@@ -1705,9 +2562,9 @@ func file_intelligence_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_intelligence_service_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   22,
+			NumMessages:   35,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   4,
 		},
 		GoTypes:           file_intelligence_service_proto_goTypes,
 		DependencyIndexes: file_intelligence_service_proto_depIdxs,
