@@ -1,0 +1,1256 @@
+{
+  "components": {
+    "schemas": {
+      "ttab.hub.AddAllowedDeployKeyRequest": {
+        "properties": {
+          "deploy_key_id": {
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.AddAllowedDeployKeyResponse": {
+        "type": "object"
+      },
+      "ttab.hub.AddAllowedSANRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "san_pattern": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.AddAllowedSANResponse": {
+        "type": "object"
+      },
+      "ttab.hub.ApproveDeployKeyRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ApproveDeployKeyResponse": {
+        "type": "object"
+      },
+      "ttab.hub.ApproveOrganisationRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ApproveOrganisationResponse": {
+        "type": "object"
+      },
+      "ttab.hub.ArtifactInfo": {
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "official": {
+            "type": "boolean"
+          },
+          "organisation": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ArtifactKind": {
+        "enum": [
+          "ARTIFACT_KIND_UNSPECIFIED",
+          "ARTIFACT_KIND_SCHEMA",
+          "ARTIFACT_KIND_PLUGIN"
+        ],
+        "type": "string"
+      },
+      "ttab.hub.AssetInfo": {
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.DeployKeyInfo": {
+        "properties": {
+          "approved": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "fingerprint": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "user_email": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactAssetRequest": {
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactAssetResponse": {
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "description": "Organisation domain.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactResponse": {
+        "properties": {
+          "artifact": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactInfo"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.VersionInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactVersionRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "version": {
+            "description": "Specific version string, or empty for latest.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetArtifactVersionResponse": {
+        "properties": {
+          "artifact": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactInfo"
+          },
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.AssetInfo"
+            },
+            "type": "array"
+          },
+          "manifest": {
+            "description": "Raw manifest bytes.",
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/ttab.hub.VersionInfo"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListArtifactPermissionsRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListArtifactPermissionsResponse": {
+        "properties": {
+          "allowed_deploy_keys": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
+            },
+            "type": "array"
+          },
+          "allowed_sans": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListArtifactsRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "organisation": {
+            "description": "Optional filter by organisation domain.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListArtifactsResponse": {
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.ArtifactInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListDeployKeysRequest": {
+        "type": "object"
+      },
+      "ttab.hub.ListDeployKeysResponse": {
+        "properties": {
+          "deploy_keys": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListOrganisationsRequest": {
+        "type": "object"
+      },
+      "ttab.hub.ListOrganisationsResponse": {
+        "properties": {
+          "organisations": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.Organisation"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.Organisation": {
+        "properties": {
+          "approved": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_owner": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.PublishAsset": {
+        "description": "An asset to upload alongside a version.",
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.PublishVersionRequest": {
+        "properties": {
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.PublishAsset"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "manifest": {
+            "description": "Raw manifest bytes.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full name in org/name format.",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Signature bytes (Ed25519 sig or sigstore bundle).",
+            "type": "string"
+          },
+          "signature_type": {
+            "$ref": "#/components/schemas/ttab.hub.SignatureType"
+          },
+          "signing_identity": {
+            "description": "Identity that signed (key fingerprint or SAN).",
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.PublishVersionResponse": {
+        "properties": {
+          "version_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RegisterDeployKeyRequest": {
+        "properties": {
+          "fingerprint": {
+            "type": "string"
+          },
+          "public_key": {
+            "description": "Ed25519 public key bytes.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RegisterDeployKeyResponse": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RemoveAllowedDeployKeyRequest": {
+        "properties": {
+          "deploy_key_id": {
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RemoveAllowedDeployKeyResponse": {
+        "type": "object"
+      },
+      "ttab.hub.RemoveAllowedSANRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "san_pattern": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RemoveAllowedSANResponse": {
+        "type": "object"
+      },
+      "ttab.hub.RevokeDeployKeyRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RevokeDeployKeyResponse": {
+        "type": "object"
+      },
+      "ttab.hub.RevokeVersionRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RevokeVersionResponse": {
+        "type": "object"
+      },
+      "ttab.hub.SetOfficialStatusRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "official": {
+            "type": "boolean"
+          },
+          "organisation": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.SetOfficialStatusResponse": {
+        "type": "object"
+      },
+      "ttab.hub.SignatureType": {
+        "enum": [
+          "SIGNATURE_TYPE_UNSPECIFIED",
+          "SIGNATURE_TYPE_DEPLOY_KEY",
+          "SIGNATURE_TYPE_SIGSTORE"
+        ],
+        "type": "string"
+      },
+      "ttab.hub.VersionInfo": {
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "signature_type": {
+            "$ref": "#/components/schemas/ttab.hub.SignatureType"
+          },
+          "signing_identity": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "hub API",
+    "version": "v0.4.2"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.hub.Hub/AddAllowedDeployKey": {
+      "post": {
+        "description": "AddAllowedDeployKey adds a deploy key allowed to publish an artifact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.AddAllowedDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.AddAllowedDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AddAllowedDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/AddAllowedSAN": {
+      "post": {
+        "description": "AddAllowedSAN adds a cosign SAN pattern allowed to publish an artifact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.AddAllowedSANRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.AddAllowedSANResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AddAllowedSAN",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ApproveDeployKey": {
+      "post": {
+        "description": "ApproveDeployKey approves a deploy key for publishing.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ApproveDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ApproveDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ApproveDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ApproveOrganisation": {
+      "post": {
+        "description": "ApproveOrganisation approves an organisation, allowing its members to log in.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ApproveOrganisationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ApproveOrganisationResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ApproveOrganisation",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/GetArtifact": {
+      "post": {
+        "description": "GetArtifact returns metadata for a specific artifact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.GetArtifactRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.GetArtifactResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetArtifact",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/GetArtifactAsset": {
+      "post": {
+        "description": "GetArtifactAsset returns the contents of a specific asset file.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.GetArtifactAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.GetArtifactAssetResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetArtifactAsset",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/GetArtifactVersion": {
+      "post": {
+        "description": "GetArtifactVersion returns a specific version of an artifact including its manifest.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.GetArtifactVersionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.GetArtifactVersionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetArtifactVersion",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListArtifactPermissions": {
+      "post": {
+        "description": "ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListArtifactPermissionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListArtifactPermissionsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListArtifactPermissions",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListArtifacts": {
+      "post": {
+        "description": "ListArtifacts returns artifacts, optionally filtered by kind and organisation.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListArtifactsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListArtifactsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListArtifacts",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListDeployKeys": {
+      "post": {
+        "description": "ListDeployKeys lists registered deploy keys.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListDeployKeysRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListDeployKeysResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListDeployKeys",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListOrganisations": {
+      "post": {
+        "description": "ListOrganisations returns all registered organisations.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListOrganisationsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListOrganisationsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListOrganisations",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/PublishVersion": {
+      "post": {
+        "description": "PublishVersion publishes a new version of a schema or plugin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.PublishVersionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.PublishVersionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "PublishVersion",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/RegisterDeployKey": {
+      "post": {
+        "description": "RegisterDeployKey registers a new deploy key for the authenticated user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RegisterDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RegisterDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RegisterDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/RemoveAllowedDeployKey": {
+      "post": {
+        "description": "RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RemoveAllowedDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RemoveAllowedDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RemoveAllowedDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/RemoveAllowedSAN": {
+      "post": {
+        "description": "RemoveAllowedSAN removes an allowed SAN pattern from an artifact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RemoveAllowedSANRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RemoveAllowedSANResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RemoveAllowedSAN",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/RevokeDeployKey": {
+      "post": {
+        "description": "RevokeDeployKey revokes a deploy key.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RevokeDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RevokeDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RevokeDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/RevokeVersion": {
+      "post": {
+        "description": "RevokeVersion marks a published version as revoked.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RevokeVersionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RevokeVersionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RevokeVersion",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/SetOfficialStatus": {
+      "post": {
+        "description": "SetOfficialStatus promotes or demotes an artifact's official status. Only the owner organisation can call this.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.SetOfficialStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.SetOfficialStatusResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "SetOfficialStatus",
+        "tags": [
+          "Hub"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://hub.api.tt.se"
+    },
+    {
+      "url": "https://hub.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Hub provides the API for managing schemas and plugins in the Elephant Hub registry.",
+      "name": "Hub"
+    }
+  ]
+}

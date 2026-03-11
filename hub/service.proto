@@ -1,0 +1,300 @@
+syntax = "proto3";
+
+package ttab.hub;
+
+option go_package = "github.com/ttab/elephant-tt-api/hub";
+
+// Hub provides the API for managing schemas and plugins in the
+// Elephant Hub registry.
+service Hub {
+  // --- Organisation management ---
+
+  // ListOrganisations returns all registered organisations.
+  rpc ListOrganisations(ListOrganisationsRequest) returns (ListOrganisationsResponse);
+  // ApproveOrganisation approves an organisation, allowing its members to log in.
+  rpc ApproveOrganisation(ApproveOrganisationRequest) returns (ApproveOrganisationResponse);
+
+  // --- Artifact browsing ---
+
+  // ListArtifacts returns artifacts, optionally filtered by kind and organisation.
+  rpc ListArtifacts(ListArtifactsRequest) returns (ListArtifactsResponse);
+  // GetArtifact returns metadata for a specific artifact.
+  rpc GetArtifact(GetArtifactRequest) returns (GetArtifactResponse);
+  // GetArtifactVersion returns a specific version of an artifact including its manifest.
+  rpc GetArtifactVersion(GetArtifactVersionRequest) returns (GetArtifactVersionResponse);
+  // GetArtifactAsset returns the contents of a specific asset file.
+  rpc GetArtifactAsset(GetArtifactAssetRequest) returns (GetArtifactAssetResponse);
+
+  // --- Publishing ---
+
+  // PublishVersion publishes a new version of a schema or plugin.
+  rpc PublishVersion(PublishVersionRequest) returns (PublishVersionResponse);
+  // RevokeVersion marks a published version as revoked.
+  rpc RevokeVersion(RevokeVersionRequest) returns (RevokeVersionResponse);
+
+  // --- Deploy key management ---
+
+  // RegisterDeployKey registers a new deploy key for the authenticated user.
+  rpc RegisterDeployKey(RegisterDeployKeyRequest) returns (RegisterDeployKeyResponse);
+  // ListDeployKeys lists registered deploy keys.
+  rpc ListDeployKeys(ListDeployKeysRequest) returns (ListDeployKeysResponse);
+  // ApproveDeployKey approves a deploy key for publishing.
+  rpc ApproveDeployKey(ApproveDeployKeyRequest) returns (ApproveDeployKeyResponse);
+  // RevokeDeployKey revokes a deploy key.
+  rpc RevokeDeployKey(RevokeDeployKeyRequest) returns (RevokeDeployKeyResponse);
+
+  // --- Artifact permissions ---
+
+  // AddAllowedSAN adds a cosign SAN pattern allowed to publish an artifact.
+  rpc AddAllowedSAN(AddAllowedSANRequest) returns (AddAllowedSANResponse);
+  // RemoveAllowedSAN removes an allowed SAN pattern from an artifact.
+  rpc RemoveAllowedSAN(RemoveAllowedSANRequest) returns (RemoveAllowedSANResponse);
+  // AddAllowedDeployKey adds a deploy key allowed to publish an artifact.
+  rpc AddAllowedDeployKey(AddAllowedDeployKeyRequest) returns (AddAllowedDeployKeyResponse);
+  // RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.
+  rpc RemoveAllowedDeployKey(RemoveAllowedDeployKeyRequest) returns (RemoveAllowedDeployKeyResponse);
+  // ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.
+  rpc ListArtifactPermissions(ListArtifactPermissionsRequest) returns (ListArtifactPermissionsResponse);
+
+  // --- Official status ---
+
+  // SetOfficialStatus promotes or demotes an artifact's official status.
+  // Only the owner organisation can call this.
+  rpc SetOfficialStatus(SetOfficialStatusRequest) returns (SetOfficialStatusResponse);
+}
+
+// --- Enums ---
+
+enum ArtifactKind {
+  ARTIFACT_KIND_UNSPECIFIED = 0;
+  ARTIFACT_KIND_SCHEMA      = 1;
+  ARTIFACT_KIND_PLUGIN      = 2;
+}
+
+enum SignatureType {
+  SIGNATURE_TYPE_UNSPECIFIED = 0;
+  SIGNATURE_TYPE_DEPLOY_KEY  = 1;
+  SIGNATURE_TYPE_SIGSTORE    = 2;
+}
+
+// --- Common types ---
+
+message Organisation {
+  int64  id         = 1;
+  string domain     = 2;
+  string name       = 3;
+  bool   approved   = 4;
+  bool   is_owner   = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message ArtifactInfo {
+  int64        id           = 1;
+  string       organisation = 2;
+  ArtifactKind kind         = 3;
+  string       name         = 4;
+  bool         official     = 5;
+  string       created_at   = 6;
+}
+
+message VersionInfo {
+  int64         id               = 1;
+  string        version          = 2;
+  SignatureType  signature_type   = 3;
+  string        signing_identity = 4;
+  bool          revoked          = 5;
+  string        created_at       = 6;
+}
+
+message AssetInfo {
+  string filename = 1;
+  string sha256   = 2;
+}
+
+message DeployKeyInfo {
+  int64  id          = 1;
+  string fingerprint = 2;
+  string user_email  = 3;
+  bool   approved    = 4;
+  bool   revoked     = 5;
+  string created_at  = 6;
+}
+
+// An asset to upload alongside a version.
+message PublishAsset {
+  string filename = 1;
+  string sha256   = 2;
+  bytes  data     = 3;
+}
+
+// --- Organisation requests/responses ---
+
+message ListOrganisationsRequest {}
+message ListOrganisationsResponse {
+  repeated Organisation organisations = 1;
+}
+
+message ApproveOrganisationRequest {
+  int64 id = 1;
+}
+message ApproveOrganisationResponse {}
+
+// --- Artifact browsing requests/responses ---
+
+message ListArtifactsRequest {
+  // Optional filter by kind.
+  ArtifactKind kind = 1;
+  // Optional filter by organisation domain.
+  string organisation = 2;
+}
+message ListArtifactsResponse {
+  repeated ArtifactInfo artifacts = 1;
+}
+
+message GetArtifactRequest {
+  // Organisation domain.
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+}
+message GetArtifactResponse {
+  ArtifactInfo           artifact = 1;
+  repeated VersionInfo   versions = 2;
+}
+
+message GetArtifactVersionRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  // Specific version string, or empty for latest.
+  string version      = 4;
+}
+message GetArtifactVersionResponse {
+  ArtifactInfo        artifact = 1;
+  VersionInfo         version  = 2;
+  // Raw manifest bytes.
+  bytes               manifest = 3;
+  repeated AssetInfo  assets   = 4;
+}
+
+message GetArtifactAssetRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  string version      = 4;
+  string filename     = 5;
+}
+message GetArtifactAssetResponse {
+  string filename = 1;
+  string sha256   = 2;
+  bytes  data     = 3;
+}
+
+// --- Publishing requests/responses ---
+
+message PublishVersionRequest {
+  ArtifactKind   kind             = 1;
+  // Full name in org/name format.
+  string         name             = 2;
+  string         version          = 3;
+  // Raw manifest bytes.
+  bytes          manifest         = 4;
+  SignatureType  signature_type   = 5;
+  // Signature bytes (Ed25519 sig or sigstore bundle).
+  bytes          signature        = 6;
+  // Identity that signed (key fingerprint or SAN).
+  string         signing_identity = 7;
+  repeated PublishAsset assets    = 8;
+}
+message PublishVersionResponse {
+  int64 version_id = 1;
+}
+
+message RevokeVersionRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  string version      = 4;
+}
+message RevokeVersionResponse {}
+
+// --- Deploy key requests/responses ---
+
+message RegisterDeployKeyRequest {
+  // Ed25519 public key bytes.
+  bytes  public_key  = 1;
+  string fingerprint = 2;
+}
+message RegisterDeployKeyResponse {
+  int64 id = 1;
+}
+
+message ListDeployKeysRequest {}
+message ListDeployKeysResponse {
+  repeated DeployKeyInfo deploy_keys = 1;
+}
+
+message ApproveDeployKeyRequest {
+  int64 id = 1;
+}
+message ApproveDeployKeyResponse {}
+
+message RevokeDeployKeyRequest {
+  int64 id = 1;
+}
+message RevokeDeployKeyResponse {}
+
+// --- Permission requests/responses ---
+
+message AddAllowedSANRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  string san_pattern  = 4;
+}
+message AddAllowedSANResponse {}
+
+message RemoveAllowedSANRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  string san_pattern  = 4;
+}
+message RemoveAllowedSANResponse {}
+
+message AddAllowedDeployKeyRequest {
+  string organisation   = 1;
+  ArtifactKind kind     = 2;
+  string name           = 3;
+  int64  deploy_key_id  = 4;
+}
+message AddAllowedDeployKeyResponse {}
+
+message RemoveAllowedDeployKeyRequest {
+  string organisation   = 1;
+  ArtifactKind kind     = 2;
+  string name           = 3;
+  int64  deploy_key_id  = 4;
+}
+message RemoveAllowedDeployKeyResponse {}
+
+message ListArtifactPermissionsRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+}
+message ListArtifactPermissionsResponse {
+  repeated string       allowed_sans        = 1;
+  repeated DeployKeyInfo allowed_deploy_keys = 2;
+}
+
+// --- Official status ---
+
+message SetOfficialStatusRequest {
+  string organisation = 1;
+  ArtifactKind kind   = 2;
+  string name         = 3;
+  bool   official     = 4;
+}
+message SetOfficialStatusResponse {}
