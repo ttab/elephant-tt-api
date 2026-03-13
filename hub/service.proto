@@ -16,7 +16,7 @@ service Hub {
 
   // --- Artifact browsing ---
 
-  // ListArtifacts returns artifacts, optionally filtered by kind and organisation.
+  // ListArtifacts returns artifacts, optionally filtered by kind.
   rpc ListArtifacts(ListArtifactsRequest) returns (ListArtifactsResponse);
   // GetArtifact returns metadata for a specific artifact.
   rpc GetArtifact(GetArtifactRequest) returns (GetArtifactResponse);
@@ -56,11 +56,19 @@ service Hub {
   // ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.
   rpc ListArtifactPermissions(ListArtifactPermissionsRequest) returns (ListArtifactPermissionsResponse);
 
-  // --- Official status ---
+  // --- Visibility ---
 
-  // SetOfficialStatus promotes or demotes an artifact's official status.
-  // Only the owner organisation can call this.
-  rpc SetOfficialStatus(SetOfficialStatusRequest) returns (SetOfficialStatusResponse);
+  // SetArtifactVisibility sets whether an artifact is publicly visible.
+  rpc SetArtifactVisibility(SetArtifactVisibilityRequest) returns (SetArtifactVisibilityResponse);
+
+  // --- GitHub organisation management ---
+
+  // AddGitHubOrg links a GitHub organisation to a hub organisation.
+  rpc AddGitHubOrg(AddGitHubOrgRequest) returns (AddGitHubOrgResponse);
+  // RemoveGitHubOrg removes a GitHub organisation mapping.
+  rpc RemoveGitHubOrg(RemoveGitHubOrgRequest) returns (RemoveGitHubOrgResponse);
+  // ListGitHubOrgs lists all GitHub organisation mappings.
+  rpc ListGitHubOrgs(ListGitHubOrgsRequest) returns (ListGitHubOrgsResponse);
 }
 
 // --- Enums ---
@@ -93,9 +101,12 @@ message ArtifactInfo {
   int64        id           = 1;
   string       organisation = 2;
   ArtifactKind kind         = 3;
+  // Full artifact name in reverse-domain notation (e.g. se.tt.my-plugin).
   string       name         = 4;
-  bool         official     = 5;
-  string       created_at   = 6;
+  string       created_at   = 5;
+  // Whether the artifact is publicly visible. Private artifacts are only
+  // visible to members of the owning organisation.
+  bool         public       = 6;
 }
 
 message VersionInfo {
@@ -145,18 +156,15 @@ message ApproveOrganisationResponse {}
 message ListArtifactsRequest {
   // Optional filter by kind.
   ArtifactKind kind = 1;
-  // Optional filter by organisation domain.
-  string organisation = 2;
 }
 message ListArtifactsResponse {
   repeated ArtifactInfo artifacts = 1;
 }
 
 message GetArtifactRequest {
-  // Organisation domain.
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
 }
 message GetArtifactResponse {
   ArtifactInfo           artifact = 1;
@@ -164,11 +172,11 @@ message GetArtifactResponse {
 }
 
 message GetArtifactVersionRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
   // Specific version string, or empty for latest.
-  string version      = 4;
+  string version    = 3;
 }
 message GetArtifactVersionResponse {
   ArtifactInfo        artifact = 1;
@@ -179,11 +187,11 @@ message GetArtifactVersionResponse {
 }
 
 message GetArtifactAssetRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
-  string version      = 4;
-  string filename     = 5;
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
+  string version    = 3;
+  string filename   = 4;
 }
 message GetArtifactAssetResponse {
   string filename = 1;
@@ -195,7 +203,7 @@ message GetArtifactAssetResponse {
 
 message PublishVersionRequest {
   ArtifactKind   kind             = 1;
-  // Full name in org/name format.
+  // Full artifact name in reverse-domain notation (e.g. se.tt.my-plugin).
   string         name             = 2;
   string         version          = 3;
   // Raw manifest bytes.
@@ -212,10 +220,10 @@ message PublishVersionResponse {
 }
 
 message RevokeVersionRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
-  string version      = 4;
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
+  string version    = 3;
 }
 message RevokeVersionResponse {}
 
@@ -248,53 +256,81 @@ message RevokeDeployKeyResponse {}
 // --- Permission requests/responses ---
 
 message AddAllowedSANRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
-  string san_pattern  = 4;
+  ArtifactKind kind  = 1;
+  // Full artifact name in reverse-domain notation.
+  string name        = 2;
+  string san_pattern = 3;
 }
 message AddAllowedSANResponse {}
 
 message RemoveAllowedSANRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
-  string san_pattern  = 4;
+  ArtifactKind kind  = 1;
+  // Full artifact name in reverse-domain notation.
+  string name        = 2;
+  string san_pattern = 3;
 }
 message RemoveAllowedSANResponse {}
 
 message AddAllowedDeployKeyRequest {
-  string organisation   = 1;
-  ArtifactKind kind     = 2;
-  string name           = 3;
-  int64  deploy_key_id  = 4;
+  ArtifactKind kind    = 1;
+  // Full artifact name in reverse-domain notation.
+  string name          = 2;
+  int64  deploy_key_id = 3;
 }
 message AddAllowedDeployKeyResponse {}
 
 message RemoveAllowedDeployKeyRequest {
-  string organisation   = 1;
-  ArtifactKind kind     = 2;
-  string name           = 3;
-  int64  deploy_key_id  = 4;
+  ArtifactKind kind    = 1;
+  // Full artifact name in reverse-domain notation.
+  string name          = 2;
+  int64  deploy_key_id = 3;
 }
 message RemoveAllowedDeployKeyResponse {}
 
 message ListArtifactPermissionsRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
 }
 message ListArtifactPermissionsResponse {
   repeated string       allowed_sans        = 1;
   repeated DeployKeyInfo allowed_deploy_keys = 2;
 }
 
-// --- Official status ---
+// --- Visibility requests/responses ---
 
-message SetOfficialStatusRequest {
-  string organisation = 1;
-  ArtifactKind kind   = 2;
-  string name         = 3;
-  bool   official     = 4;
+message SetArtifactVisibilityRequest {
+  ArtifactKind kind   = 1;
+  // Full artifact name in reverse-domain notation.
+  string       name   = 2;
+  bool         public = 3;
 }
-message SetOfficialStatusResponse {}
+message SetArtifactVisibilityResponse {}
+
+// --- GitHub organisation requests/responses ---
+
+message GitHubOrgInfo {
+  int64  id              = 1;
+  string github_org      = 2;
+  int64  organisation_id = 3;
+  string org_domain      = 4;
+  string created_at      = 5;
+}
+
+message AddGitHubOrgRequest {
+  int64  organisation_id = 1;
+  string github_org      = 2;
+}
+message AddGitHubOrgResponse {
+  int64 id = 1;
+}
+
+message RemoveGitHubOrgRequest {
+  int64 id = 1;
+}
+message RemoveGitHubOrgResponse {}
+
+message ListGitHubOrgsRequest {}
+message ListGitHubOrgsResponse {
+  repeated GitHubOrgInfo github_orgs = 1;
+}

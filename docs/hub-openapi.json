@@ -10,9 +10,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           }
         },
@@ -27,9 +25,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
           "san_pattern": {
@@ -39,6 +35,25 @@
         "type": "object"
       },
       "ttab.hub.AddAllowedSANResponse": {
+        "type": "object"
+      },
+      "ttab.hub.AddGitHubOrgRequest": {
+        "properties": {
+          "github_org": {
+            "type": "string"
+          },
+          "organisation_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.AddGitHubOrgResponse": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "ttab.hub.ApproveDeployKeyRequest": {
@@ -75,13 +90,15 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
+            "description": "Full artifact name in reverse-domain notation (e.g. se.tt.my-plugin).",
             "type": "string"
-          },
-          "official": {
-            "type": "boolean"
           },
           "organisation": {
             "type": "string"
+          },
+          "public": {
+            "description": "Whether the artifact is publicly visible. Private artifacts are only visible to members of the owning organisation.",
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -137,9 +154,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
           "version": {
@@ -168,10 +183,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
-            "description": "Organisation domain.",
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           }
         },
@@ -197,9 +209,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
           "version": {
@@ -230,15 +240,33 @@
         },
         "type": "object"
       },
+      "ttab.hub.GitHubOrgInfo": {
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "github_org": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "org_domain": {
+            "type": "string"
+          },
+          "organisation_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ttab.hub.ListArtifactPermissionsRequest": {
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           }
         },
@@ -265,10 +293,6 @@
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
-          },
-          "organisation": {
-            "description": "Optional filter by organisation domain.",
-            "type": "string"
           }
         },
         "type": "object"
@@ -292,6 +316,20 @@
           "deploy_keys": {
             "items": {
               "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListGitHubOrgsRequest": {
+        "type": "object"
+      },
+      "ttab.hub.ListGitHubOrgsResponse": {
+        "properties": {
+          "github_orgs": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.GitHubOrgInfo"
             },
             "type": "array"
           }
@@ -369,7 +407,7 @@
             "type": "string"
           },
           "name": {
-            "description": "Full name in org/name format.",
+            "description": "Full artifact name in reverse-domain notation (e.g. se.tt.my-plugin).",
             "type": "string"
           },
           "signature": {
@@ -426,9 +464,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           }
         },
@@ -443,9 +479,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
           "san_pattern": {
@@ -455,6 +489,17 @@
         "type": "object"
       },
       "ttab.hub.RemoveAllowedSANResponse": {
+        "type": "object"
+      },
+      "ttab.hub.RemoveGitHubOrgRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RemoveGitHubOrgResponse": {
         "type": "object"
       },
       "ttab.hub.RevokeDeployKeyRequest": {
@@ -474,9 +519,7 @@
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
-            "type": "string"
-          },
-          "organisation": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
           "version": {
@@ -488,24 +531,22 @@
       "ttab.hub.RevokeVersionResponse": {
         "type": "object"
       },
-      "ttab.hub.SetOfficialStatusRequest": {
+      "ttab.hub.SetArtifactVisibilityRequest": {
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
+            "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
           },
-          "official": {
+          "public": {
             "type": "boolean"
-          },
-          "organisation": {
-            "type": "string"
           }
         },
         "type": "object"
       },
-      "ttab.hub.SetOfficialStatusResponse": {
+      "ttab.hub.SetArtifactVisibilityResponse": {
         "type": "object"
       },
       "ttab.hub.SignatureType": {
@@ -625,6 +666,44 @@
           }
         ],
         "summary": "AddAllowedSAN",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/AddGitHubOrg": {
+      "post": {
+        "description": "AddGitHubOrg links a GitHub organisation to a hub organisation.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.AddGitHubOrgRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.AddGitHubOrgResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AddGitHubOrg",
         "tags": [
           "Hub"
         ]
@@ -860,7 +939,7 @@
     },
     "/twirp/ttab.hub.Hub/ListArtifacts": {
       "post": {
-        "description": "ListArtifacts returns artifacts, optionally filtered by kind and organisation.",
+        "description": "ListArtifacts returns artifacts, optionally filtered by kind.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -929,6 +1008,44 @@
           }
         ],
         "summary": "ListDeployKeys",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListGitHubOrgs": {
+      "post": {
+        "description": "ListGitHubOrgs lists all GitHub organisation mappings.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListGitHubOrgsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListGitHubOrgsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListGitHubOrgs",
         "tags": [
           "Hub"
         ]
@@ -1124,6 +1241,44 @@
         ]
       }
     },
+    "/twirp/ttab.hub.Hub/RemoveGitHubOrg": {
+      "post": {
+        "description": "RemoveGitHubOrg removes a GitHub organisation mapping.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RemoveGitHubOrgRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RemoveGitHubOrgResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RemoveGitHubOrg",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/RevokeDeployKey": {
       "post": {
         "description": "RevokeDeployKey revokes a deploy key.",
@@ -1200,14 +1355,14 @@
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/SetOfficialStatus": {
+    "/twirp/ttab.hub.Hub/SetArtifactVisibility": {
       "post": {
-        "description": "SetOfficialStatus promotes or demotes an artifact's official status. Only the owner organisation can call this.",
+        "description": "SetArtifactVisibility sets whether an artifact is publicly visible.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.SetOfficialStatusRequest"
+                "$ref": "#/components/schemas/ttab.hub.SetArtifactVisibilityRequest"
               }
             }
           }
@@ -1217,7 +1372,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.SetOfficialStatusResponse"
+                  "$ref": "#/components/schemas/ttab.hub.SetArtifactVisibilityResponse"
                 }
               }
             },
@@ -1232,7 +1387,7 @@
             "bearer": []
           }
         ],
-        "summary": "SetOfficialStatus",
+        "summary": "SetArtifactVisibility",
         "tags": [
           "Hub"
         ]
