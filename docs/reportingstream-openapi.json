@@ -1,0 +1,800 @@
+{
+  "components": {
+    "schemas": {
+      "newsdoc.Block": {
+        "description": "Block is the building block for data embedded in documents. It is used for both content, links and metadata. Blocks have can be nested, but that's nothing to strive for, keep it simple.",
+        "properties": {
+          "content": {
+            "description": "Content is used to embed content blocks.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "contenttype": {
+            "description": "ContentType is used to describe the content type of the block/linked entity if it differs from the type of the block.",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data contains block data.",
+            "type": "object"
+          },
+          "id": {
+            "description": "ID is the block ID,",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are used to link to other resources and documents.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is used to embed metadata",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name is a name for the block. An alternative to \"rel\" when relationship is a term that doesn't fit.",
+            "type": "string"
+          },
+          "rel": {
+            "description": "Rel describes the relationship to the document/parent entity.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Role is used either as an alternative to rel, or for nuancing the relationship.",
+            "type": "string"
+          },
+          "sensitivity": {
+            "description": "Sensitivity can be use to communicate how the information in a block can be handled. It could f.ex. be set to \"internal\", to show that it contains information that must be removed or transformed before publishing.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title is the title/headline of the block, typically used in the presentation of the block.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the type of the block",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI is used to reference another entity in a document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is a browseable URL for the the block.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is used to reference another Document in a block.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value is a value for the block. Useful when we want to store a primitive value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "newsdoc.Document": {
+        "description": "Document is a NewsDoc document.",
+        "properties": {
+          "content": {
+            "description": "Content is the content of the document, this is essentially what gets rendered on the page when you view a document.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language is the language used in the document as an IETF language tag. F.ex. \"en\", \"en-UK\", \"es\", or \"sv-SE\".",
+            "type": "string"
+          },
+          "links": {
+            "description": "Links are links to other resources and entities. This could be links to topics, categories and subjects for the document, or credited authors.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "description": "Meta is the metadata for a document, this could be things like teasers, open graph data, newsvalues.",
+            "items": {
+              "$ref": "#/components/schemas/newsdoc.Block"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Title is the title of the document, can be used as the document name, or the headline when the document is displayed.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the content type of the document.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI identifies the document (in a more human-readable way than the UUID).",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL is the browseable location of the document (if any).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is a unique ID for the document, this can for example be a random v4 UUID, or a URI-derived v5 UUID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.ACLEntry": {
+        "description": "ACLEntry grants permissions to a subject or unit URI.",
+        "properties": {
+          "permissions": {
+            "description": "Permissions granted: \"r\" (read) and/or \"w\" (write).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "uri": {
+            "description": "URI of the grantee. An empty string means the calling user.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.CloseStreamRequest": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the stream to close.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.CloseStreamResponse": {
+        "type": "object"
+      },
+      "ttab.reportingstream.CreatePostRequest": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "pinned": {
+            "description": "Whether the post should be pinned to the top of the stream.",
+            "type": "boolean"
+          },
+          "post_timestamp": {
+            "description": "Timestamp to use for ordering the post.",
+            "type": "string"
+          },
+          "stream_uuid": {
+            "description": "UUID of the stream to add the post to.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.CreatePostResponse": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the created post.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.CreateStreamRequest": {
+        "properties": {
+          "acl": {
+            "description": "Initial ACL entries. The creator is always granted read+write.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.reportingstream.ACLEntry"
+            },
+            "type": "array"
+          },
+          "intro_text": {
+            "description": "Intro text for the stream.",
+            "type": "string"
+          },
+          "published": {
+            "description": "Whether the stream is visible in the public API.",
+            "type": "boolean"
+          },
+          "title": {
+            "description": "Title of the stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.CreateStreamResponse": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the created stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.DeletePostRequest": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the post to delete.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.DeletePostResponse": {
+        "type": "object"
+      },
+      "ttab.reportingstream.GetPostsRequest": {
+        "properties": {
+          "before": {
+            "description": "Return the 10 posts before this event ID. Use 0 for the latest 10 posts.",
+            "type": "integer"
+          },
+          "stream_uuid": {
+            "description": "UUID of the stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.GetPostsResponse": {
+        "properties": {
+          "posts": {
+            "description": "List of posts.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.reportingstream.Post"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.GetStreamRequest": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.GetStreamResponse": {
+        "properties": {
+          "acl": {
+            "description": "Access control list for the stream.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.reportingstream.ACLEntry"
+            },
+            "type": "array"
+          },
+          "stream": {
+            "$ref": "#/components/schemas/ttab.reportingstream.Stream"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.Post": {
+        "properties": {
+          "created_at": {
+            "description": "Creation timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "pinned": {
+            "description": "Whether the post is pinned.",
+            "type": "boolean"
+          },
+          "post_timestamp": {
+            "description": "Timestamp used for ordering.",
+            "type": "string"
+          },
+          "stream_uuid": {
+            "description": "UUID of the stream this post belongs to.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Document type (e.g. core/article, core/image).",
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "Last update timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the post.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version number, incremented on each update.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.SetStreamACLRequest": {
+        "properties": {
+          "acl": {
+            "description": "New ACL entries, replaces the existing ACL.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.reportingstream.ACLEntry"
+            },
+            "type": "array"
+          },
+          "uuid": {
+            "description": "UUID of the stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.SetStreamACLResponse": {
+        "type": "object"
+      },
+      "ttab.reportingstream.Stream": {
+        "properties": {
+          "closed": {
+            "description": "Whether the stream is closed.",
+            "type": "boolean"
+          },
+          "created_at": {
+            "description": "Creation timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "intro_text": {
+            "description": "Intro text for the stream.",
+            "type": "string"
+          },
+          "published": {
+            "description": "Whether the stream is visible in the public API.",
+            "type": "boolean"
+          },
+          "title": {
+            "description": "Title of the stream.",
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "Last update timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the stream.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.UpdatePostRequest": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/newsdoc.Document"
+          },
+          "pinned": {
+            "description": "Updated pinned status.",
+            "type": "boolean"
+          },
+          "post_timestamp": {
+            "description": "Updated timestamp for ordering.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the post to update.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.UpdatePostResponse": {
+        "type": "object"
+      },
+      "ttab.reportingstream.UpdateStreamMetadataRequest": {
+        "properties": {
+          "intro_text": {
+            "description": "New intro text for the stream.",
+            "type": "string"
+          },
+          "published": {
+            "description": "Whether the stream is visible in the public API.",
+            "type": "boolean"
+          },
+          "title": {
+            "description": "New title for the stream.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the stream to update.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.reportingstream.UpdateStreamMetadataResponse": {
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "reportingstream API",
+    "version": "v0.4.2"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/twirp/ttab.reportingstream.Streams/CloseStream": {
+      "post": {
+        "description": "CloseStream closes a stream, stopping further updates.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.CloseStreamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.CloseStreamResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "CloseStream",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/CreatePost": {
+      "post": {
+        "description": "CreatePost adds a post with a NewsDoc payload to a stream.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.CreatePostRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.CreatePostResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "CreatePost",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/CreateStream": {
+      "post": {
+        "description": "CreateStream creates a new reporting stream.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.CreateStreamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.CreateStreamResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "CreateStream",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/DeletePost": {
+      "post": {
+        "description": "DeletePost soft-deletes a post from a stream.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.DeletePostRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.DeletePostResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DeletePost",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/GetPosts": {
+      "post": {
+        "description": "GetPosts returns the 10 latest posts, or the 10 posts before a given event ID.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.GetPostsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.GetPostsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetPosts",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/GetStream": {
+      "post": {
+        "description": "GetStream returns stream metadata and ACL.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.GetStreamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.GetStreamResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetStream",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/SetStreamACL": {
+      "post": {
+        "description": "SetStreamACL replaces the ACL for a stream.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.SetStreamACLRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.SetStreamACLResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "SetStreamACL",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/UpdatePost": {
+      "post": {
+        "description": "UpdatePost updates a post's content, timestamp, or pinned status.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.UpdatePostRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.UpdatePostResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdatePost",
+        "tags": [
+          "Streams"
+        ]
+      }
+    },
+    "/twirp/ttab.reportingstream.Streams/UpdateStreamMetadata": {
+      "post": {
+        "description": "UpdateStreamMetadata updates a stream's title, intro text, and published status.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.reportingstream.UpdateStreamMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.reportingstream.UpdateStreamMetadataResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdateStreamMetadata",
+        "tags": [
+          "Streams"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://reportingstream.api.tt.se"
+    },
+    {
+      "url": "https://reportingstream.api.stage.tt.se"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Streams is the editorial management service for reporting streams.",
+      "name": "Streams"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+import "newsdoc/newsdoc.proto";
+
+package ttab.reportingstream;
+
+option go_package = "github.com/ttab/elephant-tt-api/reportingstream";
+
+// Streams is the editorial management service for reporting streams.
+service Streams {
+  // CreateStream creates a new reporting stream.
+  rpc CreateStream(CreateStreamRequest) returns (CreateStreamResponse);
+  // UpdateStreamMetadata updates a stream's title, intro text, and published
+  // status.
+  rpc UpdateStreamMetadata(UpdateStreamMetadataRequest) returns (UpdateStreamMetadataResponse);
+  // CloseStream closes a stream, stopping further updates.
+  rpc CloseStream(CloseStreamRequest) returns (CloseStreamResponse);
+  // SetStreamACL replaces the ACL for a stream.
+  rpc SetStreamACL(SetStreamACLRequest) returns (SetStreamACLResponse);
+  // CreatePost adds a post with a NewsDoc payload to a stream.
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+  // UpdatePost updates a post's content, timestamp, or pinned status.
+  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse);
+  // DeletePost soft-deletes a post from a stream.
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+  // GetStream returns stream metadata and ACL.
+  rpc GetStream(GetStreamRequest) returns (GetStreamResponse);
+  // GetPosts returns the 10 latest posts, or the 10 posts before a given
+  // event ID.
+  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse);
+}
+
+// ACLEntry grants permissions to a subject or unit URI.
+message ACLEntry {
+  // URI of the grantee. An empty string means the calling user.
+  string uri                    = 1;
+  // Permissions granted: "r" (read) and/or "w" (write).
+  repeated string permissions   = 2;
+}
+
+message CreateStreamRequest {
+  // Title of the stream.
+  string title                = 1;
+  // Intro text for the stream.
+  string intro_text           = 2;
+  // Initial ACL entries. The creator is always granted read+write.
+  repeated ACLEntry acl       = 3;
+  // Whether the stream is visible in the public API.
+  bool published              = 4;
+}
+
+message CreateStreamResponse {
+  // UUID of the created stream.
+  string uuid = 1;
+}
+
+message UpdateStreamMetadataRequest {
+  // UUID of the stream to update.
+  string uuid       = 1;
+  // New title for the stream.
+  string title      = 2;
+  // New intro text for the stream.
+  string intro_text = 3;
+  // Whether the stream is visible in the public API.
+  bool published    = 4;
+}
+
+message UpdateStreamMetadataResponse {}
+
+message CloseStreamRequest {
+  // UUID of the stream to close.
+  string uuid = 1;
+}
+
+message CloseStreamResponse {}
+
+message SetStreamACLRequest {
+  // UUID of the stream.
+  string uuid             = 1;
+  // New ACL entries, replaces the existing ACL.
+  repeated ACLEntry acl   = 2;
+}
+
+message SetStreamACLResponse {}
+
+message CreatePostRequest {
+  // UUID of the stream to add the post to.
+  string stream_uuid              = 1;
+  // NewsDoc document payload for the post.
+  newsdoc.Document document       = 2;
+  // Timestamp to use for ordering the post.
+  string post_timestamp           = 3;
+  // Whether the post should be pinned to the top of the stream.
+  bool pinned                     = 4;
+}
+
+message CreatePostResponse {
+  // UUID of the created post.
+  string uuid = 1;
+}
+
+message UpdatePostRequest {
+  // UUID of the post to update.
+  string uuid                     = 1;
+  // Updated NewsDoc document payload.
+  newsdoc.Document document       = 2;
+  // Updated timestamp for ordering.
+  string post_timestamp           = 3;
+  // Updated pinned status.
+  bool pinned                     = 4;
+}
+
+message UpdatePostResponse {}
+
+message DeletePostRequest {
+  // UUID of the post to delete.
+  string uuid = 1;
+}
+
+message DeletePostResponse {}
+
+message GetStreamRequest {
+  // UUID of the stream.
+  string uuid = 1;
+}
+
+message GetStreamResponse {
+  // Stream metadata.
+  Stream stream           = 1;
+  // Access control list for the stream.
+  repeated ACLEntry acl   = 2;
+}
+
+message Stream {
+  // UUID of the stream.
+  string uuid       = 1;
+  // Title of the stream.
+  string title      = 2;
+  // Intro text for the stream.
+  string intro_text = 3;
+  // Whether the stream is closed.
+  bool closed       = 4;
+  // Creation timestamp (RFC 3339).
+  string created_at = 5;
+  // Last update timestamp (RFC 3339).
+  string updated_at = 6;
+  // Whether the stream is visible in the public API.
+  bool published    = 7;
+}
+
+message GetPostsRequest {
+  // UUID of the stream.
+  string stream_uuid = 1;
+  // Return the 10 posts before this event ID. Use 0 for the latest 10 posts.
+  int64 before       = 2;
+}
+
+message GetPostsResponse {
+  // List of posts.
+  repeated Post posts = 1;
+}
+
+message Post {
+  // UUID of the post.
+  string uuid                     = 1;
+  // UUID of the stream this post belongs to.
+  string stream_uuid              = 2;
+  // Document type (e.g. core/article, core/image).
+  string type                     = 3;
+  // NewsDoc document payload.
+  newsdoc.Document document       = 4;
+  // Timestamp used for ordering.
+  string post_timestamp           = 5;
+  // Whether the post is pinned.
+  bool pinned                     = 6;
+  // Version number, incremented on each update.
+  int64 version                   = 7;
+  // Creation timestamp (RFC 3339).
+  string created_at               = 8;
+  // Last update timestamp (RFC 3339).
+  string updated_at               = 9;
+}
