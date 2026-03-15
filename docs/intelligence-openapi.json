@@ -134,6 +134,93 @@
         },
         "type": "object"
       },
+      "ttab.intelligence.Comment": {
+        "description": "Comment is a single comment in a thread.",
+        "properties": {
+          "author_name": {
+            "description": "Display name of the author.",
+            "type": "string"
+          },
+          "author_uri": {
+            "description": "URI identifying the author.",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "Creation timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "deleted_at": {
+            "description": "Soft-delete timestamp (RFC 3339). Empty if not deleted.",
+            "type": "string"
+          },
+          "parent_uuid": {
+            "description": "UUID of the parent comment for replies. Empty for top-level comments.",
+            "type": "string"
+          },
+          "replies": {
+            "description": "Replies to this comment. Only populated in GetThread responses.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.Comment"
+            },
+            "type": "array"
+          },
+          "text": {
+            "description": "Text content of the comment.",
+            "type": "string"
+          },
+          "thread_uuid": {
+            "description": "UUID of the thread this comment belongs to.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the comment.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.CommentACLEntry": {
+        "description": "CommentACLEntry grants permissions to a subject or unit URI.",
+        "properties": {
+          "permissions": {
+            "description": "Permissions granted: \"r\" (read) and/or \"w\" (write).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "uri": {
+            "description": "URI of the grantee.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.CommentThread": {
+        "description": "CommentThread is the metadata for a comment thread.",
+        "properties": {
+          "acl": {
+            "description": "Access control list for the thread.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.CommentACLEntry"
+            },
+            "type": "array"
+          },
+          "created_at": {
+            "description": "Creation timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "Last update timestamp (RFC 3339).",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the thread.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.intelligence.ConfigureGenerativeTranslatorRequest": {
         "properties": {
           "model": {
@@ -148,6 +235,18 @@
         "type": "object"
       },
       "ttab.intelligence.ConfigureGenerativeTranslatorResponse": {
+        "type": "object"
+      },
+      "ttab.intelligence.DeleteCommentRequest": {
+        "properties": {
+          "comment_uuid": {
+            "description": "UUID of the comment to soft-delete.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.DeleteCommentResponse": {
         "type": "object"
       },
       "ttab.intelligence.DocumentFromTextRequest": {
@@ -197,6 +296,23 @@
           "job_id": {
             "description": "JobID that identifies the job.",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.GetCommentRequest": {
+        "properties": {
+          "comment_uuid": {
+            "description": "UUID of the comment.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.GetCommentResponse": {
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/ttab.intelligence.Comment"
           }
         },
         "type": "object"
@@ -268,6 +384,30 @@
           },
           "type": {
             "$ref": "#/components/schemas/ttab.intelligence.JobType"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.GetThreadRequest": {
+        "properties": {
+          "thread_uuid": {
+            "description": "UUID of the thread.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.GetThreadResponse": {
+        "properties": {
+          "comments": {
+            "description": "Top-level comments with replies nested.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.Comment"
+            },
+            "type": "array"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ttab.intelligence.CommentThread"
           }
         },
         "type": "object"
@@ -429,6 +569,67 @@
         },
         "type": "object"
       },
+      "ttab.intelligence.ListThreadsRequest": {
+        "properties": {
+          "thread_uuids": {
+            "description": "UUIDs of the threads to fetch.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.ListThreadsResponse": {
+        "properties": {
+          "threads": {
+            "description": "Threads the caller has read access to.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.CommentThread"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.PostCommentRequest": {
+        "properties": {
+          "acl": {
+            "description": "Initial ACL entries. Only used when creating a new thread.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.CommentACLEntry"
+            },
+            "type": "array"
+          },
+          "parent_uuid": {
+            "description": "UUID of the parent comment for replies. Empty for top-level comments.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Text content of the comment.",
+            "type": "string"
+          },
+          "thread_uuid": {
+            "description": "UUID of the thread to post to. Empty to create a new thread.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.PostCommentResponse": {
+        "properties": {
+          "comment_uuid": {
+            "description": "UUID of the created comment.",
+            "type": "string"
+          },
+          "thread_uuid": {
+            "description": "UUID of the thread (new or existing).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.intelligence.PromptInfo": {
         "description": "PromptInfo is a summary of a prompt document.",
         "properties": {
@@ -531,6 +732,25 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "ttab.intelligence.SetThreadACLRequest": {
+        "properties": {
+          "acl": {
+            "description": "New ACL entries, replaces the existing ACL.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.intelligence.CommentACLEntry"
+            },
+            "type": "array"
+          },
+          "thread_uuid": {
+            "description": "UUID of the thread.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.intelligence.SetThreadACLResponse": {
         "type": "object"
       },
       "ttab.intelligence.TestPromptRequest": {
@@ -696,6 +916,234 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/twirp/ttab.intelligence.Comments/DeleteComment": {
+      "post": {
+        "description": "DeleteComment soft-deletes a comment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.DeleteCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.DeleteCommentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DeleteComment",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Comments/GetComment": {
+      "post": {
+        "description": "GetComment returns a single comment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.GetCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.GetCommentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetComment",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Comments/GetThread": {
+      "post": {
+        "description": "GetThread returns a thread with all its comments and replies.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.GetThreadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.GetThreadResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetThread",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Comments/ListThreads": {
+      "post": {
+        "description": "ListThreads returns metadata for the given thread UUIDs.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.ListThreadsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.ListThreadsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListThreads",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Comments/PostComment": {
+      "post": {
+        "description": "PostComment posts a comment to a thread. If thread_uuid is empty, a new thread is created.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.PostCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.PostCommentResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "PostComment",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/twirp/ttab.intelligence.Comments/SetThreadACL": {
+      "post": {
+        "description": "SetThreadACL replaces the access control list for a thread.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.intelligence.SetThreadACLRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.intelligence.SetThreadACLResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "SetThreadACL",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
     "/twirp/ttab.intelligence.Embeddings/Search": {
       "post": {
         "description": "Search performs a semantic search across embedded documents.",
@@ -1253,6 +1701,10 @@
     {
       "description": "Prompts provides management and testing of prompt documents.",
       "name": "Prompts"
+    },
+    {
+      "description": "Comments provides threaded commenting for research documents.",
+      "name": "Comments"
     }
   ]
 }

@@ -361,3 +361,128 @@ message GetResultResponse {
   // Feedback result, set for JOB_TYPE_FEEDBACK jobs.
   LanguageFeedback feedback = 8;
 }
+
+// Comments provides threaded commenting for research documents.
+service Comments {
+  // PostComment posts a comment to a thread. If thread_uuid is empty, a new
+  // thread is created.
+  rpc PostComment(PostCommentRequest) returns (PostCommentResponse);
+  // GetThread returns a thread with all its comments and replies.
+  rpc GetThread(GetThreadRequest) returns (GetThreadResponse);
+  // ListThreads returns metadata for the given thread UUIDs.
+  rpc ListThreads(ListThreadsRequest) returns (ListThreadsResponse);
+  // GetComment returns a single comment.
+  rpc GetComment(GetCommentRequest) returns (GetCommentResponse);
+  // DeleteComment soft-deletes a comment.
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
+  // SetThreadACL replaces the access control list for a thread.
+  rpc SetThreadACL(SetThreadACLRequest) returns (SetThreadACLResponse);
+}
+
+// CommentACLEntry grants permissions to a subject or unit URI.
+message CommentACLEntry {
+  // URI of the grantee.
+  string uri                    = 1;
+  // Permissions granted: "r" (read) and/or "w" (write).
+  repeated string permissions   = 2;
+}
+
+// Comment is a single comment in a thread.
+message Comment {
+  // UUID of the comment.
+  string uuid         = 1;
+  // UUID of the thread this comment belongs to.
+  string thread_uuid  = 2;
+  // UUID of the parent comment for replies. Empty for top-level comments.
+  string parent_uuid  = 3;
+  // URI identifying the author.
+  string author_uri   = 4;
+  // Display name of the author.
+  string author_name  = 5;
+  // Text content of the comment.
+  string text         = 6;
+  // Creation timestamp (RFC 3339).
+  string created_at   = 7;
+  // Soft-delete timestamp (RFC 3339). Empty if not deleted.
+  string deleted_at   = 8;
+  // Replies to this comment. Only populated in GetThread responses.
+  repeated Comment replies = 9;
+}
+
+// CommentThread is the metadata for a comment thread.
+message CommentThread {
+  // UUID of the thread.
+  string uuid       = 1;
+  // Creation timestamp (RFC 3339).
+  string created_at = 2;
+  // Last update timestamp (RFC 3339).
+  string updated_at = 3;
+  // Access control list for the thread.
+  repeated CommentACLEntry acl = 4;
+}
+
+message PostCommentRequest {
+  // UUID of the thread to post to. Empty to create a new thread.
+  string thread_uuid          = 1;
+  // UUID of the parent comment for replies. Empty for top-level comments.
+  string parent_uuid          = 2;
+  // Text content of the comment.
+  string text                 = 3;
+  // Initial ACL entries. Only used when creating a new thread.
+  repeated CommentACLEntry acl = 4;
+}
+
+message PostCommentResponse {
+  // UUID of the thread (new or existing).
+  string thread_uuid  = 1;
+  // UUID of the created comment.
+  string comment_uuid = 2;
+}
+
+message GetThreadRequest {
+  // UUID of the thread.
+  string thread_uuid = 1;
+}
+
+message GetThreadResponse {
+  // Thread metadata.
+  CommentThread thread       = 1;
+  // Top-level comments with replies nested.
+  repeated Comment comments  = 2;
+}
+
+message GetCommentRequest {
+  // UUID of the comment.
+  string comment_uuid = 1;
+}
+
+message GetCommentResponse {
+  // The comment.
+  Comment comment = 1;
+}
+
+message DeleteCommentRequest {
+  // UUID of the comment to soft-delete.
+  string comment_uuid = 1;
+}
+
+message DeleteCommentResponse {}
+
+message ListThreadsRequest {
+  // UUIDs of the threads to fetch.
+  repeated string thread_uuids = 1;
+}
+
+message ListThreadsResponse {
+  // Threads the caller has read access to.
+  repeated CommentThread threads = 1;
+}
+
+message SetThreadACLRequest {
+  // UUID of the thread.
+  string thread_uuid          = 1;
+  // New ACL entries, replaces the existing ACL.
+  repeated CommentACLEntry acl = 2;
+}
+
+message SetThreadACLResponse {}

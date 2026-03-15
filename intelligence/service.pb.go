@@ -2080,6 +2080,828 @@ func (x *GetResultResponse) GetFeedback() *LanguageFeedback {
 	return nil
 }
 
+// CommentACLEntry grants permissions to a subject or unit URI.
+type CommentACLEntry struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// URI of the grantee.
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Permissions granted: "r" (read) and/or "w" (write).
+	Permissions   []string `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentACLEntry) Reset() {
+	*x = CommentACLEntry{}
+	mi := &file_intelligence_service_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentACLEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentACLEntry) ProtoMessage() {}
+
+func (x *CommentACLEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentACLEntry.ProtoReflect.Descriptor instead.
+func (*CommentACLEntry) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *CommentACLEntry) GetUri() string {
+	if x != nil {
+		return x.Uri
+	}
+	return ""
+}
+
+func (x *CommentACLEntry) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+// Comment is a single comment in a thread.
+type Comment struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the comment.
+	Uuid string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	// UUID of the thread this comment belongs to.
+	ThreadUuid string `protobuf:"bytes,2,opt,name=thread_uuid,json=threadUuid,proto3" json:"thread_uuid,omitempty"`
+	// UUID of the parent comment for replies. Empty for top-level comments.
+	ParentUuid string `protobuf:"bytes,3,opt,name=parent_uuid,json=parentUuid,proto3" json:"parent_uuid,omitempty"`
+	// URI identifying the author.
+	AuthorUri string `protobuf:"bytes,4,opt,name=author_uri,json=authorUri,proto3" json:"author_uri,omitempty"`
+	// Display name of the author.
+	AuthorName string `protobuf:"bytes,5,opt,name=author_name,json=authorName,proto3" json:"author_name,omitempty"`
+	// Text content of the comment.
+	Text string `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
+	// Creation timestamp (RFC 3339).
+	CreatedAt string `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Soft-delete timestamp (RFC 3339). Empty if not deleted.
+	DeletedAt string `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	// Replies to this comment. Only populated in GetThread responses.
+	Replies       []*Comment `protobuf:"bytes,9,rep,name=replies,proto3" json:"replies,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Comment) Reset() {
+	*x = Comment{}
+	mi := &file_intelligence_service_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Comment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Comment) ProtoMessage() {}
+
+func (x *Comment) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Comment.ProtoReflect.Descriptor instead.
+func (*Comment) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *Comment) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *Comment) GetThreadUuid() string {
+	if x != nil {
+		return x.ThreadUuid
+	}
+	return ""
+}
+
+func (x *Comment) GetParentUuid() string {
+	if x != nil {
+		return x.ParentUuid
+	}
+	return ""
+}
+
+func (x *Comment) GetAuthorUri() string {
+	if x != nil {
+		return x.AuthorUri
+	}
+	return ""
+}
+
+func (x *Comment) GetAuthorName() string {
+	if x != nil {
+		return x.AuthorName
+	}
+	return ""
+}
+
+func (x *Comment) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *Comment) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Comment) GetDeletedAt() string {
+	if x != nil {
+		return x.DeletedAt
+	}
+	return ""
+}
+
+func (x *Comment) GetReplies() []*Comment {
+	if x != nil {
+		return x.Replies
+	}
+	return nil
+}
+
+// CommentThread is the metadata for a comment thread.
+type CommentThread struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the thread.
+	Uuid string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	// Creation timestamp (RFC 3339).
+	CreatedAt string `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Last update timestamp (RFC 3339).
+	UpdatedAt string `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	// Access control list for the thread.
+	Acl           []*CommentACLEntry `protobuf:"bytes,4,rep,name=acl,proto3" json:"acl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentThread) Reset() {
+	*x = CommentThread{}
+	mi := &file_intelligence_service_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentThread) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentThread) ProtoMessage() {}
+
+func (x *CommentThread) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentThread.ProtoReflect.Descriptor instead.
+func (*CommentThread) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *CommentThread) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *CommentThread) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *CommentThread) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *CommentThread) GetAcl() []*CommentACLEntry {
+	if x != nil {
+		return x.Acl
+	}
+	return nil
+}
+
+type PostCommentRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the thread to post to. Empty to create a new thread.
+	ThreadUuid string `protobuf:"bytes,1,opt,name=thread_uuid,json=threadUuid,proto3" json:"thread_uuid,omitempty"`
+	// UUID of the parent comment for replies. Empty for top-level comments.
+	ParentUuid string `protobuf:"bytes,2,opt,name=parent_uuid,json=parentUuid,proto3" json:"parent_uuid,omitempty"`
+	// Text content of the comment.
+	Text string `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
+	// Initial ACL entries. Only used when creating a new thread.
+	Acl           []*CommentACLEntry `protobuf:"bytes,4,rep,name=acl,proto3" json:"acl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PostCommentRequest) Reset() {
+	*x = PostCommentRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PostCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PostCommentRequest) ProtoMessage() {}
+
+func (x *PostCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PostCommentRequest.ProtoReflect.Descriptor instead.
+func (*PostCommentRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *PostCommentRequest) GetThreadUuid() string {
+	if x != nil {
+		return x.ThreadUuid
+	}
+	return ""
+}
+
+func (x *PostCommentRequest) GetParentUuid() string {
+	if x != nil {
+		return x.ParentUuid
+	}
+	return ""
+}
+
+func (x *PostCommentRequest) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *PostCommentRequest) GetAcl() []*CommentACLEntry {
+	if x != nil {
+		return x.Acl
+	}
+	return nil
+}
+
+type PostCommentResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the thread (new or existing).
+	ThreadUuid string `protobuf:"bytes,1,opt,name=thread_uuid,json=threadUuid,proto3" json:"thread_uuid,omitempty"`
+	// UUID of the created comment.
+	CommentUuid   string `protobuf:"bytes,2,opt,name=comment_uuid,json=commentUuid,proto3" json:"comment_uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PostCommentResponse) Reset() {
+	*x = PostCommentResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PostCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PostCommentResponse) ProtoMessage() {}
+
+func (x *PostCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PostCommentResponse.ProtoReflect.Descriptor instead.
+func (*PostCommentResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *PostCommentResponse) GetThreadUuid() string {
+	if x != nil {
+		return x.ThreadUuid
+	}
+	return ""
+}
+
+func (x *PostCommentResponse) GetCommentUuid() string {
+	if x != nil {
+		return x.CommentUuid
+	}
+	return ""
+}
+
+type GetThreadRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the thread.
+	ThreadUuid    string `protobuf:"bytes,1,opt,name=thread_uuid,json=threadUuid,proto3" json:"thread_uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetThreadRequest) Reset() {
+	*x = GetThreadRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetThreadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetThreadRequest) ProtoMessage() {}
+
+func (x *GetThreadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetThreadRequest.ProtoReflect.Descriptor instead.
+func (*GetThreadRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetThreadRequest) GetThreadUuid() string {
+	if x != nil {
+		return x.ThreadUuid
+	}
+	return ""
+}
+
+type GetThreadResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Thread metadata.
+	Thread *CommentThread `protobuf:"bytes,1,opt,name=thread,proto3" json:"thread,omitempty"`
+	// Top-level comments with replies nested.
+	Comments      []*Comment `protobuf:"bytes,2,rep,name=comments,proto3" json:"comments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetThreadResponse) Reset() {
+	*x = GetThreadResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetThreadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetThreadResponse) ProtoMessage() {}
+
+func (x *GetThreadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetThreadResponse.ProtoReflect.Descriptor instead.
+func (*GetThreadResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *GetThreadResponse) GetThread() *CommentThread {
+	if x != nil {
+		return x.Thread
+	}
+	return nil
+}
+
+func (x *GetThreadResponse) GetComments() []*Comment {
+	if x != nil {
+		return x.Comments
+	}
+	return nil
+}
+
+type GetCommentRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the comment.
+	CommentUuid   string `protobuf:"bytes,1,opt,name=comment_uuid,json=commentUuid,proto3" json:"comment_uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCommentRequest) Reset() {
+	*x = GetCommentRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCommentRequest) ProtoMessage() {}
+
+func (x *GetCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCommentRequest.ProtoReflect.Descriptor instead.
+func (*GetCommentRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *GetCommentRequest) GetCommentUuid() string {
+	if x != nil {
+		return x.CommentUuid
+	}
+	return ""
+}
+
+type GetCommentResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The comment.
+	Comment       *Comment `protobuf:"bytes,1,opt,name=comment,proto3" json:"comment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCommentResponse) Reset() {
+	*x = GetCommentResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCommentResponse) ProtoMessage() {}
+
+func (x *GetCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCommentResponse.ProtoReflect.Descriptor instead.
+func (*GetCommentResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *GetCommentResponse) GetComment() *Comment {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+type DeleteCommentRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the comment to soft-delete.
+	CommentUuid   string `protobuf:"bytes,1,opt,name=comment_uuid,json=commentUuid,proto3" json:"comment_uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCommentRequest) Reset() {
+	*x = DeleteCommentRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentRequest) ProtoMessage() {}
+
+func (x *DeleteCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCommentRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *DeleteCommentRequest) GetCommentUuid() string {
+	if x != nil {
+		return x.CommentUuid
+	}
+	return ""
+}
+
+type DeleteCommentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCommentResponse) Reset() {
+	*x = DeleteCommentResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentResponse) ProtoMessage() {}
+
+func (x *DeleteCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCommentResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{43}
+}
+
+type ListThreadsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUIDs of the threads to fetch.
+	ThreadUuids   []string `protobuf:"bytes,1,rep,name=thread_uuids,json=threadUuids,proto3" json:"thread_uuids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListThreadsRequest) Reset() {
+	*x = ListThreadsRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListThreadsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListThreadsRequest) ProtoMessage() {}
+
+func (x *ListThreadsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListThreadsRequest.ProtoReflect.Descriptor instead.
+func (*ListThreadsRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *ListThreadsRequest) GetThreadUuids() []string {
+	if x != nil {
+		return x.ThreadUuids
+	}
+	return nil
+}
+
+type ListThreadsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Threads the caller has read access to.
+	Threads       []*CommentThread `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListThreadsResponse) Reset() {
+	*x = ListThreadsResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListThreadsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListThreadsResponse) ProtoMessage() {}
+
+func (x *ListThreadsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListThreadsResponse.ProtoReflect.Descriptor instead.
+func (*ListThreadsResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *ListThreadsResponse) GetThreads() []*CommentThread {
+	if x != nil {
+		return x.Threads
+	}
+	return nil
+}
+
+type SetThreadACLRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the thread.
+	ThreadUuid string `protobuf:"bytes,1,opt,name=thread_uuid,json=threadUuid,proto3" json:"thread_uuid,omitempty"`
+	// New ACL entries, replaces the existing ACL.
+	Acl           []*CommentACLEntry `protobuf:"bytes,2,rep,name=acl,proto3" json:"acl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetThreadACLRequest) Reset() {
+	*x = SetThreadACLRequest{}
+	mi := &file_intelligence_service_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetThreadACLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetThreadACLRequest) ProtoMessage() {}
+
+func (x *SetThreadACLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetThreadACLRequest.ProtoReflect.Descriptor instead.
+func (*SetThreadACLRequest) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *SetThreadACLRequest) GetThreadUuid() string {
+	if x != nil {
+		return x.ThreadUuid
+	}
+	return ""
+}
+
+func (x *SetThreadACLRequest) GetAcl() []*CommentACLEntry {
+	if x != nil {
+		return x.Acl
+	}
+	return nil
+}
+
+type SetThreadACLResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetThreadACLResponse) Reset() {
+	*x = SetThreadACLResponse{}
+	mi := &file_intelligence_service_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetThreadACLResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetThreadACLResponse) ProtoMessage() {}
+
+func (x *SetThreadACLResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_intelligence_service_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetThreadACLResponse.ProtoReflect.Descriptor instead.
+func (*SetThreadACLResponse) Descriptor() ([]byte, []int) {
+	return file_intelligence_service_proto_rawDescGZIP(), []int{47}
+}
+
 var File_intelligence_service_proto protoreflect.FileDescriptor
 
 var file_intelligence_service_proto_rawDesc = []byte{
@@ -2328,7 +3150,98 @@ var file_intelligence_service_proto_rawDesc = []byte{
 	0x08, 0x66, 0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x23, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65,
 	0x6e, 0x63, 0x65, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x46, 0x65, 0x65, 0x64,
-	0x62, 0x61, 0x63, 0x6b, 0x52, 0x08, 0x66, 0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x2a, 0x43,
+	0x62, 0x61, 0x63, 0x6b, 0x52, 0x08, 0x66, 0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x22, 0x45,
+	0x0a, 0x0f, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x41, 0x43, 0x4c, 0x45, 0x6e, 0x74, 0x72,
+	0x79, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x75, 0x72, 0x69, 0x12, 0x20, 0x0a, 0x0b, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0xa7, 0x02, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5f,
+	0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x74, 0x68, 0x72, 0x65,
+	0x61, 0x64, 0x55, 0x75, 0x69, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74,
+	0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x72,
+	0x65, 0x6e, 0x74, 0x55, 0x75, 0x69, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x61, 0x75, 0x74, 0x68, 0x6f,
+	0x72, 0x5f, 0x75, 0x72, 0x69, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74,
+	0x68, 0x6f, 0x72, 0x55, 0x72, 0x69, 0x12, 0x1f, 0x0a, 0x0b, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72,
+	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x61, 0x75, 0x74,
+	0x68, 0x6f, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18,
+	0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x64, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
+	0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x34, 0x0a, 0x07, 0x72, 0x65, 0x70,
+	0x6c, 0x69, 0x65, 0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x74, 0x74, 0x61,
+	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x43,
+	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x69, 0x65, 0x73, 0x22,
+	0x97, 0x01, 0x0a, 0x0d, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61,
+	0x64, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x5f, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x41, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f,
+	0x61, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x64, 0x41, 0x74, 0x12, 0x34, 0x0a, 0x03, 0x61, 0x63, 0x6c, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x22, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67,
+	0x65, 0x6e, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x41, 0x43, 0x4c, 0x45,
+	0x6e, 0x74, 0x72, 0x79, 0x52, 0x03, 0x61, 0x63, 0x6c, 0x22, 0xa0, 0x01, 0x0a, 0x12, 0x50, 0x6f,
+	0x73, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x55, 0x75, 0x69,
+	0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x75, 0x75, 0x69, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x55, 0x75,
+	0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x12, 0x34, 0x0a, 0x03, 0x61, 0x63, 0x6c, 0x18, 0x04, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c,
+	0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x41,
+	0x43, 0x4c, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x03, 0x61, 0x63, 0x6c, 0x22, 0x59, 0x0a, 0x13,
+	0x50, 0x6f, 0x73, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x75, 0x75,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64,
+	0x55, 0x75, 0x69, 0x64, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x5f,
+	0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x55, 0x75, 0x69, 0x64, 0x22, 0x33, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x54, 0x68,
+	0x72, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x74,
+	0x68, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x55, 0x75, 0x69, 0x64, 0x22, 0x85, 0x01, 0x0a,
+	0x11, 0x47, 0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x20, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c,
+	0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x68,
+	0x72, 0x65, 0x61, 0x64, 0x52, 0x06, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x12, 0x36, 0x0a, 0x08,
+	0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e,
+	0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x08, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x73, 0x22, 0x36, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65,
+	0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0b, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x55, 0x75, 0x69, 0x64, 0x22, 0x4a, 0x0a, 0x12,
+	0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x34, 0x0a, 0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c,
+	0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52,
+	0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x39, 0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x75, 0x75, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x55,
+	0x75, 0x69, 0x64, 0x22, 0x17, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x37, 0x0a, 0x12,
+	0x4c, 0x69, 0x73, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x75, 0x75, 0x69,
+	0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64,
+	0x55, 0x75, 0x69, 0x64, 0x73, 0x22, 0x51, 0x0a, 0x13, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x68, 0x72,
+	0x65, 0x61, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x07,
+	0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e,
+	0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63,
+	0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x52,
+	0x07, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x73, 0x22, 0x6c, 0x0a, 0x13, 0x53, 0x65, 0x74, 0x54,
+	0x68, 0x72, 0x65, 0x61, 0x64, 0x41, 0x43, 0x4c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x1f, 0x0a, 0x0b, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64, 0x55, 0x75, 0x69, 0x64,
+	0x12, 0x34, 0x0a, 0x03, 0x61, 0x63, 0x6c, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x22, 0x2e,
+	0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63,
+	0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x41, 0x43, 0x4c, 0x45, 0x6e, 0x74, 0x72,
+	0x79, 0x52, 0x03, 0x61, 0x63, 0x6c, 0x22, 0x16, 0x0a, 0x14, 0x53, 0x65, 0x74, 0x54, 0x68, 0x72,
+	0x65, 0x61, 0x64, 0x41, 0x43, 0x4c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2a, 0x43,
 	0x0a, 0x09, 0x4a, 0x6f, 0x62, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x12, 0x0a, 0x0e, 0x53,
 	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12,
 	0x0f, 0x0a, 0x0b, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x44, 0x4f, 0x4e, 0x45, 0x10, 0x01,
@@ -2433,10 +3346,46 @@ var file_intelligence_service_proto_rawDesc = []byte{
 	0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x74, 0x74,
 	0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e,
 	0x54, 0x65, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x42, 0x2e, 0x5a, 0x2c, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x74, 0x74, 0x61, 0x62, 0x2f, 0x65, 0x6c, 0x65, 0x70, 0x68, 0x61, 0x6e, 0x74, 0x2d, 0x74,
-	0x74, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e,
-	0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x65, 0x32, 0xbe, 0x04, 0x0a, 0x08, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12,
+	0x5c, 0x0a, 0x0b, 0x50, 0x6f, 0x73, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x25,
+	0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e,
+	0x63, 0x65, 0x2e, 0x50, 0x6f, 0x73, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74,
+	0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x50, 0x6f, 0x73, 0x74, 0x43, 0x6f,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x56, 0x0a,
+	0x09, 0x47, 0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x12, 0x23, 0x2e, 0x74, 0x74, 0x61,
+	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47,
+	0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x24, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65,
+	0x6e, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5c, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x68, 0x72,
+	0x65, 0x61, 0x64, 0x73, 0x12, 0x25, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65,
+	0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x68, 0x72,
+	0x65, 0x61, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x74, 0x74,
+	0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e,
+	0x4c, 0x69, 0x73, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x59, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x12, 0x24, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69,
+	0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69,
+	0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x43,
+	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x62,
+	0x0a, 0x0d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12,
+	0x27, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65,
+	0x6e, 0x63, 0x65, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e,
+	0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x5f, 0x0a, 0x0c, 0x53, 0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x41,
+	0x43, 0x4c, 0x12, 0x26, 0x2e, 0x74, 0x74, 0x61, 0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c,
+	0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64,
+	0x41, 0x43, 0x4c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x74, 0x74, 0x61,
+	0x62, 0x2e, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x53,
+	0x65, 0x74, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x41, 0x43, 0x4c, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x42, 0x2e, 0x5a, 0x2c, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x74, 0x74, 0x61, 0x62, 0x2f, 0x65, 0x6c, 0x65, 0x70, 0x68, 0x61, 0x6e, 0x74, 0x2d,
+	0x74, 0x74, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65,
+	0x6e, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2452,7 +3401,7 @@ func file_intelligence_service_proto_rawDescGZIP() []byte {
 }
 
 var file_intelligence_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_intelligence_service_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_intelligence_service_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
 var file_intelligence_service_proto_goTypes = []any{
 	(JobStatus)(0),                                // 0: ttab.intelligence.JobStatus
 	(JobType)(0),                                  // 1: ttab.intelligence.JobType
@@ -2489,66 +3438,101 @@ var file_intelligence_service_proto_goTypes = []any{
 	(*GetResultRequest)(nil),                      // 32: ttab.intelligence.GetResultRequest
 	(*JobReference)(nil),                          // 33: ttab.intelligence.JobReference
 	(*GetResultResponse)(nil),                     // 34: ttab.intelligence.GetResultResponse
-	nil,                                           // 35: ttab.intelligence.TestPromptRequest.VariablesEntry
-	nil,                                           // 36: ttab.intelligence.WaitForJobsRequest.JobsEntry
-	(*newsdoc.Document)(nil),                      // 37: newsdoc.Document
-	(*newsdoc.Block)(nil),                         // 38: newsdoc.Block
+	(*CommentACLEntry)(nil),                       // 35: ttab.intelligence.CommentACLEntry
+	(*Comment)(nil),                               // 36: ttab.intelligence.Comment
+	(*CommentThread)(nil),                         // 37: ttab.intelligence.CommentThread
+	(*PostCommentRequest)(nil),                    // 38: ttab.intelligence.PostCommentRequest
+	(*PostCommentResponse)(nil),                   // 39: ttab.intelligence.PostCommentResponse
+	(*GetThreadRequest)(nil),                      // 40: ttab.intelligence.GetThreadRequest
+	(*GetThreadResponse)(nil),                     // 41: ttab.intelligence.GetThreadResponse
+	(*GetCommentRequest)(nil),                     // 42: ttab.intelligence.GetCommentRequest
+	(*GetCommentResponse)(nil),                    // 43: ttab.intelligence.GetCommentResponse
+	(*DeleteCommentRequest)(nil),                  // 44: ttab.intelligence.DeleteCommentRequest
+	(*DeleteCommentResponse)(nil),                 // 45: ttab.intelligence.DeleteCommentResponse
+	(*ListThreadsRequest)(nil),                    // 46: ttab.intelligence.ListThreadsRequest
+	(*ListThreadsResponse)(nil),                   // 47: ttab.intelligence.ListThreadsResponse
+	(*SetThreadACLRequest)(nil),                   // 48: ttab.intelligence.SetThreadACLRequest
+	(*SetThreadACLResponse)(nil),                  // 49: ttab.intelligence.SetThreadACLResponse
+	nil,                                           // 50: ttab.intelligence.TestPromptRequest.VariablesEntry
+	nil,                                           // 51: ttab.intelligence.WaitForJobsRequest.JobsEntry
+	(*newsdoc.Document)(nil),                      // 52: newsdoc.Document
+	(*newsdoc.Block)(nil),                         // 53: newsdoc.Block
 }
 var file_intelligence_service_proto_depIdxs = []int32{
 	4,  // 0: ttab.intelligence.SemanticSearchResponse.results:type_name -> ttab.intelligence.SemanticSearchResult
 	7,  // 1: ttab.intelligence.ListPromptsResponse.prompts:type_name -> ttab.intelligence.PromptInfo
-	37, // 2: ttab.intelligence.GetPromptResponse.document:type_name -> newsdoc.Document
-	35, // 3: ttab.intelligence.TestPromptRequest.variables:type_name -> ttab.intelligence.TestPromptRequest.VariablesEntry
-	37, // 4: ttab.intelligence.TranslateDocumentRequest.document:type_name -> newsdoc.Document
-	37, // 5: ttab.intelligence.TranslateDocumentResponse.document:type_name -> newsdoc.Document
+	52, // 2: ttab.intelligence.GetPromptResponse.document:type_name -> newsdoc.Document
+	50, // 3: ttab.intelligence.TestPromptRequest.variables:type_name -> ttab.intelligence.TestPromptRequest.VariablesEntry
+	52, // 4: ttab.intelligence.TranslateDocumentRequest.document:type_name -> newsdoc.Document
+	52, // 5: ttab.intelligence.TranslateDocumentResponse.document:type_name -> newsdoc.Document
 	20, // 6: ttab.intelligence.GetTranslationModelsResponse.models:type_name -> ttab.intelligence.TranslationModelInfo
-	38, // 7: ttab.intelligence.DocumentFromTextRequest.additionalLinks:type_name -> newsdoc.Block
-	38, // 8: ttab.intelligence.DocumentFromTextRequest.additionalMeta:type_name -> newsdoc.Block
-	37, // 9: ttab.intelligence.DocumentFromTextResponse.document:type_name -> newsdoc.Document
-	37, // 10: ttab.intelligence.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
+	53, // 7: ttab.intelligence.DocumentFromTextRequest.additionalLinks:type_name -> newsdoc.Block
+	53, // 8: ttab.intelligence.DocumentFromTextRequest.additionalMeta:type_name -> newsdoc.Block
+	52, // 9: ttab.intelligence.DocumentFromTextResponse.document:type_name -> newsdoc.Document
+	52, // 10: ttab.intelligence.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
 	25, // 11: ttab.intelligence.LanguageFeedbackResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
-	38, // 12: ttab.intelligence.TextResponse.content:type_name -> newsdoc.Block
+	53, // 12: ttab.intelligence.TextResponse.content:type_name -> newsdoc.Block
 	33, // 13: ttab.intelligence.ListJobsResponse.jobs:type_name -> ttab.intelligence.JobReference
-	36, // 14: ttab.intelligence.WaitForJobsRequest.jobs:type_name -> ttab.intelligence.WaitForJobsRequest.JobsEntry
+	51, // 14: ttab.intelligence.WaitForJobsRequest.jobs:type_name -> ttab.intelligence.WaitForJobsRequest.JobsEntry
 	33, // 15: ttab.intelligence.WaitForJobsResponse.updated:type_name -> ttab.intelligence.JobReference
 	0,  // 16: ttab.intelligence.JobReference.status:type_name -> ttab.intelligence.JobStatus
 	1,  // 17: ttab.intelligence.GetResultResponse.type:type_name -> ttab.intelligence.JobType
 	0,  // 18: ttab.intelligence.GetResultResponse.status:type_name -> ttab.intelligence.JobStatus
-	37, // 19: ttab.intelligence.GetResultResponse.document:type_name -> newsdoc.Document
+	52, // 19: ttab.intelligence.GetResultResponse.document:type_name -> newsdoc.Document
 	25, // 20: ttab.intelligence.GetResultResponse.feedback:type_name -> ttab.intelligence.LanguageFeedback
-	21, // 21: ttab.intelligence.Generate.DocumentFromText:input_type -> ttab.intelligence.DocumentFromTextRequest
-	23, // 22: ttab.intelligence.Generate.LanguageFeedback:input_type -> ttab.intelligence.LanguageFeedbackRequest
-	26, // 23: ttab.intelligence.Generate.Text:input_type -> ttab.intelligence.TextRequest
-	28, // 24: ttab.intelligence.Generate.ListJobs:input_type -> ttab.intelligence.ListJobsRequest
-	30, // 25: ttab.intelligence.Generate.WaitForJobs:input_type -> ttab.intelligence.WaitForJobsRequest
-	32, // 26: ttab.intelligence.Generate.GetResult:input_type -> ttab.intelligence.GetResultRequest
-	18, // 27: ttab.intelligence.Translate.GetTranslationModels:input_type -> ttab.intelligence.GetTranslationModelsRequest
-	14, // 28: ttab.intelligence.Translate.ConfigureGenerativeTranslator:input_type -> ttab.intelligence.ConfigureGenerativeTranslatorRequest
-	16, // 29: ttab.intelligence.Translate.RemoveGenerativeTranslator:input_type -> ttab.intelligence.RemoveGenerativeTranslatorRequest
-	12, // 30: ttab.intelligence.Translate.TranslateDocument:input_type -> ttab.intelligence.TranslateDocumentRequest
-	2,  // 31: ttab.intelligence.Embeddings.Search:input_type -> ttab.intelligence.SemanticSearchRequest
-	5,  // 32: ttab.intelligence.Prompts.ListPrompts:input_type -> ttab.intelligence.ListPromptsRequest
-	8,  // 33: ttab.intelligence.Prompts.GetPrompt:input_type -> ttab.intelligence.GetPromptRequest
-	10, // 34: ttab.intelligence.Prompts.TestPrompt:input_type -> ttab.intelligence.TestPromptRequest
-	22, // 35: ttab.intelligence.Generate.DocumentFromText:output_type -> ttab.intelligence.DocumentFromTextResponse
-	24, // 36: ttab.intelligence.Generate.LanguageFeedback:output_type -> ttab.intelligence.LanguageFeedbackResponse
-	27, // 37: ttab.intelligence.Generate.Text:output_type -> ttab.intelligence.TextResponse
-	29, // 38: ttab.intelligence.Generate.ListJobs:output_type -> ttab.intelligence.ListJobsResponse
-	31, // 39: ttab.intelligence.Generate.WaitForJobs:output_type -> ttab.intelligence.WaitForJobsResponse
-	34, // 40: ttab.intelligence.Generate.GetResult:output_type -> ttab.intelligence.GetResultResponse
-	19, // 41: ttab.intelligence.Translate.GetTranslationModels:output_type -> ttab.intelligence.GetTranslationModelsResponse
-	15, // 42: ttab.intelligence.Translate.ConfigureGenerativeTranslator:output_type -> ttab.intelligence.ConfigureGenerativeTranslatorResponse
-	17, // 43: ttab.intelligence.Translate.RemoveGenerativeTranslator:output_type -> ttab.intelligence.RemoveGenerativeTranslatorResponse
-	13, // 44: ttab.intelligence.Translate.TranslateDocument:output_type -> ttab.intelligence.TranslateDocumentResponse
-	3,  // 45: ttab.intelligence.Embeddings.Search:output_type -> ttab.intelligence.SemanticSearchResponse
-	6,  // 46: ttab.intelligence.Prompts.ListPrompts:output_type -> ttab.intelligence.ListPromptsResponse
-	9,  // 47: ttab.intelligence.Prompts.GetPrompt:output_type -> ttab.intelligence.GetPromptResponse
-	11, // 48: ttab.intelligence.Prompts.TestPrompt:output_type -> ttab.intelligence.TestPromptResponse
-	35, // [35:49] is the sub-list for method output_type
-	21, // [21:35] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	36, // 21: ttab.intelligence.Comment.replies:type_name -> ttab.intelligence.Comment
+	35, // 22: ttab.intelligence.CommentThread.acl:type_name -> ttab.intelligence.CommentACLEntry
+	35, // 23: ttab.intelligence.PostCommentRequest.acl:type_name -> ttab.intelligence.CommentACLEntry
+	37, // 24: ttab.intelligence.GetThreadResponse.thread:type_name -> ttab.intelligence.CommentThread
+	36, // 25: ttab.intelligence.GetThreadResponse.comments:type_name -> ttab.intelligence.Comment
+	36, // 26: ttab.intelligence.GetCommentResponse.comment:type_name -> ttab.intelligence.Comment
+	37, // 27: ttab.intelligence.ListThreadsResponse.threads:type_name -> ttab.intelligence.CommentThread
+	35, // 28: ttab.intelligence.SetThreadACLRequest.acl:type_name -> ttab.intelligence.CommentACLEntry
+	21, // 29: ttab.intelligence.Generate.DocumentFromText:input_type -> ttab.intelligence.DocumentFromTextRequest
+	23, // 30: ttab.intelligence.Generate.LanguageFeedback:input_type -> ttab.intelligence.LanguageFeedbackRequest
+	26, // 31: ttab.intelligence.Generate.Text:input_type -> ttab.intelligence.TextRequest
+	28, // 32: ttab.intelligence.Generate.ListJobs:input_type -> ttab.intelligence.ListJobsRequest
+	30, // 33: ttab.intelligence.Generate.WaitForJobs:input_type -> ttab.intelligence.WaitForJobsRequest
+	32, // 34: ttab.intelligence.Generate.GetResult:input_type -> ttab.intelligence.GetResultRequest
+	18, // 35: ttab.intelligence.Translate.GetTranslationModels:input_type -> ttab.intelligence.GetTranslationModelsRequest
+	14, // 36: ttab.intelligence.Translate.ConfigureGenerativeTranslator:input_type -> ttab.intelligence.ConfigureGenerativeTranslatorRequest
+	16, // 37: ttab.intelligence.Translate.RemoveGenerativeTranslator:input_type -> ttab.intelligence.RemoveGenerativeTranslatorRequest
+	12, // 38: ttab.intelligence.Translate.TranslateDocument:input_type -> ttab.intelligence.TranslateDocumentRequest
+	2,  // 39: ttab.intelligence.Embeddings.Search:input_type -> ttab.intelligence.SemanticSearchRequest
+	5,  // 40: ttab.intelligence.Prompts.ListPrompts:input_type -> ttab.intelligence.ListPromptsRequest
+	8,  // 41: ttab.intelligence.Prompts.GetPrompt:input_type -> ttab.intelligence.GetPromptRequest
+	10, // 42: ttab.intelligence.Prompts.TestPrompt:input_type -> ttab.intelligence.TestPromptRequest
+	38, // 43: ttab.intelligence.Comments.PostComment:input_type -> ttab.intelligence.PostCommentRequest
+	40, // 44: ttab.intelligence.Comments.GetThread:input_type -> ttab.intelligence.GetThreadRequest
+	46, // 45: ttab.intelligence.Comments.ListThreads:input_type -> ttab.intelligence.ListThreadsRequest
+	42, // 46: ttab.intelligence.Comments.GetComment:input_type -> ttab.intelligence.GetCommentRequest
+	44, // 47: ttab.intelligence.Comments.DeleteComment:input_type -> ttab.intelligence.DeleteCommentRequest
+	48, // 48: ttab.intelligence.Comments.SetThreadACL:input_type -> ttab.intelligence.SetThreadACLRequest
+	22, // 49: ttab.intelligence.Generate.DocumentFromText:output_type -> ttab.intelligence.DocumentFromTextResponse
+	24, // 50: ttab.intelligence.Generate.LanguageFeedback:output_type -> ttab.intelligence.LanguageFeedbackResponse
+	27, // 51: ttab.intelligence.Generate.Text:output_type -> ttab.intelligence.TextResponse
+	29, // 52: ttab.intelligence.Generate.ListJobs:output_type -> ttab.intelligence.ListJobsResponse
+	31, // 53: ttab.intelligence.Generate.WaitForJobs:output_type -> ttab.intelligence.WaitForJobsResponse
+	34, // 54: ttab.intelligence.Generate.GetResult:output_type -> ttab.intelligence.GetResultResponse
+	19, // 55: ttab.intelligence.Translate.GetTranslationModels:output_type -> ttab.intelligence.GetTranslationModelsResponse
+	15, // 56: ttab.intelligence.Translate.ConfigureGenerativeTranslator:output_type -> ttab.intelligence.ConfigureGenerativeTranslatorResponse
+	17, // 57: ttab.intelligence.Translate.RemoveGenerativeTranslator:output_type -> ttab.intelligence.RemoveGenerativeTranslatorResponse
+	13, // 58: ttab.intelligence.Translate.TranslateDocument:output_type -> ttab.intelligence.TranslateDocumentResponse
+	3,  // 59: ttab.intelligence.Embeddings.Search:output_type -> ttab.intelligence.SemanticSearchResponse
+	6,  // 60: ttab.intelligence.Prompts.ListPrompts:output_type -> ttab.intelligence.ListPromptsResponse
+	9,  // 61: ttab.intelligence.Prompts.GetPrompt:output_type -> ttab.intelligence.GetPromptResponse
+	11, // 62: ttab.intelligence.Prompts.TestPrompt:output_type -> ttab.intelligence.TestPromptResponse
+	39, // 63: ttab.intelligence.Comments.PostComment:output_type -> ttab.intelligence.PostCommentResponse
+	41, // 64: ttab.intelligence.Comments.GetThread:output_type -> ttab.intelligence.GetThreadResponse
+	47, // 65: ttab.intelligence.Comments.ListThreads:output_type -> ttab.intelligence.ListThreadsResponse
+	43, // 66: ttab.intelligence.Comments.GetComment:output_type -> ttab.intelligence.GetCommentResponse
+	45, // 67: ttab.intelligence.Comments.DeleteComment:output_type -> ttab.intelligence.DeleteCommentResponse
+	49, // 68: ttab.intelligence.Comments.SetThreadACL:output_type -> ttab.intelligence.SetThreadACLResponse
+	49, // [49:69] is the sub-list for method output_type
+	29, // [29:49] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_intelligence_service_proto_init() }
@@ -2562,9 +3546,9 @@ func file_intelligence_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_intelligence_service_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   35,
+			NumMessages:   50,
 			NumExtensions: 0,
-			NumServices:   4,
+			NumServices:   5,
 		},
 		GoTypes:           file_intelligence_service_proto_goTypes,
 		DependencyIndexes: file_intelligence_service_proto_depIdxs,
