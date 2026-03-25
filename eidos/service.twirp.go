@@ -35,6 +35,10 @@ type Tagger interface {
 	// AnalyseDocument and return the generated meta document and the text
 	// representatin of the document that was used for analysis.
 	AnalyseDocument(context.Context, *AnalyseDocumentRequest) (*AnalyseDocumentResponse, error)
+
+	// RegisterUsage is used to inform eidos when an external system has tagged a
+	// piece of media with entities managed by eidos.
+	RegisterUsage(context.Context, *RegisterUsageRequest) (*RegisterUsageResponse, error)
 }
 
 // ======================
@@ -43,7 +47,7 @@ type Tagger interface {
 
 type taggerProtobufClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [2]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -71,8 +75,9 @@ func NewTaggerProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Cl
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.eidos", "Tagger")
-	urls := [1]string{
+	urls := [2]string{
 		serviceURL + "AnalyseDocument",
+		serviceURL + "RegisterUsage",
 	}
 
 	return &taggerProtobufClient{
@@ -129,13 +134,59 @@ func (c *taggerProtobufClient) callAnalyseDocument(ctx context.Context, in *Anal
 	return out, nil
 }
 
+func (c *taggerProtobufClient) RegisterUsage(ctx context.Context, in *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.eidos")
+	ctx = ctxsetters.WithServiceName(ctx, "Tagger")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterUsage")
+	caller := c.callRegisterUsage
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterUsageRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterUsageRequest) when calling interceptor")
+					}
+					return c.callRegisterUsage(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterUsageResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterUsageResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *taggerProtobufClient) callRegisterUsage(ctx context.Context, in *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+	out := new(RegisterUsageResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // ==================
 // Tagger JSON Client
 // ==================
 
 type taggerJSONClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [2]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -163,8 +214,9 @@ func NewTaggerJSONClient(baseURL string, client HTTPClient, opts ...twirp.Client
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.eidos", "Tagger")
-	urls := [1]string{
+	urls := [2]string{
 		serviceURL + "AnalyseDocument",
+		serviceURL + "RegisterUsage",
 	}
 
 	return &taggerJSONClient{
@@ -207,6 +259,52 @@ func (c *taggerJSONClient) AnalyseDocument(ctx context.Context, in *AnalyseDocum
 func (c *taggerJSONClient) callAnalyseDocument(ctx context.Context, in *AnalyseDocumentRequest) (*AnalyseDocumentResponse, error) {
 	out := new(AnalyseDocumentResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *taggerJSONClient) RegisterUsage(ctx context.Context, in *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.eidos")
+	ctx = ctxsetters.WithServiceName(ctx, "Tagger")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterUsage")
+	caller := c.callRegisterUsage
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterUsageRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterUsageRequest) when calling interceptor")
+					}
+					return c.callRegisterUsage(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterUsageResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterUsageResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *taggerJSONClient) callRegisterUsage(ctx context.Context, in *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+	out := new(RegisterUsageResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -320,6 +418,9 @@ func (s *taggerServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	switch method {
 	case "AnalyseDocument":
 		s.serveAnalyseDocument(ctx, resp, req)
+		return
+	case "RegisterUsage":
+		s.serveRegisterUsage(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -485,6 +586,186 @@ func (s *taggerServer) serveAnalyseDocumentProtobuf(ctx context.Context, resp ht
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *AnalyseDocumentResponse and nil error while calling AnalyseDocument. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *taggerServer) serveRegisterUsage(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveRegisterUsageJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveRegisterUsageProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *taggerServer) serveRegisterUsageJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterUsage")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(RegisterUsageRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Tagger.RegisterUsage
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterUsageRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterUsageRequest) when calling interceptor")
+					}
+					return s.Tagger.RegisterUsage(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterUsageResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterUsageResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RegisterUsageResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterUsageResponse and nil error while calling RegisterUsage. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *taggerServer) serveRegisterUsageProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterUsage")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(RegisterUsageRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Tagger.RegisterUsage
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RegisterUsageRequest) (*RegisterUsageResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterUsageRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterUsageRequest) when calling interceptor")
+					}
+					return s.Tagger.RegisterUsage(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterUsageResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterUsageResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RegisterUsageResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterUsageResponse and nil error while calling RegisterUsage. nil responses are not supported"))
 		return
 	}
 
@@ -1089,21 +1370,27 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 247 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x90, 0xdf, 0x4a, 0xc3, 0x30,
-	0x14, 0x87, 0xa9, 0x8c, 0xe1, 0x8e, 0x8a, 0x18, 0x51, 0xc7, 0xae, 0x46, 0xc7, 0x70, 0x37, 0x4d,
-	0x60, 0x3e, 0x81, 0xe2, 0x13, 0x94, 0x79, 0xb3, 0x1b, 0x49, 0x9b, 0x43, 0x17, 0x68, 0x93, 0xd8,
-	0x9c, 0xf8, 0xe7, 0xed, 0xc5, 0x74, 0x9d, 0xa0, 0x65, 0x57, 0x49, 0xce, 0xf9, 0xe5, 0xfb, 0x92,
-	0x03, 0xd7, 0xa8, 0x95, 0xf5, 0xc2, 0x63, 0xfb, 0xae, 0x4b, 0xe4, 0xae, 0xb5, 0x64, 0x19, 0x10,
-	0xc9, 0x82, 0xc7, 0xce, 0xec, 0xc6, 0xe0, 0x87, 0x57, 0xb6, 0x14, 0xfb, 0xb5, 0x8b, 0xa4, 0x35,
-	0xdc, 0x3e, 0x1a, 0x59, 0x7f, 0x79, 0x7c, 0xb6, 0x65, 0x68, 0xd0, 0x50, 0x8e, 0x6f, 0x01, 0x3d,
-	0xb1, 0x05, 0x5c, 0xa8, 0x7d, 0xe9, 0x35, 0x04, 0xad, 0xa6, 0xc9, 0x3c, 0x59, 0x4d, 0xf2, 0xf3,
-	0xbe, 0xf8, 0x12, 0xb4, 0x62, 0x19, 0x9c, 0xf6, 0xe7, 0xe9, 0xc9, 0x3c, 0x59, 0x9d, 0xad, 0xaf,
-	0x78, 0x2f, 0x38, 0x00, 0x0f, 0x91, 0x74, 0x03, 0x77, 0xff, 0x6c, 0xde, 0x59, 0xe3, 0x91, 0x2d,
-	0x61, 0xd4, 0x20, 0xc9, 0x68, 0x19, 0xa4, 0xc4, 0x36, 0x63, 0x30, 0x22, 0xfc, 0xec, 0x64, 0x93,
-	0x3c, 0xee, 0xd7, 0x0a, 0xc6, 0x1b, 0x59, 0x55, 0xd8, 0xb2, 0x2d, 0x5c, 0xfe, 0xe1, 0xb3, 0x94,
-	0xff, 0x0e, 0x81, 0x0f, 0x7f, 0x75, 0xb6, 0x38, 0x9a, 0xe9, 0x1e, 0xf8, 0x74, 0xbf, 0x5d, 0x56,
-	0x9a, 0x76, 0xa1, 0xe0, 0xa5, 0x6d, 0xc4, 0xcf, 0x05, 0x81, 0x35, 0xba, 0x9d, 0x34, 0x94, 0x11,
-	0x65, 0xd2, 0x69, 0x11, 0x01, 0xc5, 0x38, 0x4e, 0xf6, 0xe1, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x0a,
-	0xaf, 0xdb, 0xb9, 0x93, 0x01, 0x00, 0x00,
+	// 340 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x52, 0x41, 0x4f, 0xf2, 0x40,
+	0x14, 0x4c, 0x3f, 0x08, 0xf9, 0x78, 0x40, 0x8c, 0xab, 0x08, 0xe1, 0x62, 0x29, 0x21, 0x72, 0xa1,
+	0x4d, 0xf0, 0x17, 0x68, 0xfc, 0x05, 0x4d, 0xb9, 0x70, 0x21, 0xa5, 0x7d, 0x29, 0x9b, 0x40, 0xb7,
+	0x76, 0xdf, 0x2a, 0x3d, 0xf8, 0xc7, 0xfc, 0x75, 0xa6, 0xdb, 0x2d, 0x2a, 0x12, 0x4e, 0xed, 0xce,
+	0xce, 0x9b, 0xc9, 0xcc, 0x5b, 0xb8, 0x41, 0x1e, 0x0b, 0xe9, 0x49, 0xcc, 0xdf, 0x78, 0x84, 0x6e,
+	0x96, 0x0b, 0x12, 0x0c, 0x88, 0xc2, 0x8d, 0xab, 0x6f, 0x46, 0xfd, 0x14, 0xdf, 0x65, 0x2c, 0x22,
+	0xcf, 0x7c, 0x2b, 0x8a, 0xb3, 0x83, 0xbb, 0xa7, 0x34, 0xdc, 0x15, 0x12, 0x5f, 0x44, 0xa4, 0xf6,
+	0x98, 0x92, 0x8f, 0xaf, 0x0a, 0x25, 0xb1, 0x09, 0xf4, 0x62, 0x03, 0xad, 0x95, 0xe2, 0xf1, 0xd0,
+	0xb2, 0xad, 0x59, 0xdb, 0xef, 0xd6, 0xe0, 0x52, 0xf1, 0x98, 0xcd, 0xe1, 0x7f, 0x7d, 0x1e, 0xfe,
+	0xb3, 0xad, 0x59, 0x67, 0x71, 0xed, 0xd6, 0x06, 0x47, 0xc1, 0x23, 0xc5, 0x09, 0x60, 0xf0, 0xc7,
+	0x4d, 0x66, 0x22, 0x95, 0xc8, 0xa6, 0xd0, 0xdc, 0x23, 0x85, 0xda, 0xe5, 0xac, 0x8a, 0xbe, 0x66,
+	0x0c, 0x9a, 0x84, 0x87, 0xca, 0xac, 0xed, 0xeb, 0x7f, 0xe7, 0x03, 0x6e, 0x7d, 0x4c, 0xb8, 0x24,
+	0xcc, 0x97, 0x32, 0x4c, 0xb0, 0x4e, 0x30, 0x86, 0x6e, 0x24, 0x52, 0x2a, 0x03, 0x50, 0x91, 0xa1,
+	0x09, 0xd0, 0x31, 0x58, 0x50, 0x64, 0xc8, 0xee, 0xa1, 0x3a, 0x1e, 0x68, 0xad, 0x72, 0x6e, 0x54,
+	0xc1, 0x40, 0xcb, 0x9c, 0x97, 0x1a, 0x98, 0x12, 0xa7, 0x42, 0x77, 0x20, 0x87, 0x0d, 0xbb, 0x51,
+	0x6a, 0x54, 0x58, 0x59, 0x81, 0x74, 0x06, 0xd0, 0x3f, 0xb1, 0xaf, 0x22, 0x2d, 0x3e, 0x2d, 0x68,
+	0x05, 0x61, 0x92, 0x60, 0xce, 0x56, 0x70, 0x75, 0x12, 0x9c, 0x39, 0xee, 0xf7, 0x76, 0xdc, 0xf3,
+	0x3b, 0x18, 0x4d, 0x2e, 0x72, 0x4c, 0x73, 0x01, 0xf4, 0x7e, 0xf9, 0x33, 0xfb, 0xe7, 0xd4, 0xb9,
+	0x66, 0x46, 0xe3, 0x0b, 0x8c, 0x4a, 0xf5, 0xf9, 0x61, 0x35, 0x4d, 0x38, 0x6d, 0xd5, 0xc6, 0x8d,
+	0xc4, 0xde, 0x2b, 0xe9, 0x1e, 0xee, 0x30, 0xdb, 0x86, 0x29, 0xcd, 0x89, 0xe6, 0x61, 0xc6, 0x3d,
+	0x3d, 0xbe, 0x69, 0xe9, 0x87, 0xf4, 0xf8, 0x15, 0x00, 0x00, 0xff, 0xff, 0x05, 0x50, 0x0d, 0x1b,
+	0x82, 0x02, 0x00, 0x00,
 }
