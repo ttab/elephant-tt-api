@@ -10,6 +10,9 @@ service Tagger {
   // AnalyseDocument and return the generated meta document and the text
   // representatin of the document that was used for analysis.
   rpc AnalyseDocument(AnalyseDocumentRequest) returns (AnalyseDocumentResponse);
+  // RegisterUsage is used to inform eidos when an external system has tagged a
+  // piece of media with entities managed by eidos.
+  rpc RegisterUsage(RegisterUsageRequest) returns (RegisterUsageResponse);
 }
 
 message AnalyseDocumentRequest {
@@ -26,3 +29,14 @@ message AnalyseDocumentResponse {
   // Text used in recognition query.
   string text           = 2;
 }
+
+message RegisterUsageRequest {
+  // ContentType of the media that was tagged.
+  string content_type = 1;
+  // ContentURI is an URI that identified the tagged media.
+  string context_uri  = 2;
+  // The UUIDs of the entities that were used.
+  repeated string entity_uuids = 3;
+}
+
+message RegisterUsageResponse {}

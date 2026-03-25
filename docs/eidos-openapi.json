@@ -157,6 +157,29 @@
           }
         },
         "type": "object"
+      },
+      "ttab.eidos.RegisterUsageRequest": {
+        "properties": {
+          "content_type": {
+            "description": "ContentType of the media that was tagged.",
+            "type": "string"
+          },
+          "context_uri": {
+            "description": "ContentURI is an URI that identified the tagged media.",
+            "type": "string"
+          },
+          "entity_uuids": {
+            "description": "The UUIDs of the entities that were used.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.eidos.RegisterUsageResponse": {
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -206,6 +229,44 @@
           }
         ],
         "summary": "AnalyseDocument",
+        "tags": [
+          "Tagger"
+        ]
+      }
+    },
+    "/twirp/ttab.eidos.Tagger/RegisterUsage": {
+      "post": {
+        "description": "RegisterUsage is used to inform eidos when an external system has tagged a piece of media with entities managed by eidos.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.eidos.RegisterUsageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.eidos.RegisterUsageResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RegisterUsage",
         "tags": [
           "Tagger"
         ]
