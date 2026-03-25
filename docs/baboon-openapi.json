@@ -886,7 +886,7 @@
   },
   "info": {
     "title": "baboon API",
-    "version": "v0.4.2"
+    "version": "v0.4.3"
   },
   "openapi": "3.0.0",
   "paths": {
