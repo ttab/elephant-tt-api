@@ -333,6 +333,18 @@ message SortField {
 
 // Nynorsk Types
 
+// LangParameterTranslate controls how text inside HTML lang-tagged elements
+// is handled during translation.
+enum LangParameterTranslate {
+  LANG_PARAMETER_TRANSLATE_UNSPECIFIED = 0;
+  // Translate only tags where the lang attribute matches the source language.
+  LANG_PARAMETER_TRANSLATE_ORIGIN      = 1;
+  // Ignore lang attributes and translate all text.
+  LANG_PARAMETER_TRANSLATE_ALL         = 2;
+  // Do not translate any text inside lang-tagged elements.
+  LANG_PARAMETER_TRANSLATE_NONE        = 3;
+}
+
 message StringList {
   repeated string values = 1;
 }
@@ -366,9 +378,9 @@ message TranslateRequest {
   // The document format (e.g. "html", "txt", "docx", "json"). Defaults to
   // "html".
   string file_type = 4;
-  // Controls translation of text inside HTML lang-tagged elements. Values:
-  // "origin", "all", "none". Only applies when file_type is "html".
-  string lang_parameter_translate = 5;
+  // Controls translation of text inside HTML lang-tagged elements. Only
+  // applies when file_type is "html".
+  LangParameterTranslate lang_parameter_translate = 5;
   // A preference template name ("standard", "tradisjonell", or "moderne").
   // Can be combined with individual prefs.
   string prefs_template = 6;

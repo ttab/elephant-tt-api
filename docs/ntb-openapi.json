@@ -165,6 +165,16 @@
         },
         "type": "object"
       },
+      "ttab.ntb.LangParameterTranslate": {
+        "description": "LangParameterTranslate controls how text inside HTML lang-tagged elements is handled during translation.",
+        "enum": [
+          "LANG_PARAMETER_TRANSLATE_UNSPECIFIED",
+          "LANG_PARAMETER_TRANSLATE_ORIGIN",
+          "LANG_PARAMETER_TRANSLATE_ALL",
+          "LANG_PARAMETER_TRANSLATE_NONE"
+        ],
+        "type": "string"
+      },
       "ttab.ntb.LanguagePreference": {
         "description": "LanguagePreference describes a single optional language form.",
         "properties": {
@@ -667,8 +677,7 @@
             "type": "string"
           },
           "lang_parameter_translate": {
-            "description": "Controls translation of text inside HTML lang-tagged elements. Values: \"origin\", \"all\", \"none\". Only applies when file_type is \"html\".",
-            "type": "string"
+            "$ref": "#/components/schemas/ttab.ntb.LangParameterTranslate"
           },
           "post_edit": {
             "description": "Enable AI-assisted post-editing of the translation.",
