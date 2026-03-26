@@ -430,9 +430,20 @@ message GetLanguagePrefsResponse {
 
 message GetDocumentFormatsRequest {}
 
+// DocumentFormatInfo describes a supported document format.
+message DocumentFormatInfo {
+  // The file type identifier used in translation requests (e.g. "html", "docx").
+  string file_type = 1;
+  // File suffixes associated with this format (e.g. [".html", ".htm"]).
+  repeated string file_suffixes = 2;
+  // MIME types associated with this format (e.g. ["text/html"]).
+  repeated string mime_types = 3;
+  // Whether document content must be base64-encoded for this format.
+  bool base64_encode = 4;
+}
+
 message GetDocumentFormatsResponse {
-  // List of supported document format identifiers (e.g. "docx", "html", "txt").
-  repeated string document_formats = 1;
+  repeated DocumentFormatInfo document_formats = 1;
 }
 
 message GetPreferenceTemplatesRequest {}

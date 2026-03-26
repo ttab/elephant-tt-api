@@ -1,6 +1,34 @@
 {
   "components": {
     "schemas": {
+      "ttab.ntb.DocumentFormatInfo": {
+        "description": "DocumentFormatInfo describes a supported document format.",
+        "properties": {
+          "base64_encode": {
+            "description": "Whether document content must be base64-encoded for this format.",
+            "type": "boolean"
+          },
+          "file_suffixes": {
+            "description": "File suffixes associated with this format (e.g. [\".html\", \".htm\"]).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "file_type": {
+            "description": "The file type identifier used in translation requests (e.g. \"html\", \"docx\").",
+            "type": "string"
+          },
+          "mime_types": {
+            "description": "MIME types associated with this format (e.g. [\"text/html\"]).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.File": {
         "properties": {
           "height": {
@@ -63,9 +91,8 @@
       "ttab.ntb.GetDocumentFormatsResponse": {
         "properties": {
           "document_formats": {
-            "description": "List of supported document format identifiers (e.g. \"docx\", \"html\", \"txt\").",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ttab.ntb.DocumentFormatInfo"
             },
             "type": "array"
           }
