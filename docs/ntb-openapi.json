@@ -1,6 +1,34 @@
 {
   "components": {
     "schemas": {
+      "ttab.ntb.DocumentFormatInfo": {
+        "description": "DocumentFormatInfo describes a supported document format.",
+        "properties": {
+          "base64_encode": {
+            "description": "Whether document content must be base64-encoded for this format.",
+            "type": "boolean"
+          },
+          "file_suffixes": {
+            "description": "File suffixes associated with this format (e.g. [\".html\", \".htm\"]).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "file_type": {
+            "description": "The file type identifier used in translation requests (e.g. \"html\", \"docx\").",
+            "type": "string"
+          },
+          "mime_types": {
+            "description": "MIME types associated with this format (e.g. [\"text/html\"]).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.File": {
         "properties": {
           "height": {
@@ -57,6 +85,20 @@
         },
         "type": "object"
       },
+      "ttab.ntb.GetDocumentFormatsRequest": {
+        "type": "object"
+      },
+      "ttab.ntb.GetDocumentFormatsResponse": {
+        "properties": {
+          "document_formats": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.DocumentFormatInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.GetItemRequest": {
         "properties": {
           "archive": {
@@ -74,6 +116,36 @@
         "properties": {
           "item": {
             "$ref": "#/components/schemas/ttab.ntb.MediaItem"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.GetLanguagePrefsRequest": {
+        "type": "object"
+      },
+      "ttab.ntb.GetLanguagePrefsResponse": {
+        "properties": {
+          "language_prefs": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ttab.ntb.LanguagePreference"
+            },
+            "description": "Map of form name to its details.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.GetPreferenceTemplatesRequest": {
+        "type": "object"
+      },
+      "ttab.ntb.GetPreferenceTemplatesResponse": {
+        "properties": {
+          "preference_templates": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ttab.ntb.StringList"
+            },
+            "description": "Map of template name to the list of language form names it enables.",
+            "type": "object"
           }
         },
         "type": "object"
@@ -116,6 +188,37 @@
           },
           "origin": {
             "$ref": "#/components/schemas/ttab.ntb.OriginInfo"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.LangParameterTranslate": {
+        "description": "LangParameterTranslate controls how text inside HTML lang-tagged elements is handled during translation.",
+        "enum": [
+          "LANG_PARAMETER_TRANSLATE_UNSPECIFIED",
+          "LANG_PARAMETER_TRANSLATE_ORIGIN",
+          "LANG_PARAMETER_TRANSLATE_ALL",
+          "LANG_PARAMETER_TRANSLATE_NONE"
+        ],
+        "type": "string"
+      },
+      "ttab.ntb.LanguagePreference": {
+        "description": "LanguagePreference describes a single optional language form.",
+        "properties": {
+          "category": {
+            "description": "Category of the language form (e.g. \"Konsonantar\", \"Synonym og stavemåtar\").",
+            "type": "string"
+          },
+          "description": {
+            "description": "Human-readable description of what this form changes.",
+            "type": "string"
+          },
+          "modify_for": {
+            "description": "Words that can be individually selected for this form. Empty if the form applies to all words in its category.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -366,6 +469,18 @@
         },
         "type": "object"
       },
+      "ttab.ntb.PreferenceValue": {
+        "description": "PreferenceValue represents a language preference setting. It can be a boolean to enable/disable a form, or a list of specific words to include or exclude. Prefix a word with \"-\" to exclude it from the form.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "words": {
+            "$ref": "#/components/schemas/ttab.ntb.StringList"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.Preview": {
         "properties": {
           "height": {
@@ -542,6 +657,28 @@
         },
         "type": "object"
       },
+      "ttab.ntb.StringList": {
+        "properties": {
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.StringMap": {
+        "properties": {
+          "entries": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.TimestampPrecision": {
         "enum": [
           "TS_PRECISION_UNKNOWN",
@@ -555,6 +692,73 @@
           "TS_PRECISION_CENTURY"
         ],
         "type": "string"
+      },
+      "ttab.ntb.TranslateRequest": {
+        "properties": {
+          "file_type": {
+            "description": "The document format (e.g. \"html\", \"txt\", \"docx\", \"json\"). Defaults to \"html\".",
+            "type": "string"
+          },
+          "guid": {
+            "description": "Optional GUID to identify this document for translation tracking. If empty, the service generates one.",
+            "type": "string"
+          },
+          "lang_parameter_translate": {
+            "$ref": "#/components/schemas/ttab.ntb.LangParameterTranslate"
+          },
+          "post_edit": {
+            "description": "Enable AI-assisted post-editing of the translation.",
+            "type": "boolean"
+          },
+          "prefs": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ttab.ntb.PreferenceValue"
+            },
+            "description": "Optional language form preferences keyed by form name.",
+            "type": "object"
+          },
+          "prefs_template": {
+            "description": "A preference template name (\"standard\", \"tradisjonell\", or \"moderne\"). Can be combined with individual prefs.",
+            "type": "string"
+          },
+          "source_language": {
+            "description": "Source language as an ISO 639-1 code, optionally with a region subtag (e.g. \"nb\", \"nb-no\", \"nn\", \"sv\", \"da\"). Defaults to \"nb\".",
+            "type": "string"
+          },
+          "target_language": {
+            "description": "Target language as an ISO 639-1 code, optionally with a region subtag (e.g. \"nn\", \"nb\", \"sv\", \"da\"). Defaults to \"nn\".",
+            "type": "string"
+          },
+          "text": {
+            "description": "A single document as plain text or base64-encoded binary.",
+            "type": "string"
+          },
+          "text_map": {
+            "$ref": "#/components/schemas/ttab.ntb.StringMap"
+          },
+          "texts": {
+            "$ref": "#/components/schemas/ttab.ntb.StringList"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.TranslateResponse": {
+        "properties": {
+          "guid": {
+            "description": "The GUID associated with this translation.",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "text_map": {
+            "$ref": "#/components/schemas/ttab.ntb.StringMap"
+          },
+          "texts": {
+            "$ref": "#/components/schemas/ttab.ntb.StringList"
+          }
+        },
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -722,6 +926,158 @@
           "Metadata"
         ]
       }
+    },
+    "/twirp/ttab.ntb.Nynorsk/GetDocumentFormats": {
+      "post": {
+        "description": "GetDocumentFormats returns the supported document formats.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetDocumentFormatsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetDocumentFormatsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetDocumentFormats",
+        "tags": [
+          "Nynorsk"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Nynorsk/GetLanguagePrefs": {
+      "post": {
+        "description": "GetLanguagePrefs returns the available optional language forms.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetLanguagePrefsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetLanguagePrefsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetLanguagePrefs",
+        "tags": [
+          "Nynorsk"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Nynorsk/GetPreferenceTemplates": {
+      "post": {
+        "description": "GetPreferenceTemplates returns the available preference templates and the language forms they enable.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.GetPreferenceTemplatesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.GetPreferenceTemplatesResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetPreferenceTemplates",
+        "tags": [
+          "Nynorsk"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Nynorsk/Translate": {
+      "post": {
+        "description": "Translate translates a document between Scandinavian languages.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.TranslateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.TranslateResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Translate",
+        "tags": [
+          "Nynorsk"
+        ]
+      }
     }
   },
   "servers": [
@@ -740,6 +1096,10 @@
     {
       "description": "Media service for interacting with the NTB media manager archive. Experimental.",
       "name": "Media"
+    },
+    {
+      "description": "Nynorsk service for translating documents using Nynorskroboten.",
+      "name": "Nynorsk"
     }
   ]
 }

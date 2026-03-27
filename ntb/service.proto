@@ -30,6 +30,19 @@ service Media {
   rpc GetSortFields(GetSortFieldsRequest) returns (GetSortFieldsResponse);
 }
 
+// Nynorsk service for translating documents using Nynorskroboten.
+service Nynorsk {
+  // Translate translates a document between Scandinavian languages.
+  rpc Translate(TranslateRequest) returns (TranslateResponse);
+  // GetLanguagePrefs returns the available optional language forms.
+  rpc GetLanguagePrefs(GetLanguagePrefsRequest) returns (GetLanguagePrefsResponse);
+  // GetDocumentFormats returns the supported document formats.
+  rpc GetDocumentFormats(GetDocumentFormatsRequest) returns (GetDocumentFormatsResponse);
+  // GetPreferenceTemplates returns the available preference templates and the
+  // language forms they enable.
+  rpc GetPreferenceTemplates(GetPreferenceTemplatesRequest) returns (GetPreferenceTemplatesResponse);
+}
+
 // Enums
 
 enum Orientation {
@@ -316,4 +329,126 @@ message GetSortFieldsResponse {
 
 message SortField {
   string name = 1;
+}
+
+// Nynorsk Types
+
+// LangParameterTranslate controls how text inside HTML lang-tagged elements
+// is handled during translation.
+enum LangParameterTranslate {
+  LANG_PARAMETER_TRANSLATE_UNSPECIFIED = 0;
+  // Translate only tags where the lang attribute matches the source language.
+  LANG_PARAMETER_TRANSLATE_ORIGIN      = 1;
+  // Ignore lang attributes and translate all text.
+  LANG_PARAMETER_TRANSLATE_ALL         = 2;
+  // Do not translate any text inside lang-tagged elements.
+  LANG_PARAMETER_TRANSLATE_NONE        = 3;
+}
+
+message StringList {
+  repeated string values = 1;
+}
+
+message StringMap {
+  map<string, string> entries = 1;
+}
+
+// PreferenceValue represents a language preference setting. It can be a
+// boolean to enable/disable a form, or a list of specific words to include or
+// exclude. Prefix a word with "-" to exclude it from the form.
+message PreferenceValue {
+  oneof value {
+    bool enabled = 1;
+    StringList words = 2;
+  }
+}
+
+// Nynorsk Request/Response Messages
+
+message TranslateRequest {
+  // The document content to translate.
+  oneof document {
+    // A single document as plain text or base64-encoded binary.
+    string text = 1;
+    // Multiple document fragments as a list, translated in order.
+    StringList texts = 2;
+    // Multiple document fragments as named key-value pairs.
+    StringMap text_map = 3;
+  }
+  // The document format (e.g. "html", "txt", "docx", "json"). Defaults to
+  // "html".
+  string file_type = 4;
+  // Controls translation of text inside HTML lang-tagged elements. Only
+  // applies when file_type is "html".
+  LangParameterTranslate lang_parameter_translate = 5;
+  // A preference template name ("standard", "tradisjonell", or "moderne").
+  // Can be combined with individual prefs.
+  string prefs_template = 6;
+  // Optional GUID to identify this document for translation tracking. If
+  // empty, the service generates one.
+  string guid = 7;
+  // Source language as an ISO 639-1 code, optionally with a region subtag
+  // (e.g. "nb", "nb-no", "nn", "sv", "da"). Defaults to "nb".
+  string source_language = 8;
+  // Target language as an ISO 639-1 code, optionally with a region subtag
+  // (e.g. "nn", "nb", "sv", "da"). Defaults to "nn".
+  string target_language = 9;
+  // Enable AI-assisted post-editing of the translation.
+  bool post_edit = 10;
+  // Optional language form preferences keyed by form name.
+  map<string, PreferenceValue> prefs = 11;
+}
+
+message TranslateResponse {
+  // The translated document in the same format as the request.
+  oneof document {
+    string text = 1;
+    StringList texts = 2;
+    StringMap text_map = 3;
+  }
+  // The GUID associated with this translation.
+  string guid = 4;
+}
+
+message GetLanguagePrefsRequest {}
+
+// LanguagePreference describes a single optional language form.
+message LanguagePreference {
+  // Category of the language form (e.g. "Konsonantar", "Synonym og stavemåtar").
+  string category = 1;
+  // Human-readable description of what this form changes.
+  string description = 2;
+  // Words that can be individually selected for this form. Empty if the form
+  // applies to all words in its category.
+  repeated string modify_for = 3;
+}
+
+message GetLanguagePrefsResponse {
+  // Map of form name to its details.
+  map<string, LanguagePreference> language_prefs = 1;
+}
+
+message GetDocumentFormatsRequest {}
+
+// DocumentFormatInfo describes a supported document format.
+message DocumentFormatInfo {
+  // The file type identifier used in translation requests (e.g. "html", "docx").
+  string file_type = 1;
+  // File suffixes associated with this format (e.g. [".html", ".htm"]).
+  repeated string file_suffixes = 2;
+  // MIME types associated with this format (e.g. ["text/html"]).
+  repeated string mime_types = 3;
+  // Whether document content must be base64-encoded for this format.
+  bool base64_encode = 4;
+}
+
+message GetDocumentFormatsResponse {
+  repeated DocumentFormatInfo document_formats = 1;
+}
+
+message GetPreferenceTemplatesRequest {}
+
+message GetPreferenceTemplatesResponse {
+  // Map of template name to the list of language form names it enables.
+  map<string, StringList> preference_templates = 1;
 }
