@@ -240,6 +240,40 @@
         },
         "type": "object"
       },
+      "ttab.hub.GetDocumentationRequest": {
+        "properties": {
+          "filename": {
+            "description": "Documentation file path relative to the manifest (e.g. \"README.md\", \"agents/editing.md\").",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "description": "Full artifact name in reverse-domain notation.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Specific version string (v-prefixed), or empty for latest.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.GetDocumentationResponse": {
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.hub.GitHubOrgInfo": {
         "properties": {
           "created_at": {
@@ -318,6 +352,37 @@
               "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListDocumentationRequest": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "name": {
+            "description": "Full artifact name in reverse-domain notation.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Specific version string (v-prefixed), or empty for latest.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListDocumentationResponse": {
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.AssetInfo"
+            },
+            "type": "array"
+          },
+          "version": {
+            "description": "The resolved version.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -899,6 +964,44 @@
         ]
       }
     },
+    "/twirp/ttab.hub.Hub/GetDocumentation": {
+      "post": {
+        "description": "GetDocumentation returns the contents of a specific documentation file.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.GetDocumentationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.GetDocumentationResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetDocumentation",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/ListArtifactPermissions": {
       "post": {
         "description": "ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.",
@@ -1008,6 +1111,44 @@
           }
         ],
         "summary": "ListDeployKeys",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/ListDocumentation": {
+      "post": {
+        "description": "ListDocumentation returns the available documentation files for an artifact version.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListDocumentationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListDocumentationResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListDocumentation",
         "tags": [
           "Hub"
         ]

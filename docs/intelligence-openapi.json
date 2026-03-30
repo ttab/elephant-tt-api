@@ -837,7 +837,7 @@
             "$ref": "#/components/schemas/newsdoc.Document"
           },
           "model": {
-            "description": "Model name to use for translation (maps to DeepL or a generative translator).",
+            "description": "Model name to use for translation (maps to a generative translator). Leave empty to use default translation model.",
             "type": "string"
           },
           "target_language": {

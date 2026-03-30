@@ -720,8 +720,8 @@ func (x *TestPromptResponse) GetRenderedPrompt() string {
 
 type TranslateDocumentRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Model name to use for translation (maps to DeepL or a generative
-	// translator).
+	// Model name to use for translation (maps to a generative
+	// translator). Leave empty to use default translation model.
 	Model string `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
 	// Document to translate.
 	Document *newsdoc.Document `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`

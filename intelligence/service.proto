@@ -140,8 +140,8 @@ message TestPromptResponse {
 }
 
 message TranslateDocumentRequest {
-  // Model name to use for translation (maps to DeepL or a generative
-  // translator).
+  // Model name to use for translation (maps to a generative
+  // translator). Leave empty to use default translation model.
   string model = 1;
   // Document to translate.
   newsdoc.Document document = 2;
