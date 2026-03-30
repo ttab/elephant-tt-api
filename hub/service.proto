@@ -25,6 +25,13 @@ service Hub {
   // GetArtifactAsset returns the contents of a specific asset file.
   rpc GetArtifactAsset(GetArtifactAssetRequest) returns (GetArtifactAssetResponse);
 
+  // --- Documentation ---
+
+  // ListDocumentation returns the available documentation files for an artifact version.
+  rpc ListDocumentation(ListDocumentationRequest) returns (ListDocumentationResponse);
+  // GetDocumentation returns the contents of a specific documentation file.
+  rpc GetDocumentation(GetDocumentationRequest) returns (GetDocumentationResponse);
+
   // --- Publishing ---
 
   // PublishVersion publishes a new version of a schema or plugin.
@@ -194,6 +201,36 @@ message GetArtifactAssetRequest {
   string filename   = 4;
 }
 message GetArtifactAssetResponse {
+  string filename = 1;
+  string sha256   = 2;
+  bytes  data     = 3;
+}
+
+// --- Documentation requests/responses ---
+
+message ListDocumentationRequest {
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
+  // Specific version string (v-prefixed), or empty for latest.
+  string version    = 3;
+}
+message ListDocumentationResponse {
+  // The resolved version.
+  string             version = 1;
+  repeated AssetInfo files   = 2;
+}
+
+message GetDocumentationRequest {
+  ArtifactKind kind = 1;
+  // Full artifact name in reverse-domain notation.
+  string name       = 2;
+  // Specific version string (v-prefixed), or empty for latest.
+  string version    = 3;
+  // Documentation file path relative to the manifest (e.g. "README.md", "agents/editing.md").
+  string filename   = 4;
+}
+message GetDocumentationResponse {
   string filename = 1;
   string sha256   = 2;
   bytes  data     = 3;
