@@ -4819,7 +4819,7 @@ func (s *promptsServer) PathPrefix() string {
 // Comments Interface
 // ==================
 
-// Comments provides threaded commenting for research documents.
+// Comments provides threaded commenting for documents.
 type Comments interface {
 	// PostComment posts a comment to a thread. If thread_uuid is empty, a new
 	// thread is created.

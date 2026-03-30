@@ -362,7 +362,7 @@ message GetResultResponse {
   LanguageFeedback feedback = 8;
 }
 
-// Comments provides threaded commenting for research documents.
+// Comments provides threaded commenting for documents.
 service Comments {
   // PostComment posts a comment to a thread. If thread_uuid is empty, a new
   // thread is created.
