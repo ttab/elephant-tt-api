@@ -45,9 +45,13 @@ service Hub {
   rpc RegisterDeployKey(RegisterDeployKeyRequest) returns (RegisterDeployKeyResponse);
   // ListDeployKeys lists registered deploy keys.
   rpc ListDeployKeys(ListDeployKeysRequest) returns (ListDeployKeysResponse);
-  // ApproveDeployKey approves a deploy key for publishing.
+  // ApproveDeployKey approves a pending deploy key for publishing.
   rpc ApproveDeployKey(ApproveDeployKeyRequest) returns (ApproveDeployKeyResponse);
-  // RevokeDeployKey revokes a deploy key.
+  // DeactivateDeployKey deactivates an active deploy key (e.g. for rotation).
+  rpc DeactivateDeployKey(DeactivateDeployKeyRequest) returns (DeactivateDeployKeyResponse);
+  // ActivateDeployKey reactivates a deactivated deploy key.
+  rpc ActivateDeployKey(ActivateDeployKeyRequest) returns (ActivateDeployKeyResponse);
+  // RevokeDeployKey permanently revokes a compromised deploy key.
   rpc RevokeDeployKey(RevokeDeployKeyRequest) returns (RevokeDeployKeyResponse);
 
   // --- Artifact permissions ---
@@ -92,6 +96,14 @@ enum SignatureType {
   SIGNATURE_TYPE_SIGSTORE    = 2;
 }
 
+enum DeployKeyStatus {
+  DEPLOY_KEY_STATUS_UNSPECIFIED = 0;
+  DEPLOY_KEY_STATUS_PENDING     = 1;
+  DEPLOY_KEY_STATUS_ACTIVE      = 2;
+  DEPLOY_KEY_STATUS_INACTIVE    = 3;
+  DEPLOY_KEY_STATUS_REVOKED     = 4;
+}
+
 // --- Common types ---
 
 message Organisation {
@@ -131,12 +143,11 @@ message AssetInfo {
 }
 
 message DeployKeyInfo {
-  int64  id          = 1;
-  string fingerprint = 2;
-  string user_email  = 3;
-  bool   approved    = 4;
-  bool   revoked     = 5;
-  string created_at  = 6;
+  int64           id          = 1;
+  string          fingerprint = 2;
+  string          user_email  = 3;
+  DeployKeyStatus status      = 4;
+  string          created_at  = 5;
 }
 
 // An asset to upload alongside a version.
@@ -284,6 +295,16 @@ message ApproveDeployKeyRequest {
   int64 id = 1;
 }
 message ApproveDeployKeyResponse {}
+
+message DeactivateDeployKeyRequest {
+  int64 id = 1;
+}
+message DeactivateDeployKeyResponse {}
+
+message ActivateDeployKeyRequest {
+  int64 id = 1;
+}
+message ActivateDeployKeyResponse {}
 
 message RevokeDeployKeyRequest {
   int64 id = 1;

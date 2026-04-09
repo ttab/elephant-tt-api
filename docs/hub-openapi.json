@@ -1,6 +1,17 @@
 {
   "components": {
     "schemas": {
+      "ttab.hub.ActivateDeployKeyRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ActivateDeployKeyResponse": {
+        "type": "object"
+      },
       "ttab.hub.AddAllowedDeployKeyRequest": {
         "properties": {
           "deploy_key_id": {
@@ -122,11 +133,19 @@
         },
         "type": "object"
       },
+      "ttab.hub.DeactivateDeployKeyRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.DeactivateDeployKeyResponse": {
+        "type": "object"
+      },
       "ttab.hub.DeployKeyInfo": {
         "properties": {
-          "approved": {
-            "type": "boolean"
-          },
           "created_at": {
             "type": "string"
           },
@@ -136,14 +155,24 @@
           "id": {
             "type": "integer"
           },
-          "revoked": {
-            "type": "boolean"
+          "status": {
+            "$ref": "#/components/schemas/ttab.hub.DeployKeyStatus"
           },
           "user_email": {
             "type": "string"
           }
         },
         "type": "object"
+      },
+      "ttab.hub.DeployKeyStatus": {
+        "enum": [
+          "DEPLOY_KEY_STATUS_UNSPECIFIED",
+          "DEPLOY_KEY_STATUS_PENDING",
+          "DEPLOY_KEY_STATUS_ACTIVE",
+          "DEPLOY_KEY_STATUS_INACTIVE",
+          "DEPLOY_KEY_STATUS_REVOKED"
+        ],
+        "type": "string"
       },
       "ttab.hub.GetArtifactAssetRequest": {
         "properties": {
@@ -660,6 +689,44 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/twirp/ttab.hub.Hub/ActivateDeployKey": {
+      "post": {
+        "description": "ActivateDeployKey reactivates a deactivated deploy key.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ActivateDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ActivateDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ActivateDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/AddAllowedDeployKey": {
       "post": {
         "description": "AddAllowedDeployKey adds a deploy key allowed to publish an artifact.",
@@ -776,7 +843,7 @@
     },
     "/twirp/ttab.hub.Hub/ApproveDeployKey": {
       "post": {
-        "description": "ApproveDeployKey approves a deploy key for publishing.",
+        "description": "ApproveDeployKey approves a pending deploy key for publishing.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -845,6 +912,44 @@
           }
         ],
         "summary": "ApproveOrganisation",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/DeactivateDeployKey": {
+      "post": {
+        "description": "DeactivateDeployKey deactivates an active deploy key (e.g. for rotation).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.DeactivateDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.DeactivateDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DeactivateDeployKey",
         "tags": [
           "Hub"
         ]
@@ -1422,7 +1527,7 @@
     },
     "/twirp/ttab.hub.Hub/RevokeDeployKey": {
       "post": {
-        "description": "RevokeDeployKey revokes a deploy key.",
+        "description": "RevokeDeployKey permanently revokes a compromised deploy key.",
         "requestBody": {
           "content": {
             "application/json": {
