@@ -8,16 +8,8 @@ option go_package = "github.com/ttab/elephant-tt-api/ntb";
 service Metadata {
   // GetAssignment returns metadata for a specific assignment.
   rpc GetAssignment(GetAssignmentRequest) returns (GetAssignmentResponse);
-}
-
-message GetAssignmentRequest {
-  // The assignee is identified by their commission code.
-  string commission_code = 1;
-}
-
-message GetAssignmentResponse {
-  string planning_uuid   = 1;
-  string assignment_uuid = 2;
+  // ListAssignments returns metadata for all assignments.
+  rpc ListAssignments(ListAssignmentsRequest) returns (ListAssignmentsResponse);
 }
 
 // Media service for interacting with the NTB media manager archive. Experimental.
@@ -43,7 +35,33 @@ service Nynorsk {
   rpc GetPreferenceTemplates(GetPreferenceTemplatesRequest) returns (GetPreferenceTemplatesResponse);
 }
 
-// Enums
+// Metadata Request/Response Messages
+
+message GetAssignmentRequest {
+  // The assignee is identified by their commission code.
+  string commission_code = 1;
+}
+
+message GetAssignmentResponse {
+  string planning_uuid   = 1;
+  string assignment_uuid = 2;
+}
+
+message ListAssignmentsRequest {}
+
+message Assignment {
+  string planning_uuid   = 1;
+  string assignment_uuid = 2;
+  string assignee_uuid   = 3;
+  string assignee_name   = 4;
+  string commission_code = 5;
+}
+
+message ListAssignmentsResponse {
+  repeated Assignment assignments = 1;
+}
+
+// Media Enums
 
 enum Orientation {
   ORIENTATION_UNSPECIFIED = 0;
@@ -83,7 +101,7 @@ enum FileType {
   FILE_TYPE_PHOTOSHOP   = 5;
 }
 
-// Request/Response Messages
+// Media Request/Response Messages
 
 message GetItemRequest {
    // Archive to search in.
