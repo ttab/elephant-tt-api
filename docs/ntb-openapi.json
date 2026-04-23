@@ -1,6 +1,26 @@
 {
   "components": {
     "schemas": {
+      "ttab.ntb.Assignment": {
+        "properties": {
+          "assignee_name": {
+            "type": "string"
+          },
+          "assignee_uuid": {
+            "type": "string"
+          },
+          "assignment_uuid": {
+            "type": "string"
+          },
+          "commission_code": {
+            "type": "string"
+          },
+          "planning_uuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.ntb.DocumentFormatInfo": {
         "description": "DocumentFormatInfo describes a supported document format.",
         "properties": {
@@ -217,6 +237,20 @@
             "description": "Words that can be individually selected for this form. Empty if the form applies to all words in its category.",
             "items": {
               "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.ntb.ListAssignmentsRequest": {
+        "type": "object"
+      },
+      "ttab.ntb.ListAssignmentsResponse": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.ntb.Assignment"
             },
             "type": "array"
           }
@@ -771,7 +805,7 @@
   },
   "info": {
     "title": "ntb API",
-    "version": "v0.4.3"
+    "version": "v0.5.0"
   },
   "openapi": "3.0.0",
   "paths": {
@@ -922,6 +956,44 @@
           }
         ],
         "summary": "GetAssignment",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/twirp/ttab.ntb.Metadata/ListAssignments": {
+      "post": {
+        "description": "ListAssignments returns metadata for all assignments.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.ntb.ListAssignmentsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.ntb.ListAssignmentsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListAssignments",
         "tags": [
           "Metadata"
         ]
