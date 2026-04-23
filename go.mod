@@ -3,7 +3,7 @@ module github.com/ttab/elephant-tt-api
 go 1.25.7
 
 require (
-	github.com/ttab/elephant-api v0.21.3
+	github.com/ttab/elephant-api v0.22.2
 	github.com/ttab/mage v0.9.0
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	google.golang.org/protobuf v1.36.11
