@@ -1,7 +1,7 @@
 {
   "components": {
     "schemas": {
-      "ttab.hub.ActivateDeployKeyRequest": {
+      "ttab.hub.ActivatePublishingKeyRequest": {
         "properties": {
           "id": {
             "type": "integer"
@@ -9,36 +9,25 @@
         },
         "type": "object"
       },
-      "ttab.hub.ActivateDeployKeyResponse": {
+      "ttab.hub.ActivatePublishingKeyResponse": {
         "type": "object"
       },
-      "ttab.hub.AddAllowedDeployKeyRequest": {
+      "ttab.hub.AddAllowedPublishingKeyRequest": {
         "properties": {
-          "deploy_key_id": {
-            "type": "integer"
-          },
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
             "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.AddAllowedDeployKeyResponse": {
-        "type": "object"
-      },
-      "ttab.hub.ApproveDeployKeyRequest": {
-        "properties": {
-          "id": {
+          },
+          "publishing_key_id": {
             "type": "integer"
           }
         },
         "type": "object"
       },
-      "ttab.hub.ApproveDeployKeyResponse": {
+      "ttab.hub.AddAllowedPublishingKeyResponse": {
         "type": "object"
       },
       "ttab.hub.ApproveOrganisationRequest": {
@@ -50,6 +39,17 @@
         "type": "object"
       },
       "ttab.hub.ApproveOrganisationResponse": {
+        "type": "object"
+      },
+      "ttab.hub.ApprovePublishingKeyRequest": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ApprovePublishingKeyResponse": {
         "type": "object"
       },
       "ttab.hub.ArtifactInfo": {
@@ -155,7 +155,7 @@
             "$ref": "#/components/schemas/ttab.hub.SignatureType"
           },
           "signing_identity": {
-            "description": "Deploy key fingerprint (shared across all items).",
+            "description": "Publishing key fingerprint (shared across all items).",
             "type": "string"
           },
           "version": {
@@ -177,7 +177,7 @@
         },
         "type": "object"
       },
-      "ttab.hub.DeactivateDeployKeyRequest": {
+      "ttab.hub.DeactivatePublishingKeyRequest": {
         "properties": {
           "id": {
             "type": "integer"
@@ -185,38 +185,8 @@
         },
         "type": "object"
       },
-      "ttab.hub.DeactivateDeployKeyResponse": {
+      "ttab.hub.DeactivatePublishingKeyResponse": {
         "type": "object"
-      },
-      "ttab.hub.DeployKeyInfo": {
-        "properties": {
-          "created_at": {
-            "type": "string"
-          },
-          "fingerprint": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ttab.hub.DeployKeyStatus"
-          },
-          "user_email": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.DeployKeyStatus": {
-        "enum": [
-          "DEPLOY_KEY_STATUS_UNSPECIFIED",
-          "DEPLOY_KEY_STATUS_PENDING",
-          "DEPLOY_KEY_STATUS_ACTIVE",
-          "DEPLOY_KEY_STATUS_INACTIVE",
-          "DEPLOY_KEY_STATUS_REVOKED"
-        ],
-        "type": "string"
       },
       "ttab.hub.ForgeType": {
         "enum": [
@@ -372,9 +342,9 @@
       },
       "ttab.hub.ListArtifactPermissionsResponse": {
         "properties": {
-          "allowed_deploy_keys": {
+          "allowed_publishing_keys": {
             "items": {
-              "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
+              "$ref": "#/components/schemas/ttab.hub.PublishingKeyInfo"
             },
             "type": "array"
           },
@@ -403,20 +373,6 @@
           "artifacts": {
             "items": {
               "$ref": "#/components/schemas/ttab.hub.ArtifactInfo"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.ListDeployKeysRequest": {
-        "type": "object"
-      },
-      "ttab.hub.ListDeployKeysResponse": {
-        "properties": {
-          "deploy_keys": {
-            "items": {
-              "$ref": "#/components/schemas/ttab.hub.DeployKeyInfo"
             },
             "type": "array"
           }
@@ -462,6 +418,20 @@
           "organisations": {
             "items": {
               "$ref": "#/components/schemas/ttab.hub.Organisation"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.ListPublishingKeysRequest": {
+        "type": "object"
+      },
+      "ttab.hub.ListPublishingKeysResponse": {
+        "properties": {
+          "publishing_keys": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.PublishingKeyInfo"
             },
             "type": "array"
           }
@@ -553,7 +523,7 @@
             "$ref": "#/components/schemas/ttab.hub.SignatureType"
           },
           "signing_identity": {
-            "description": "Deploy key fingerprint.",
+            "description": "Publishing key fingerprint.",
             "type": "string"
           },
           "version": {
@@ -570,24 +540,37 @@
         },
         "type": "object"
       },
-      "ttab.hub.RegisterDeployKeyRequest": {
+      "ttab.hub.PublishingKeyInfo": {
         "properties": {
-          "public_key": {
-            "description": "Ed25519 public key bytes.",
+          "created_at": {
+            "type": "string"
+          },
+          "fingerprint": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ttab.hub.PublishingKeyStatus"
+          },
+          "user_email": {
             "type": "string"
           }
         },
         "type": "object"
       },
-      "ttab.hub.RegisterDeployKeyResponse": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
+      "ttab.hub.PublishingKeyStatus": {
+        "enum": [
+          "PUBLISHING_KEY_STATUS_UNSPECIFIED",
+          "PUBLISHING_KEY_STATUS_PENDING",
+          "PUBLISHING_KEY_STATUS_ACTIVE",
+          "PUBLISHING_KEY_STATUS_INACTIVE",
+          "PUBLISHING_KEY_STATUS_REVOKED"
+        ],
+        "type": "string"
       },
-      "ttab.hub.RegisterOrgDeployKeyRequest": {
+      "ttab.hub.RegisterOrgPublishingKeyRequest": {
         "properties": {
           "organisation_id": {
             "type": "integer"
@@ -599,7 +582,7 @@
         },
         "type": "object"
       },
-      "ttab.hub.RegisterOrgDeployKeyResponse": {
+      "ttab.hub.RegisterOrgPublishingKeyResponse": {
         "properties": {
           "id": {
             "type": "integer"
@@ -607,25 +590,42 @@
         },
         "type": "object"
       },
-      "ttab.hub.RemoveAllowedDeployKeyRequest": {
+      "ttab.hub.RegisterPublishingKeyRequest": {
         "properties": {
-          "deploy_key_id": {
+          "public_key": {
+            "description": "Ed25519 public key bytes.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RegisterPublishingKeyResponse": {
+        "properties": {
+          "id": {
             "type": "integer"
-          },
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RemoveAllowedPublishingKeyRequest": {
+        "properties": {
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
           },
           "name": {
             "description": "Full artifact name in reverse-domain notation.",
             "type": "string"
+          },
+          "publishing_key_id": {
+            "type": "integer"
           }
         },
         "type": "object"
       },
-      "ttab.hub.RemoveAllowedDeployKeyResponse": {
+      "ttab.hub.RemoveAllowedPublishingKeyResponse": {
         "type": "object"
       },
-      "ttab.hub.RevokeDeployKeyRequest": {
+      "ttab.hub.RevokePublishingKeyRequest": {
         "properties": {
           "id": {
             "type": "integer"
@@ -633,7 +633,7 @@
         },
         "type": "object"
       },
-      "ttab.hub.RevokeDeployKeyResponse": {
+      "ttab.hub.RevokePublishingKeyResponse": {
         "type": "object"
       },
       "ttab.hub.RevokeVersionRequest": {
@@ -685,7 +685,7 @@
       "ttab.hub.SignatureType": {
         "enum": [
           "SIGNATURE_TYPE_UNSPECIFIED",
-          "SIGNATURE_TYPE_DEPLOY_KEY",
+          "SIGNATURE_TYPE_PUBLISHING_KEY",
           "SIGNATURE_TYPE_SIGSTORE"
         ],
         "type": "string"
@@ -728,14 +728,14 @@
   },
   "openapi": "3.0.0",
   "paths": {
-    "/twirp/ttab.hub.Hub/ActivateDeployKey": {
+    "/twirp/ttab.hub.Hub/ActivatePublishingKey": {
       "post": {
-        "description": "ActivateDeployKey reactivates a deactivated deploy key.",
+        "description": "ActivatePublishingKey reactivates a deactivated publishing key.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.ActivateDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.ActivatePublishingKeyRequest"
               }
             }
           }
@@ -745,7 +745,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.ActivateDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.ActivatePublishingKeyResponse"
                 }
               }
             },
@@ -760,20 +760,20 @@
             "bearer": []
           }
         ],
-        "summary": "ActivateDeployKey",
+        "summary": "ActivatePublishingKey",
         "tags": [
           "Hub"
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/AddAllowedDeployKey": {
+    "/twirp/ttab.hub.Hub/AddAllowedPublishingKey": {
       "post": {
-        "description": "AddAllowedDeployKey adds a deploy key allowed to publish an artifact.",
+        "description": "AddAllowedPublishingKey adds a publishing key allowed to publish an artifact.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.AddAllowedDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.AddAllowedPublishingKeyRequest"
               }
             }
           }
@@ -783,7 +783,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.AddAllowedDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.AddAllowedPublishingKeyResponse"
                 }
               }
             },
@@ -798,45 +798,7 @@
             "bearer": []
           }
         ],
-        "summary": "AddAllowedDeployKey",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
-    "/twirp/ttab.hub.Hub/ApproveDeployKey": {
-      "post": {
-        "description": "ApproveDeployKey approves a pending deploy key for publishing.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.ApproveDeployKeyRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.ApproveDeployKeyResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "ApproveDeployKey",
+        "summary": "AddAllowedPublishingKey",
         "tags": [
           "Hub"
         ]
@@ -880,6 +842,44 @@
         ]
       }
     },
+    "/twirp/ttab.hub.Hub/ApprovePublishingKey": {
+      "post": {
+        "description": "ApprovePublishingKey approves a pending publishing key for publishing.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ApprovePublishingKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ApprovePublishingKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ApprovePublishingKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/BulkPublishVersion": {
       "post": {
         "description": "BulkPublishVersion publishes new versions of multiple artifacts in a single transaction. All items must use the same version and signing key.",
@@ -918,14 +918,14 @@
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/DeactivateDeployKey": {
+    "/twirp/ttab.hub.Hub/DeactivatePublishingKey": {
       "post": {
-        "description": "DeactivateDeployKey deactivates an active deploy key (e.g. for rotation).",
+        "description": "DeactivatePublishingKey deactivates an active publishing key (e.g. for rotation).",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.DeactivateDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.DeactivatePublishingKeyRequest"
               }
             }
           }
@@ -935,7 +935,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.DeactivateDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.DeactivatePublishingKeyResponse"
                 }
               }
             },
@@ -950,7 +950,7 @@
             "bearer": []
           }
         ],
-        "summary": "DeactivateDeployKey",
+        "summary": "DeactivatePublishingKey",
         "tags": [
           "Hub"
         ]
@@ -1110,7 +1110,7 @@
     },
     "/twirp/ttab.hub.Hub/ListArtifactPermissions": {
       "post": {
-        "description": "ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.",
+        "description": "ListArtifactPermissions lists the publishing keys and CI publishers allowed for an artifact.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1179,44 +1179,6 @@
           }
         ],
         "summary": "ListArtifacts",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
-    "/twirp/ttab.hub.Hub/ListDeployKeys": {
-      "post": {
-        "description": "ListDeployKeys lists registered deploy keys.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.ListDeployKeysRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.ListDeployKeysResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "ListDeployKeys",
         "tags": [
           "Hub"
         ]
@@ -1298,6 +1260,44 @@
         ]
       }
     },
+    "/twirp/ttab.hub.Hub/ListPublishingKeys": {
+      "post": {
+        "description": "ListPublishingKeys lists registered publishing keys.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.ListPublishingKeysRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.ListPublishingKeysResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListPublishingKeys",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/PublishVersion": {
       "post": {
         "description": "PublishVersion publishes a new version of a schema or plugin.",
@@ -1336,14 +1336,14 @@
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/RegisterDeployKey": {
+    "/twirp/ttab.hub.Hub/RegisterOrgPublishingKey": {
       "post": {
-        "description": "RegisterDeployKey registers a new deploy key for the authenticated user.",
+        "description": "RegisterOrgPublishingKey registers a CI publishing key owned by an organisation. Requires the caller to be an admin of the target organisation.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RegisterDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.RegisterOrgPublishingKeyRequest"
               }
             }
           }
@@ -1353,7 +1353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RegisterDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.RegisterOrgPublishingKeyResponse"
                 }
               }
             },
@@ -1368,20 +1368,20 @@
             "bearer": []
           }
         ],
-        "summary": "RegisterDeployKey",
+        "summary": "RegisterOrgPublishingKey",
         "tags": [
           "Hub"
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/RegisterOrgDeployKey": {
+    "/twirp/ttab.hub.Hub/RegisterPublishingKey": {
       "post": {
-        "description": "RegisterOrgDeployKey registers a CI deploy key owned by an organisation. Requires the caller to be an admin of the target organisation.",
+        "description": "RegisterPublishingKey registers a new publishing key for the authenticated user.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RegisterOrgDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.RegisterPublishingKeyRequest"
               }
             }
           }
@@ -1391,7 +1391,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RegisterOrgDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.RegisterPublishingKeyResponse"
                 }
               }
             },
@@ -1406,20 +1406,20 @@
             "bearer": []
           }
         ],
-        "summary": "RegisterOrgDeployKey",
+        "summary": "RegisterPublishingKey",
         "tags": [
           "Hub"
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/RemoveAllowedDeployKey": {
+    "/twirp/ttab.hub.Hub/RemoveAllowedPublishingKey": {
       "post": {
-        "description": "RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.",
+        "description": "RemoveAllowedPublishingKey removes a publishing key from an artifact's allow list.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RemoveAllowedDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.RemoveAllowedPublishingKeyRequest"
               }
             }
           }
@@ -1429,7 +1429,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RemoveAllowedDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.RemoveAllowedPublishingKeyResponse"
                 }
               }
             },
@@ -1444,20 +1444,20 @@
             "bearer": []
           }
         ],
-        "summary": "RemoveAllowedDeployKey",
+        "summary": "RemoveAllowedPublishingKey",
         "tags": [
           "Hub"
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/RevokeDeployKey": {
+    "/twirp/ttab.hub.Hub/RevokePublishingKey": {
       "post": {
-        "description": "RevokeDeployKey permanently revokes a compromised deploy key.",
+        "description": "RevokePublishingKey permanently revokes a compromised publishing key.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RevokeDeployKeyRequest"
+                "$ref": "#/components/schemas/ttab.hub.RevokePublishingKeyRequest"
               }
             }
           }
@@ -1467,7 +1467,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RevokeDeployKeyResponse"
+                  "$ref": "#/components/schemas/ttab.hub.RevokePublishingKeyResponse"
                 }
               }
             },
@@ -1482,7 +1482,7 @@
             "bearer": []
           }
         ],
-        "summary": "RevokeDeployKey",
+        "summary": "RevokePublishingKey",
         "tags": [
           "Hub"
         ]

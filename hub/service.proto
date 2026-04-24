@@ -42,31 +42,31 @@ service Hub {
   // RevokeVersion marks a published version as revoked.
   rpc RevokeVersion(RevokeVersionRequest) returns (RevokeVersionResponse);
 
-  // --- Deploy key management ---
+  // --- Publishing key management ---
 
-  // RegisterDeployKey registers a new deploy key for the authenticated user.
-  rpc RegisterDeployKey(RegisterDeployKeyRequest) returns (RegisterDeployKeyResponse);
-  // RegisterOrgDeployKey registers a CI deploy key owned by an organisation.
+  // RegisterPublishingKey registers a new publishing key for the authenticated user.
+  rpc RegisterPublishingKey(RegisterPublishingKeyRequest) returns (RegisterPublishingKeyResponse);
+  // RegisterOrgPublishingKey registers a CI publishing key owned by an organisation.
   // Requires the caller to be an admin of the target organisation.
-  rpc RegisterOrgDeployKey(RegisterOrgDeployKeyRequest) returns (RegisterOrgDeployKeyResponse);
-  // ListDeployKeys lists registered deploy keys.
-  rpc ListDeployKeys(ListDeployKeysRequest) returns (ListDeployKeysResponse);
-  // ApproveDeployKey approves a pending deploy key for publishing.
-  rpc ApproveDeployKey(ApproveDeployKeyRequest) returns (ApproveDeployKeyResponse);
-  // DeactivateDeployKey deactivates an active deploy key (e.g. for rotation).
-  rpc DeactivateDeployKey(DeactivateDeployKeyRequest) returns (DeactivateDeployKeyResponse);
-  // ActivateDeployKey reactivates a deactivated deploy key.
-  rpc ActivateDeployKey(ActivateDeployKeyRequest) returns (ActivateDeployKeyResponse);
-  // RevokeDeployKey permanently revokes a compromised deploy key.
-  rpc RevokeDeployKey(RevokeDeployKeyRequest) returns (RevokeDeployKeyResponse);
+  rpc RegisterOrgPublishingKey(RegisterOrgPublishingKeyRequest) returns (RegisterOrgPublishingKeyResponse);
+  // ListPublishingKeys lists registered publishing keys.
+  rpc ListPublishingKeys(ListPublishingKeysRequest) returns (ListPublishingKeysResponse);
+  // ApprovePublishingKey approves a pending publishing key for publishing.
+  rpc ApprovePublishingKey(ApprovePublishingKeyRequest) returns (ApprovePublishingKeyResponse);
+  // DeactivatePublishingKey deactivates an active publishing key (e.g. for rotation).
+  rpc DeactivatePublishingKey(DeactivatePublishingKeyRequest) returns (DeactivatePublishingKeyResponse);
+  // ActivatePublishingKey reactivates a deactivated publishing key.
+  rpc ActivatePublishingKey(ActivatePublishingKeyRequest) returns (ActivatePublishingKeyResponse);
+  // RevokePublishingKey permanently revokes a compromised publishing key.
+  rpc RevokePublishingKey(RevokePublishingKeyRequest) returns (RevokePublishingKeyResponse);
 
   // --- Artifact permissions ---
 
-  // AddAllowedDeployKey adds a deploy key allowed to publish an artifact.
-  rpc AddAllowedDeployKey(AddAllowedDeployKeyRequest) returns (AddAllowedDeployKeyResponse);
-  // RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.
-  rpc RemoveAllowedDeployKey(RemoveAllowedDeployKeyRequest) returns (RemoveAllowedDeployKeyResponse);
-  // ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.
+  // AddAllowedPublishingKey adds a publishing key allowed to publish an artifact.
+  rpc AddAllowedPublishingKey(AddAllowedPublishingKeyRequest) returns (AddAllowedPublishingKeyResponse);
+  // RemoveAllowedPublishingKey removes a publishing key from an artifact's allow list.
+  rpc RemoveAllowedPublishingKey(RemoveAllowedPublishingKeyRequest) returns (RemoveAllowedPublishingKeyResponse);
+  // ListArtifactPermissions lists the publishing keys and CI publishers allowed for an artifact.
   rpc ListArtifactPermissions(ListArtifactPermissionsRequest) returns (ListArtifactPermissionsResponse);
 
   // --- Visibility ---
@@ -85,11 +85,11 @@ enum ArtifactKind {
 }
 
 enum SignatureType {
-  SIGNATURE_TYPE_UNSPECIFIED = 0;
-  SIGNATURE_TYPE_DEPLOY_KEY  = 1;
+  SIGNATURE_TYPE_UNSPECIFIED    = 0;
+  SIGNATURE_TYPE_PUBLISHING_KEY = 1;
   // Deprecated: sigstore signing is no longer supported for new publishes.
   // Kept for reading historical versions.
-  SIGNATURE_TYPE_SIGSTORE    = 2;
+  SIGNATURE_TYPE_SIGSTORE       = 2;
 }
 
 enum ForgeType {
@@ -101,12 +101,12 @@ enum ForgeType {
   FORGE_TYPE_CUSTOM     = 5;
 }
 
-enum DeployKeyStatus {
-  DEPLOY_KEY_STATUS_UNSPECIFIED = 0;
-  DEPLOY_KEY_STATUS_PENDING     = 1;
-  DEPLOY_KEY_STATUS_ACTIVE      = 2;
-  DEPLOY_KEY_STATUS_INACTIVE    = 3;
-  DEPLOY_KEY_STATUS_REVOKED     = 4;
+enum PublishingKeyStatus {
+  PUBLISHING_KEY_STATUS_UNSPECIFIED = 0;
+  PUBLISHING_KEY_STATUS_PENDING     = 1;
+  PUBLISHING_KEY_STATUS_ACTIVE      = 2;
+  PUBLISHING_KEY_STATUS_INACTIVE    = 3;
+  PUBLISHING_KEY_STATUS_REVOKED     = 4;
 }
 
 enum SchemaUsage {
@@ -157,12 +157,12 @@ message AssetInfo {
   string sha256   = 2;
 }
 
-message DeployKeyInfo {
-  int64           id          = 1;
-  string          fingerprint = 2;
-  string          user_email  = 3;
-  DeployKeyStatus status      = 4;
-  string          created_at  = 5;
+message PublishingKeyInfo {
+  int64              id          = 1;
+  string             fingerprint = 2;
+  string             user_email  = 3;
+  PublishingKeyStatus status      = 4;
+  string             created_at  = 5;
 }
 
 // An asset to upload alongside a version.
@@ -276,7 +276,7 @@ message PublishVersionRequest {
   SignatureType  signature_type   = 5;
   // Ed25519 signature bytes.
   bytes          signature        = 6;
-  // Deploy key fingerprint.
+  // Publishing key fingerprint.
   string         signing_identity = 7;
   repeated PublishAsset assets    = 8;
 }
@@ -300,7 +300,7 @@ message BulkPublishVersionRequest {
   // Version string applied to all items.
   string                   version          = 1;
   SignatureType            signature_type   = 2;
-  // Deploy key fingerprint (shared across all items).
+  // Publishing key fingerprint (shared across all items).
   string                   signing_identity = 3;
   repeated BulkPublishItem items            = 4;
 }
@@ -318,67 +318,67 @@ message RevokeVersionRequest {
 }
 message RevokeVersionResponse {}
 
-// --- Deploy key requests/responses ---
+// --- Publishing key requests/responses ---
 
-message RegisterDeployKeyRequest {
+message RegisterPublishingKeyRequest {
   // Ed25519 public key bytes.
   bytes public_key = 1;
 }
-message RegisterDeployKeyResponse {
+message RegisterPublishingKeyResponse {
   int64 id = 1;
 }
 
-message RegisterOrgDeployKeyRequest {
+message RegisterOrgPublishingKeyRequest {
   int64 organisation_id = 1;
   // Ed25519 public key bytes.
   bytes public_key      = 2;
 }
-message RegisterOrgDeployKeyResponse {
+message RegisterOrgPublishingKeyResponse {
   int64 id = 1;
 }
 
-message ListDeployKeysRequest {}
-message ListDeployKeysResponse {
-  repeated DeployKeyInfo deploy_keys = 1;
+message ListPublishingKeysRequest {}
+message ListPublishingKeysResponse {
+  repeated PublishingKeyInfo publishing_keys = 1;
 }
 
-message ApproveDeployKeyRequest {
+message ApprovePublishingKeyRequest {
   int64 id = 1;
 }
-message ApproveDeployKeyResponse {}
+message ApprovePublishingKeyResponse {}
 
-message DeactivateDeployKeyRequest {
+message DeactivatePublishingKeyRequest {
   int64 id = 1;
 }
-message DeactivateDeployKeyResponse {}
+message DeactivatePublishingKeyResponse {}
 
-message ActivateDeployKeyRequest {
+message ActivatePublishingKeyRequest {
   int64 id = 1;
 }
-message ActivateDeployKeyResponse {}
+message ActivatePublishingKeyResponse {}
 
-message RevokeDeployKeyRequest {
+message RevokePublishingKeyRequest {
   int64 id = 1;
 }
-message RevokeDeployKeyResponse {}
+message RevokePublishingKeyResponse {}
 
 // --- Permission requests/responses ---
 
-message AddAllowedDeployKeyRequest {
-  ArtifactKind kind    = 1;
+message AddAllowedPublishingKeyRequest {
+  ArtifactKind kind           = 1;
   // Full artifact name in reverse-domain notation.
-  string name          = 2;
-  int64  deploy_key_id = 3;
+  string name                 = 2;
+  int64  publishing_key_id    = 3;
 }
-message AddAllowedDeployKeyResponse {}
+message AddAllowedPublishingKeyResponse {}
 
-message RemoveAllowedDeployKeyRequest {
-  ArtifactKind kind    = 1;
+message RemoveAllowedPublishingKeyRequest {
+  ArtifactKind kind           = 1;
   // Full artifact name in reverse-domain notation.
-  string name          = 2;
-  int64  deploy_key_id = 3;
+  string name                 = 2;
+  int64  publishing_key_id    = 3;
 }
-message RemoveAllowedDeployKeyResponse {}
+message RemoveAllowedPublishingKeyResponse {}
 
 message ListArtifactPermissionsRequest {
   ArtifactKind kind = 1;
@@ -386,8 +386,8 @@ message ListArtifactPermissionsRequest {
   string name       = 2;
 }
 message ListArtifactPermissionsResponse {
-  repeated DeployKeyInfo allowed_deploy_keys = 2;
-  repeated ArtifactPublisherInfo publishers  = 3;
+  repeated PublishingKeyInfo allowed_publishing_keys = 2;
+  repeated ArtifactPublisherInfo publishers          = 3;
 }
 
 // --- Visibility requests/responses ---

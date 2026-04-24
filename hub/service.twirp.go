@@ -68,35 +68,35 @@ type Hub interface {
 	// RevokeVersion marks a published version as revoked.
 	RevokeVersion(context.Context, *RevokeVersionRequest) (*RevokeVersionResponse, error)
 
-	// RegisterDeployKey registers a new deploy key for the authenticated user.
-	RegisterDeployKey(context.Context, *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error)
+	// RegisterPublishingKey registers a new publishing key for the authenticated user.
+	RegisterPublishingKey(context.Context, *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error)
 
-	// RegisterOrgDeployKey registers a CI deploy key owned by an organisation.
+	// RegisterOrgPublishingKey registers a CI publishing key owned by an organisation.
 	// Requires the caller to be an admin of the target organisation.
-	RegisterOrgDeployKey(context.Context, *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error)
+	RegisterOrgPublishingKey(context.Context, *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error)
 
-	// ListDeployKeys lists registered deploy keys.
-	ListDeployKeys(context.Context, *ListDeployKeysRequest) (*ListDeployKeysResponse, error)
+	// ListPublishingKeys lists registered publishing keys.
+	ListPublishingKeys(context.Context, *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error)
 
-	// ApproveDeployKey approves a pending deploy key for publishing.
-	ApproveDeployKey(context.Context, *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error)
+	// ApprovePublishingKey approves a pending publishing key for publishing.
+	ApprovePublishingKey(context.Context, *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error)
 
-	// DeactivateDeployKey deactivates an active deploy key (e.g. for rotation).
-	DeactivateDeployKey(context.Context, *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error)
+	// DeactivatePublishingKey deactivates an active publishing key (e.g. for rotation).
+	DeactivatePublishingKey(context.Context, *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error)
 
-	// ActivateDeployKey reactivates a deactivated deploy key.
-	ActivateDeployKey(context.Context, *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error)
+	// ActivatePublishingKey reactivates a deactivated publishing key.
+	ActivatePublishingKey(context.Context, *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error)
 
-	// RevokeDeployKey permanently revokes a compromised deploy key.
-	RevokeDeployKey(context.Context, *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error)
+	// RevokePublishingKey permanently revokes a compromised publishing key.
+	RevokePublishingKey(context.Context, *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error)
 
-	// AddAllowedDeployKey adds a deploy key allowed to publish an artifact.
-	AddAllowedDeployKey(context.Context, *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error)
+	// AddAllowedPublishingKey adds a publishing key allowed to publish an artifact.
+	AddAllowedPublishingKey(context.Context, *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error)
 
-	// RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.
-	RemoveAllowedDeployKey(context.Context, *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error)
+	// RemoveAllowedPublishingKey removes a publishing key from an artifact's allow list.
+	RemoveAllowedPublishingKey(context.Context, *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error)
 
-	// ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.
+	// ListArtifactPermissions lists the publishing keys and CI publishers allowed for an artifact.
 	ListArtifactPermissions(context.Context, *ListArtifactPermissionsRequest) (*ListArtifactPermissionsResponse, error)
 
 	// SetArtifactVisibility sets whether an artifact is publicly visible.
@@ -149,15 +149,15 @@ func NewHubProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 		serviceURL + "PublishVersion",
 		serviceURL + "BulkPublishVersion",
 		serviceURL + "RevokeVersion",
-		serviceURL + "RegisterDeployKey",
-		serviceURL + "RegisterOrgDeployKey",
-		serviceURL + "ListDeployKeys",
-		serviceURL + "ApproveDeployKey",
-		serviceURL + "DeactivateDeployKey",
-		serviceURL + "ActivateDeployKey",
-		serviceURL + "RevokeDeployKey",
-		serviceURL + "AddAllowedDeployKey",
-		serviceURL + "RemoveAllowedDeployKey",
+		serviceURL + "RegisterPublishingKey",
+		serviceURL + "RegisterOrgPublishingKey",
+		serviceURL + "ListPublishingKeys",
+		serviceURL + "ApprovePublishingKey",
+		serviceURL + "DeactivatePublishingKey",
+		serviceURL + "ActivatePublishingKey",
+		serviceURL + "RevokePublishingKey",
+		serviceURL + "AddAllowedPublishingKey",
+		serviceURL + "RemoveAllowedPublishingKey",
 		serviceURL + "ListArtifactPermissions",
 		serviceURL + "SetArtifactVisibility",
 	}
@@ -676,26 +676,26 @@ func (c *hubProtobufClient) callRevokeVersion(ctx context.Context, in *RevokeVer
 	return out, nil
 }
 
-func (c *hubProtobufClient) RegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+func (c *hubProtobufClient) RegisterPublishingKey(ctx context.Context, in *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterDeployKey")
-	caller := c.callRegisterDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterPublishingKey")
+	caller := c.callRegisterPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterDeployKeyRequest)
+					typedReq, ok := req.(*RegisterPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRegisterDeployKey(ctx, typedReq)
+					return c.callRegisterPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -705,8 +705,8 @@ func (c *hubProtobufClient) RegisterDeployKey(ctx context.Context, in *RegisterD
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callRegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
-	out := new(RegisterDeployKeyResponse)
+func (c *hubProtobufClient) callRegisterPublishingKey(ctx context.Context, in *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
+	out := new(RegisterPublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -722,26 +722,26 @@ func (c *hubProtobufClient) callRegisterDeployKey(ctx context.Context, in *Regis
 	return out, nil
 }
 
-func (c *hubProtobufClient) RegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+func (c *hubProtobufClient) RegisterOrgPublishingKey(ctx context.Context, in *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
-	caller := c.callRegisterOrgDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgPublishingKey")
+	caller := c.callRegisterOrgPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					typedReq, ok := req.(*RegisterOrgPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRegisterOrgDeployKey(ctx, typedReq)
+					return c.callRegisterOrgPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterOrgPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -751,8 +751,8 @@ func (c *hubProtobufClient) RegisterOrgDeployKey(ctx context.Context, in *Regist
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callRegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
-	out := new(RegisterOrgDeployKeyResponse)
+func (c *hubProtobufClient) callRegisterOrgPublishingKey(ctx context.Context, in *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
+	out := new(RegisterOrgPublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -768,26 +768,26 @@ func (c *hubProtobufClient) callRegisterOrgDeployKey(ctx context.Context, in *Re
 	return out, nil
 }
 
-func (c *hubProtobufClient) ListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+func (c *hubProtobufClient) ListPublishingKeys(ctx context.Context, in *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ListDeployKeys")
-	caller := c.callListDeployKeys
+	ctx = ctxsetters.WithMethodName(ctx, "ListPublishingKeys")
+	caller := c.callListPublishingKeys
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+		caller = func(ctx context.Context, req *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListDeployKeysRequest)
+					typedReq, ok := req.(*ListPublishingKeysRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListDeployKeysRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPublishingKeysRequest) when calling interceptor")
 					}
-					return c.callListDeployKeys(ctx, typedReq)
+					return c.callListPublishingKeys(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListDeployKeysResponse)
+				typedResp, ok := resp.(*ListPublishingKeysResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListDeployKeysResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPublishingKeysResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -797,8 +797,8 @@ func (c *hubProtobufClient) ListDeployKeys(ctx context.Context, in *ListDeployKe
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
-	out := new(ListDeployKeysResponse)
+func (c *hubProtobufClient) callListPublishingKeys(ctx context.Context, in *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
+	out := new(ListPublishingKeysResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -814,26 +814,26 @@ func (c *hubProtobufClient) callListDeployKeys(ctx context.Context, in *ListDepl
 	return out, nil
 }
 
-func (c *hubProtobufClient) ApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+func (c *hubProtobufClient) ApprovePublishingKey(ctx context.Context, in *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ApproveDeployKey")
-	caller := c.callApproveDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "ApprovePublishingKey")
+	caller := c.callApprovePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ApproveDeployKeyRequest)
+					typedReq, ok := req.(*ApprovePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ApproveDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ApprovePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callApproveDeployKey(ctx, typedReq)
+					return c.callApprovePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ApproveDeployKeyResponse)
+				typedResp, ok := resp.(*ApprovePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ApproveDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ApprovePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -843,8 +843,8 @@ func (c *hubProtobufClient) ApproveDeployKey(ctx context.Context, in *ApproveDep
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
-	out := new(ApproveDeployKeyResponse)
+func (c *hubProtobufClient) callApprovePublishingKey(ctx context.Context, in *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
+	out := new(ApprovePublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -860,26 +860,26 @@ func (c *hubProtobufClient) callApproveDeployKey(ctx context.Context, in *Approv
 	return out, nil
 }
 
-func (c *hubProtobufClient) DeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+func (c *hubProtobufClient) DeactivatePublishingKey(ctx context.Context, in *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "DeactivateDeployKey")
-	caller := c.callDeactivateDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "DeactivatePublishingKey")
+	caller := c.callDeactivatePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeactivateDeployKeyRequest)
+					typedReq, ok := req.(*DeactivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeactivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*DeactivatePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callDeactivateDeployKey(ctx, typedReq)
+					return c.callDeactivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*DeactivateDeployKeyResponse)
+				typedResp, ok := resp.(*DeactivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*DeactivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*DeactivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -889,8 +889,8 @@ func (c *hubProtobufClient) DeactivateDeployKey(ctx context.Context, in *Deactiv
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callDeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
-	out := new(DeactivateDeployKeyResponse)
+func (c *hubProtobufClient) callDeactivatePublishingKey(ctx context.Context, in *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
+	out := new(DeactivatePublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -906,26 +906,26 @@ func (c *hubProtobufClient) callDeactivateDeployKey(ctx context.Context, in *Dea
 	return out, nil
 }
 
-func (c *hubProtobufClient) ActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+func (c *hubProtobufClient) ActivatePublishingKey(ctx context.Context, in *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ActivateDeployKey")
-	caller := c.callActivateDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "ActivatePublishingKey")
+	caller := c.callActivatePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ActivateDeployKeyRequest)
+					typedReq, ok := req.(*ActivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ActivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ActivatePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callActivateDeployKey(ctx, typedReq)
+					return c.callActivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ActivateDeployKeyResponse)
+				typedResp, ok := resp.(*ActivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ActivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ActivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -935,8 +935,8 @@ func (c *hubProtobufClient) ActivateDeployKey(ctx context.Context, in *ActivateD
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
-	out := new(ActivateDeployKeyResponse)
+func (c *hubProtobufClient) callActivatePublishingKey(ctx context.Context, in *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
+	out := new(ActivatePublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -952,26 +952,26 @@ func (c *hubProtobufClient) callActivateDeployKey(ctx context.Context, in *Activ
 	return out, nil
 }
 
-func (c *hubProtobufClient) RevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+func (c *hubProtobufClient) RevokePublishingKey(ctx context.Context, in *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RevokeDeployKey")
-	caller := c.callRevokeDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RevokePublishingKey")
+	caller := c.callRevokePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RevokeDeployKeyRequest)
+					typedReq, ok := req.(*RevokePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RevokeDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RevokePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRevokeDeployKey(ctx, typedReq)
+					return c.callRevokePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RevokeDeployKeyResponse)
+				typedResp, ok := resp.(*RevokePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RevokeDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RevokePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -981,8 +981,8 @@ func (c *hubProtobufClient) RevokeDeployKey(ctx context.Context, in *RevokeDeplo
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callRevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
-	out := new(RevokeDeployKeyResponse)
+func (c *hubProtobufClient) callRevokePublishingKey(ctx context.Context, in *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
+	out := new(RevokePublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[17], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -998,26 +998,26 @@ func (c *hubProtobufClient) callRevokeDeployKey(ctx context.Context, in *RevokeD
 	return out, nil
 }
 
-func (c *hubProtobufClient) AddAllowedDeployKey(ctx context.Context, in *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+func (c *hubProtobufClient) AddAllowedPublishingKey(ctx context.Context, in *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedDeployKey")
-	caller := c.callAddAllowedDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedPublishingKey")
+	caller := c.callAddAllowedPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedDeployKeyRequest)
+					typedReq, ok := req.(*AddAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callAddAllowedDeployKey(ctx, typedReq)
+					return c.callAddAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*AddAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1027,8 +1027,8 @@ func (c *hubProtobufClient) AddAllowedDeployKey(ctx context.Context, in *AddAllo
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callAddAllowedDeployKey(ctx context.Context, in *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
-	out := new(AddAllowedDeployKeyResponse)
+func (c *hubProtobufClient) callAddAllowedPublishingKey(ctx context.Context, in *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
+	out := new(AddAllowedPublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[18], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1044,26 +1044,26 @@ func (c *hubProtobufClient) callAddAllowedDeployKey(ctx context.Context, in *Add
 	return out, nil
 }
 
-func (c *hubProtobufClient) RemoveAllowedDeployKey(ctx context.Context, in *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+func (c *hubProtobufClient) RemoveAllowedPublishingKey(ctx context.Context, in *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedDeployKey")
-	caller := c.callRemoveAllowedDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedPublishingKey")
+	caller := c.callRemoveAllowedPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedDeployKeyRequest)
+					typedReq, ok := req.(*RemoveAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRemoveAllowedDeployKey(ctx, typedReq)
+					return c.callRemoveAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*RemoveAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1073,8 +1073,8 @@ func (c *hubProtobufClient) RemoveAllowedDeployKey(ctx context.Context, in *Remo
 	return caller(ctx, in)
 }
 
-func (c *hubProtobufClient) callRemoveAllowedDeployKey(ctx context.Context, in *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
-	out := new(RemoveAllowedDeployKeyResponse)
+func (c *hubProtobufClient) callRemoveAllowedPublishingKey(ctx context.Context, in *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
+	out := new(RemoveAllowedPublishingKeyResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[19], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1228,15 +1228,15 @@ func NewHubJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 		serviceURL + "PublishVersion",
 		serviceURL + "BulkPublishVersion",
 		serviceURL + "RevokeVersion",
-		serviceURL + "RegisterDeployKey",
-		serviceURL + "RegisterOrgDeployKey",
-		serviceURL + "ListDeployKeys",
-		serviceURL + "ApproveDeployKey",
-		serviceURL + "DeactivateDeployKey",
-		serviceURL + "ActivateDeployKey",
-		serviceURL + "RevokeDeployKey",
-		serviceURL + "AddAllowedDeployKey",
-		serviceURL + "RemoveAllowedDeployKey",
+		serviceURL + "RegisterPublishingKey",
+		serviceURL + "RegisterOrgPublishingKey",
+		serviceURL + "ListPublishingKeys",
+		serviceURL + "ApprovePublishingKey",
+		serviceURL + "DeactivatePublishingKey",
+		serviceURL + "ActivatePublishingKey",
+		serviceURL + "RevokePublishingKey",
+		serviceURL + "AddAllowedPublishingKey",
+		serviceURL + "RemoveAllowedPublishingKey",
 		serviceURL + "ListArtifactPermissions",
 		serviceURL + "SetArtifactVisibility",
 	}
@@ -1755,26 +1755,26 @@ func (c *hubJSONClient) callRevokeVersion(ctx context.Context, in *RevokeVersion
 	return out, nil
 }
 
-func (c *hubJSONClient) RegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+func (c *hubJSONClient) RegisterPublishingKey(ctx context.Context, in *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterDeployKey")
-	caller := c.callRegisterDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterPublishingKey")
+	caller := c.callRegisterPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterDeployKeyRequest)
+					typedReq, ok := req.(*RegisterPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRegisterDeployKey(ctx, typedReq)
+					return c.callRegisterPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1784,8 +1784,8 @@ func (c *hubJSONClient) RegisterDeployKey(ctx context.Context, in *RegisterDeplo
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callRegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
-	out := new(RegisterDeployKeyResponse)
+func (c *hubJSONClient) callRegisterPublishingKey(ctx context.Context, in *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
+	out := new(RegisterPublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1801,26 +1801,26 @@ func (c *hubJSONClient) callRegisterDeployKey(ctx context.Context, in *RegisterD
 	return out, nil
 }
 
-func (c *hubJSONClient) RegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+func (c *hubJSONClient) RegisterOrgPublishingKey(ctx context.Context, in *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
-	caller := c.callRegisterOrgDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgPublishingKey")
+	caller := c.callRegisterOrgPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					typedReq, ok := req.(*RegisterOrgPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRegisterOrgDeployKey(ctx, typedReq)
+					return c.callRegisterOrgPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterOrgPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1830,8 +1830,8 @@ func (c *hubJSONClient) RegisterOrgDeployKey(ctx context.Context, in *RegisterOr
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callRegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
-	out := new(RegisterOrgDeployKeyResponse)
+func (c *hubJSONClient) callRegisterOrgPublishingKey(ctx context.Context, in *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
+	out := new(RegisterOrgPublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1847,26 +1847,26 @@ func (c *hubJSONClient) callRegisterOrgDeployKey(ctx context.Context, in *Regist
 	return out, nil
 }
 
-func (c *hubJSONClient) ListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+func (c *hubJSONClient) ListPublishingKeys(ctx context.Context, in *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ListDeployKeys")
-	caller := c.callListDeployKeys
+	ctx = ctxsetters.WithMethodName(ctx, "ListPublishingKeys")
+	caller := c.callListPublishingKeys
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+		caller = func(ctx context.Context, req *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListDeployKeysRequest)
+					typedReq, ok := req.(*ListPublishingKeysRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListDeployKeysRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPublishingKeysRequest) when calling interceptor")
 					}
-					return c.callListDeployKeys(ctx, typedReq)
+					return c.callListPublishingKeys(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListDeployKeysResponse)
+				typedResp, ok := resp.(*ListPublishingKeysResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListDeployKeysResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPublishingKeysResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1876,8 +1876,8 @@ func (c *hubJSONClient) ListDeployKeys(ctx context.Context, in *ListDeployKeysRe
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
-	out := new(ListDeployKeysResponse)
+func (c *hubJSONClient) callListPublishingKeys(ctx context.Context, in *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
+	out := new(ListPublishingKeysResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1893,26 +1893,26 @@ func (c *hubJSONClient) callListDeployKeys(ctx context.Context, in *ListDeployKe
 	return out, nil
 }
 
-func (c *hubJSONClient) ApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+func (c *hubJSONClient) ApprovePublishingKey(ctx context.Context, in *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ApproveDeployKey")
-	caller := c.callApproveDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "ApprovePublishingKey")
+	caller := c.callApprovePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ApproveDeployKeyRequest)
+					typedReq, ok := req.(*ApprovePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ApproveDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ApprovePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callApproveDeployKey(ctx, typedReq)
+					return c.callApprovePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ApproveDeployKeyResponse)
+				typedResp, ok := resp.(*ApprovePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ApproveDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ApprovePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1922,8 +1922,8 @@ func (c *hubJSONClient) ApproveDeployKey(ctx context.Context, in *ApproveDeployK
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
-	out := new(ApproveDeployKeyResponse)
+func (c *hubJSONClient) callApprovePublishingKey(ctx context.Context, in *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
+	out := new(ApprovePublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1939,26 +1939,26 @@ func (c *hubJSONClient) callApproveDeployKey(ctx context.Context, in *ApproveDep
 	return out, nil
 }
 
-func (c *hubJSONClient) DeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+func (c *hubJSONClient) DeactivatePublishingKey(ctx context.Context, in *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "DeactivateDeployKey")
-	caller := c.callDeactivateDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "DeactivatePublishingKey")
+	caller := c.callDeactivatePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeactivateDeployKeyRequest)
+					typedReq, ok := req.(*DeactivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeactivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*DeactivatePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callDeactivateDeployKey(ctx, typedReq)
+					return c.callDeactivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*DeactivateDeployKeyResponse)
+				typedResp, ok := resp.(*DeactivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*DeactivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*DeactivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1968,8 +1968,8 @@ func (c *hubJSONClient) DeactivateDeployKey(ctx context.Context, in *DeactivateD
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callDeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
-	out := new(DeactivateDeployKeyResponse)
+func (c *hubJSONClient) callDeactivatePublishingKey(ctx context.Context, in *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
+	out := new(DeactivatePublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1985,26 +1985,26 @@ func (c *hubJSONClient) callDeactivateDeployKey(ctx context.Context, in *Deactiv
 	return out, nil
 }
 
-func (c *hubJSONClient) ActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+func (c *hubJSONClient) ActivatePublishingKey(ctx context.Context, in *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ActivateDeployKey")
-	caller := c.callActivateDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "ActivatePublishingKey")
+	caller := c.callActivatePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ActivateDeployKeyRequest)
+					typedReq, ok := req.(*ActivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ActivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ActivatePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callActivateDeployKey(ctx, typedReq)
+					return c.callActivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ActivateDeployKeyResponse)
+				typedResp, ok := resp.(*ActivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ActivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ActivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -2014,8 +2014,8 @@ func (c *hubJSONClient) ActivateDeployKey(ctx context.Context, in *ActivateDeplo
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
-	out := new(ActivateDeployKeyResponse)
+func (c *hubJSONClient) callActivatePublishingKey(ctx context.Context, in *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
+	out := new(ActivatePublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -2031,26 +2031,26 @@ func (c *hubJSONClient) callActivateDeployKey(ctx context.Context, in *ActivateD
 	return out, nil
 }
 
-func (c *hubJSONClient) RevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+func (c *hubJSONClient) RevokePublishingKey(ctx context.Context, in *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RevokeDeployKey")
-	caller := c.callRevokeDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RevokePublishingKey")
+	caller := c.callRevokePublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RevokeDeployKeyRequest)
+					typedReq, ok := req.(*RevokePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RevokeDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RevokePublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRevokeDeployKey(ctx, typedReq)
+					return c.callRevokePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RevokeDeployKeyResponse)
+				typedResp, ok := resp.(*RevokePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RevokeDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RevokePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -2060,8 +2060,8 @@ func (c *hubJSONClient) RevokeDeployKey(ctx context.Context, in *RevokeDeployKey
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callRevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
-	out := new(RevokeDeployKeyResponse)
+func (c *hubJSONClient) callRevokePublishingKey(ctx context.Context, in *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
+	out := new(RevokePublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[17], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -2077,26 +2077,26 @@ func (c *hubJSONClient) callRevokeDeployKey(ctx context.Context, in *RevokeDeplo
 	return out, nil
 }
 
-func (c *hubJSONClient) AddAllowedDeployKey(ctx context.Context, in *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+func (c *hubJSONClient) AddAllowedPublishingKey(ctx context.Context, in *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedDeployKey")
-	caller := c.callAddAllowedDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedPublishingKey")
+	caller := c.callAddAllowedPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedDeployKeyRequest)
+					typedReq, ok := req.(*AddAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callAddAllowedDeployKey(ctx, typedReq)
+					return c.callAddAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*AddAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -2106,8 +2106,8 @@ func (c *hubJSONClient) AddAllowedDeployKey(ctx context.Context, in *AddAllowedD
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callAddAllowedDeployKey(ctx context.Context, in *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
-	out := new(AddAllowedDeployKeyResponse)
+func (c *hubJSONClient) callAddAllowedPublishingKey(ctx context.Context, in *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
+	out := new(AddAllowedPublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[18], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -2123,26 +2123,26 @@ func (c *hubJSONClient) callAddAllowedDeployKey(ctx context.Context, in *AddAllo
 	return out, nil
 }
 
-func (c *hubJSONClient) RemoveAllowedDeployKey(ctx context.Context, in *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+func (c *hubJSONClient) RemoveAllowedPublishingKey(ctx context.Context, in *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedDeployKey")
-	caller := c.callRemoveAllowedDeployKey
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedPublishingKey")
+	caller := c.callRemoveAllowedPublishingKey
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+		caller = func(ctx context.Context, req *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedDeployKeyRequest)
+					typedReq, ok := req.(*RemoveAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return c.callRemoveAllowedDeployKey(ctx, typedReq)
+					return c.callRemoveAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*RemoveAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -2152,8 +2152,8 @@ func (c *hubJSONClient) RemoveAllowedDeployKey(ctx context.Context, in *RemoveAl
 	return caller(ctx, in)
 }
 
-func (c *hubJSONClient) callRemoveAllowedDeployKey(ctx context.Context, in *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
-	out := new(RemoveAllowedDeployKeyResponse)
+func (c *hubJSONClient) callRemoveAllowedPublishingKey(ctx context.Context, in *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
+	out := new(RemoveAllowedPublishingKeyResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[19], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -2391,32 +2391,32 @@ func (s *hubServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	case "RevokeVersion":
 		s.serveRevokeVersion(ctx, resp, req)
 		return
-	case "RegisterDeployKey":
-		s.serveRegisterDeployKey(ctx, resp, req)
+	case "RegisterPublishingKey":
+		s.serveRegisterPublishingKey(ctx, resp, req)
 		return
-	case "RegisterOrgDeployKey":
-		s.serveRegisterOrgDeployKey(ctx, resp, req)
+	case "RegisterOrgPublishingKey":
+		s.serveRegisterOrgPublishingKey(ctx, resp, req)
 		return
-	case "ListDeployKeys":
-		s.serveListDeployKeys(ctx, resp, req)
+	case "ListPublishingKeys":
+		s.serveListPublishingKeys(ctx, resp, req)
 		return
-	case "ApproveDeployKey":
-		s.serveApproveDeployKey(ctx, resp, req)
+	case "ApprovePublishingKey":
+		s.serveApprovePublishingKey(ctx, resp, req)
 		return
-	case "DeactivateDeployKey":
-		s.serveDeactivateDeployKey(ctx, resp, req)
+	case "DeactivatePublishingKey":
+		s.serveDeactivatePublishingKey(ctx, resp, req)
 		return
-	case "ActivateDeployKey":
-		s.serveActivateDeployKey(ctx, resp, req)
+	case "ActivatePublishingKey":
+		s.serveActivatePublishingKey(ctx, resp, req)
 		return
-	case "RevokeDeployKey":
-		s.serveRevokeDeployKey(ctx, resp, req)
+	case "RevokePublishingKey":
+		s.serveRevokePublishingKey(ctx, resp, req)
 		return
-	case "AddAllowedDeployKey":
-		s.serveAddAllowedDeployKey(ctx, resp, req)
+	case "AddAllowedPublishingKey":
+		s.serveAddAllowedPublishingKey(ctx, resp, req)
 		return
-	case "RemoveAllowedDeployKey":
-		s.serveRemoveAllowedDeployKey(ctx, resp, req)
+	case "RemoveAllowedPublishingKey":
+		s.serveRemoveAllowedPublishingKey(ctx, resp, req)
 		return
 	case "ListArtifactPermissions":
 		s.serveListArtifactPermissions(ctx, resp, req)
@@ -4411,7 +4411,7 @@ func (s *hubServer) serveRevokeVersionProtobuf(ctx context.Context, resp http.Re
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRegisterDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterPublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -4419,9 +4419,9 @@ func (s *hubServer) serveRegisterDeployKey(ctx context.Context, resp http.Respon
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveRegisterDeployKeyJSON(ctx, resp, req)
+		s.serveRegisterPublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveRegisterDeployKeyProtobuf(ctx, resp, req)
+		s.serveRegisterPublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -4429,9 +4429,9 @@ func (s *hubServer) serveRegisterDeployKey(ctx context.Context, resp http.Respon
 	}
 }
 
-func (s *hubServer) serveRegisterDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterPublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4444,29 +4444,29 @@ func (s *hubServer) serveRegisterDeployKeyJSON(ctx context.Context, resp http.Re
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(RegisterDeployKeyRequest)
+	reqContent := new(RegisterPublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.RegisterDeployKey
+	handler := s.Hub.RegisterPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterDeployKeyRequest)
+					typedReq, ok := req.(*RegisterPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RegisterDeployKey(ctx, typedReq)
+					return s.Hub.RegisterPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4475,7 +4475,7 @@ func (s *hubServer) serveRegisterDeployKeyJSON(ctx context.Context, resp http.Re
 	}
 
 	// Call service method
-	var respContent *RegisterDeployKeyResponse
+	var respContent *RegisterPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4486,7 +4486,7 @@ func (s *hubServer) serveRegisterDeployKeyJSON(ctx context.Context, resp http.Re
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterDeployKeyResponse and nil error while calling RegisterDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterPublishingKeyResponse and nil error while calling RegisterPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -4512,9 +4512,9 @@ func (s *hubServer) serveRegisterDeployKeyJSON(ctx context.Context, resp http.Re
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterPublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4526,28 +4526,28 @@ func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp htt
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(RegisterDeployKeyRequest)
+	reqContent := new(RegisterPublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.RegisterDeployKey
+	handler := s.Hub.RegisterPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RegisterPublishingKeyRequest) (*RegisterPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterDeployKeyRequest)
+					typedReq, ok := req.(*RegisterPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RegisterDeployKey(ctx, typedReq)
+					return s.Hub.RegisterPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4556,7 +4556,7 @@ func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp htt
 	}
 
 	// Call service method
-	var respContent *RegisterDeployKeyResponse
+	var respContent *RegisterPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4567,7 +4567,7 @@ func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp htt
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterDeployKeyResponse and nil error while calling RegisterDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterPublishingKeyResponse and nil error while calling RegisterPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -4591,7 +4591,7 @@ func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp htt
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRegisterOrgDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterOrgPublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -4599,9 +4599,9 @@ func (s *hubServer) serveRegisterOrgDeployKey(ctx context.Context, resp http.Res
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveRegisterOrgDeployKeyJSON(ctx, resp, req)
+		s.serveRegisterOrgPublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveRegisterOrgDeployKeyProtobuf(ctx, resp, req)
+		s.serveRegisterOrgPublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -4609,9 +4609,9 @@ func (s *hubServer) serveRegisterOrgDeployKey(ctx context.Context, resp http.Res
 	}
 }
 
-func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterOrgPublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4624,29 +4624,29 @@ func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(RegisterOrgDeployKeyRequest)
+	reqContent := new(RegisterOrgPublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.RegisterOrgDeployKey
+	handler := s.Hub.RegisterOrgPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					typedReq, ok := req.(*RegisterOrgPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RegisterOrgDeployKey(ctx, typedReq)
+					return s.Hub.RegisterOrgPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterOrgPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4655,7 +4655,7 @@ func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http
 	}
 
 	// Call service method
-	var respContent *RegisterOrgDeployKeyResponse
+	var respContent *RegisterOrgPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4666,7 +4666,7 @@ func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgDeployKeyResponse and nil error while calling RegisterOrgDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgPublishingKeyResponse and nil error while calling RegisterOrgPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -4692,9 +4692,9 @@ func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRegisterOrgPublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4706,28 +4706,28 @@ func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp 
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(RegisterOrgDeployKeyRequest)
+	reqContent := new(RegisterOrgPublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.RegisterOrgDeployKey
+	handler := s.Hub.RegisterOrgPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RegisterOrgPublishingKeyRequest) (*RegisterOrgPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					typedReq, ok := req.(*RegisterOrgPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RegisterOrgDeployKey(ctx, typedReq)
+					return s.Hub.RegisterOrgPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				typedResp, ok := resp.(*RegisterOrgPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4736,7 +4736,7 @@ func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp 
 	}
 
 	// Call service method
-	var respContent *RegisterOrgDeployKeyResponse
+	var respContent *RegisterOrgPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4747,7 +4747,7 @@ func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp 
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgDeployKeyResponse and nil error while calling RegisterOrgDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgPublishingKeyResponse and nil error while calling RegisterOrgPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -4771,7 +4771,7 @@ func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp 
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveListDeployKeys(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveListPublishingKeys(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -4779,9 +4779,9 @@ func (s *hubServer) serveListDeployKeys(ctx context.Context, resp http.ResponseW
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveListDeployKeysJSON(ctx, resp, req)
+		s.serveListPublishingKeysJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveListDeployKeysProtobuf(ctx, resp, req)
+		s.serveListPublishingKeysProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -4789,9 +4789,9 @@ func (s *hubServer) serveListDeployKeys(ctx context.Context, resp http.ResponseW
 	}
 }
 
-func (s *hubServer) serveListDeployKeysJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveListPublishingKeysJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListDeployKeys")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPublishingKeys")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4804,29 +4804,29 @@ func (s *hubServer) serveListDeployKeysJSON(ctx context.Context, resp http.Respo
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ListDeployKeysRequest)
+	reqContent := new(ListPublishingKeysRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.ListDeployKeys
+	handler := s.Hub.ListPublishingKeys
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+		handler = func(ctx context.Context, req *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListDeployKeysRequest)
+					typedReq, ok := req.(*ListPublishingKeysRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListDeployKeysRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPublishingKeysRequest) when calling interceptor")
 					}
-					return s.Hub.ListDeployKeys(ctx, typedReq)
+					return s.Hub.ListPublishingKeys(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListDeployKeysResponse)
+				typedResp, ok := resp.(*ListPublishingKeysResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListDeployKeysResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPublishingKeysResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4835,7 +4835,7 @@ func (s *hubServer) serveListDeployKeysJSON(ctx context.Context, resp http.Respo
 	}
 
 	// Call service method
-	var respContent *ListDeployKeysResponse
+	var respContent *ListPublishingKeysResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4846,7 +4846,7 @@ func (s *hubServer) serveListDeployKeysJSON(ctx context.Context, resp http.Respo
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListDeployKeysResponse and nil error while calling ListDeployKeys. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPublishingKeysResponse and nil error while calling ListPublishingKeys. nil responses are not supported"))
 		return
 	}
 
@@ -4872,9 +4872,9 @@ func (s *hubServer) serveListDeployKeysJSON(ctx context.Context, resp http.Respo
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveListDeployKeysProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveListPublishingKeysProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListDeployKeys")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPublishingKeys")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4886,28 +4886,28 @@ func (s *hubServer) serveListDeployKeysProtobuf(ctx context.Context, resp http.R
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ListDeployKeysRequest)
+	reqContent := new(ListPublishingKeysRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.ListDeployKeys
+	handler := s.Hub.ListPublishingKeys
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
+		handler = func(ctx context.Context, req *ListPublishingKeysRequest) (*ListPublishingKeysResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListDeployKeysRequest)
+					typedReq, ok := req.(*ListPublishingKeysRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListDeployKeysRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPublishingKeysRequest) when calling interceptor")
 					}
-					return s.Hub.ListDeployKeys(ctx, typedReq)
+					return s.Hub.ListPublishingKeys(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListDeployKeysResponse)
+				typedResp, ok := resp.(*ListPublishingKeysResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListDeployKeysResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPublishingKeysResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4916,7 +4916,7 @@ func (s *hubServer) serveListDeployKeysProtobuf(ctx context.Context, resp http.R
 	}
 
 	// Call service method
-	var respContent *ListDeployKeysResponse
+	var respContent *ListPublishingKeysResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4927,7 +4927,7 @@ func (s *hubServer) serveListDeployKeysProtobuf(ctx context.Context, resp http.R
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListDeployKeysResponse and nil error while calling ListDeployKeys. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPublishingKeysResponse and nil error while calling ListPublishingKeys. nil responses are not supported"))
 		return
 	}
 
@@ -4951,7 +4951,7 @@ func (s *hubServer) serveListDeployKeysProtobuf(ctx context.Context, resp http.R
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveApproveDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveApprovePublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -4959,9 +4959,9 @@ func (s *hubServer) serveApproveDeployKey(ctx context.Context, resp http.Respons
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveApproveDeployKeyJSON(ctx, resp, req)
+		s.serveApprovePublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveApproveDeployKeyProtobuf(ctx, resp, req)
+		s.serveApprovePublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -4969,9 +4969,9 @@ func (s *hubServer) serveApproveDeployKey(ctx context.Context, resp http.Respons
 	}
 }
 
-func (s *hubServer) serveApproveDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveApprovePublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ApproveDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "ApprovePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -4984,29 +4984,29 @@ func (s *hubServer) serveApproveDeployKeyJSON(ctx context.Context, resp http.Res
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ApproveDeployKeyRequest)
+	reqContent := new(ApprovePublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.ApproveDeployKey
+	handler := s.Hub.ApprovePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ApproveDeployKeyRequest)
+					typedReq, ok := req.(*ApprovePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ApproveDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ApprovePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.ApproveDeployKey(ctx, typedReq)
+					return s.Hub.ApprovePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ApproveDeployKeyResponse)
+				typedResp, ok := resp.(*ApprovePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ApproveDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ApprovePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5015,7 +5015,7 @@ func (s *hubServer) serveApproveDeployKeyJSON(ctx context.Context, resp http.Res
 	}
 
 	// Call service method
-	var respContent *ApproveDeployKeyResponse
+	var respContent *ApprovePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5026,7 +5026,7 @@ func (s *hubServer) serveApproveDeployKeyJSON(ctx context.Context, resp http.Res
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ApproveDeployKeyResponse and nil error while calling ApproveDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ApprovePublishingKeyResponse and nil error while calling ApprovePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5052,9 +5052,9 @@ func (s *hubServer) serveApproveDeployKeyJSON(ctx context.Context, resp http.Res
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveApproveDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveApprovePublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ApproveDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "ApprovePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5066,28 +5066,28 @@ func (s *hubServer) serveApproveDeployKeyProtobuf(ctx context.Context, resp http
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ApproveDeployKeyRequest)
+	reqContent := new(ApprovePublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.ApproveDeployKey
+	handler := s.Hub.ApprovePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *ApprovePublishingKeyRequest) (*ApprovePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ApproveDeployKeyRequest)
+					typedReq, ok := req.(*ApprovePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ApproveDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ApprovePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.ApproveDeployKey(ctx, typedReq)
+					return s.Hub.ApprovePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ApproveDeployKeyResponse)
+				typedResp, ok := resp.(*ApprovePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ApproveDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ApprovePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5096,7 +5096,7 @@ func (s *hubServer) serveApproveDeployKeyProtobuf(ctx context.Context, resp http
 	}
 
 	// Call service method
-	var respContent *ApproveDeployKeyResponse
+	var respContent *ApprovePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5107,7 +5107,7 @@ func (s *hubServer) serveApproveDeployKeyProtobuf(ctx context.Context, resp http
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ApproveDeployKeyResponse and nil error while calling ApproveDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ApprovePublishingKeyResponse and nil error while calling ApprovePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5131,7 +5131,7 @@ func (s *hubServer) serveApproveDeployKeyProtobuf(ctx context.Context, resp http
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveDeactivateDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveDeactivatePublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -5139,9 +5139,9 @@ func (s *hubServer) serveDeactivateDeployKey(ctx context.Context, resp http.Resp
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveDeactivateDeployKeyJSON(ctx, resp, req)
+		s.serveDeactivatePublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveDeactivateDeployKeyProtobuf(ctx, resp, req)
+		s.serveDeactivatePublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -5149,9 +5149,9 @@ func (s *hubServer) serveDeactivateDeployKey(ctx context.Context, resp http.Resp
 	}
 }
 
-func (s *hubServer) serveDeactivateDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveDeactivatePublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeactivateDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "DeactivatePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5164,29 +5164,29 @@ func (s *hubServer) serveDeactivateDeployKeyJSON(ctx context.Context, resp http.
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(DeactivateDeployKeyRequest)
+	reqContent := new(DeactivatePublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.DeactivateDeployKey
+	handler := s.Hub.DeactivatePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeactivateDeployKeyRequest)
+					typedReq, ok := req.(*DeactivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeactivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*DeactivatePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.DeactivateDeployKey(ctx, typedReq)
+					return s.Hub.DeactivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*DeactivateDeployKeyResponse)
+				typedResp, ok := resp.(*DeactivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*DeactivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*DeactivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5195,7 +5195,7 @@ func (s *hubServer) serveDeactivateDeployKeyJSON(ctx context.Context, resp http.
 	}
 
 	// Call service method
-	var respContent *DeactivateDeployKeyResponse
+	var respContent *DeactivatePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5206,7 +5206,7 @@ func (s *hubServer) serveDeactivateDeployKeyJSON(ctx context.Context, resp http.
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeactivateDeployKeyResponse and nil error while calling DeactivateDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeactivatePublishingKeyResponse and nil error while calling DeactivatePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5232,9 +5232,9 @@ func (s *hubServer) serveDeactivateDeployKeyJSON(ctx context.Context, resp http.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveDeactivateDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveDeactivatePublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeactivateDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "DeactivatePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5246,28 +5246,28 @@ func (s *hubServer) serveDeactivateDeployKeyProtobuf(ctx context.Context, resp h
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(DeactivateDeployKeyRequest)
+	reqContent := new(DeactivatePublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.DeactivateDeployKey
+	handler := s.Hub.DeactivatePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *DeactivatePublishingKeyRequest) (*DeactivatePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeactivateDeployKeyRequest)
+					typedReq, ok := req.(*DeactivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeactivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*DeactivatePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.DeactivateDeployKey(ctx, typedReq)
+					return s.Hub.DeactivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*DeactivateDeployKeyResponse)
+				typedResp, ok := resp.(*DeactivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*DeactivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*DeactivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5276,7 +5276,7 @@ func (s *hubServer) serveDeactivateDeployKeyProtobuf(ctx context.Context, resp h
 	}
 
 	// Call service method
-	var respContent *DeactivateDeployKeyResponse
+	var respContent *DeactivatePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5287,7 +5287,7 @@ func (s *hubServer) serveDeactivateDeployKeyProtobuf(ctx context.Context, resp h
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeactivateDeployKeyResponse and nil error while calling DeactivateDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeactivatePublishingKeyResponse and nil error while calling DeactivatePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5311,7 +5311,7 @@ func (s *hubServer) serveDeactivateDeployKeyProtobuf(ctx context.Context, resp h
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveActivateDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveActivatePublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -5319,9 +5319,9 @@ func (s *hubServer) serveActivateDeployKey(ctx context.Context, resp http.Respon
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveActivateDeployKeyJSON(ctx, resp, req)
+		s.serveActivatePublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveActivateDeployKeyProtobuf(ctx, resp, req)
+		s.serveActivatePublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -5329,9 +5329,9 @@ func (s *hubServer) serveActivateDeployKey(ctx context.Context, resp http.Respon
 	}
 }
 
-func (s *hubServer) serveActivateDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveActivatePublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ActivateDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "ActivatePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5344,29 +5344,29 @@ func (s *hubServer) serveActivateDeployKeyJSON(ctx context.Context, resp http.Re
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ActivateDeployKeyRequest)
+	reqContent := new(ActivatePublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.ActivateDeployKey
+	handler := s.Hub.ActivatePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ActivateDeployKeyRequest)
+					typedReq, ok := req.(*ActivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ActivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ActivatePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.ActivateDeployKey(ctx, typedReq)
+					return s.Hub.ActivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ActivateDeployKeyResponse)
+				typedResp, ok := resp.(*ActivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ActivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ActivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5375,7 +5375,7 @@ func (s *hubServer) serveActivateDeployKeyJSON(ctx context.Context, resp http.Re
 	}
 
 	// Call service method
-	var respContent *ActivateDeployKeyResponse
+	var respContent *ActivatePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5386,7 +5386,7 @@ func (s *hubServer) serveActivateDeployKeyJSON(ctx context.Context, resp http.Re
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ActivateDeployKeyResponse and nil error while calling ActivateDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ActivatePublishingKeyResponse and nil error while calling ActivatePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5412,9 +5412,9 @@ func (s *hubServer) serveActivateDeployKeyJSON(ctx context.Context, resp http.Re
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveActivateDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveActivatePublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ActivateDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "ActivatePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5426,28 +5426,28 @@ func (s *hubServer) serveActivateDeployKeyProtobuf(ctx context.Context, resp htt
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ActivateDeployKeyRequest)
+	reqContent := new(ActivatePublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.ActivateDeployKey
+	handler := s.Hub.ActivatePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *ActivatePublishingKeyRequest) (*ActivatePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ActivateDeployKeyRequest)
+					typedReq, ok := req.(*ActivatePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ActivateDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ActivatePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.ActivateDeployKey(ctx, typedReq)
+					return s.Hub.ActivatePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ActivateDeployKeyResponse)
+				typedResp, ok := resp.(*ActivatePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ActivateDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ActivatePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5456,7 +5456,7 @@ func (s *hubServer) serveActivateDeployKeyProtobuf(ctx context.Context, resp htt
 	}
 
 	// Call service method
-	var respContent *ActivateDeployKeyResponse
+	var respContent *ActivatePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5467,7 +5467,7 @@ func (s *hubServer) serveActivateDeployKeyProtobuf(ctx context.Context, resp htt
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ActivateDeployKeyResponse and nil error while calling ActivateDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ActivatePublishingKeyResponse and nil error while calling ActivatePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5491,7 +5491,7 @@ func (s *hubServer) serveActivateDeployKeyProtobuf(ctx context.Context, resp htt
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRevokeDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRevokePublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -5499,9 +5499,9 @@ func (s *hubServer) serveRevokeDeployKey(ctx context.Context, resp http.Response
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveRevokeDeployKeyJSON(ctx, resp, req)
+		s.serveRevokePublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveRevokeDeployKeyProtobuf(ctx, resp, req)
+		s.serveRevokePublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -5509,9 +5509,9 @@ func (s *hubServer) serveRevokeDeployKey(ctx context.Context, resp http.Response
 	}
 }
 
-func (s *hubServer) serveRevokeDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRevokePublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RevokeDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RevokePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5524,29 +5524,29 @@ func (s *hubServer) serveRevokeDeployKeyJSON(ctx context.Context, resp http.Resp
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(RevokeDeployKeyRequest)
+	reqContent := new(RevokePublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.RevokeDeployKey
+	handler := s.Hub.RevokePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RevokeDeployKeyRequest)
+					typedReq, ok := req.(*RevokePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RevokeDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RevokePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RevokeDeployKey(ctx, typedReq)
+					return s.Hub.RevokePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RevokeDeployKeyResponse)
+				typedResp, ok := resp.(*RevokePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RevokeDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RevokePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5555,7 +5555,7 @@ func (s *hubServer) serveRevokeDeployKeyJSON(ctx context.Context, resp http.Resp
 	}
 
 	// Call service method
-	var respContent *RevokeDeployKeyResponse
+	var respContent *RevokePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5566,7 +5566,7 @@ func (s *hubServer) serveRevokeDeployKeyJSON(ctx context.Context, resp http.Resp
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RevokeDeployKeyResponse and nil error while calling RevokeDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RevokePublishingKeyResponse and nil error while calling RevokePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5592,9 +5592,9 @@ func (s *hubServer) serveRevokeDeployKeyJSON(ctx context.Context, resp http.Resp
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRevokePublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RevokeDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RevokePublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5606,28 +5606,28 @@ func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(RevokeDeployKeyRequest)
+	reqContent := new(RevokePublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.RevokeDeployKey
+	handler := s.Hub.RevokePublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RevokePublishingKeyRequest) (*RevokePublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RevokeDeployKeyRequest)
+					typedReq, ok := req.(*RevokePublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RevokeDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RevokePublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RevokeDeployKey(ctx, typedReq)
+					return s.Hub.RevokePublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RevokeDeployKeyResponse)
+				typedResp, ok := resp.(*RevokePublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RevokeDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RevokePublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5636,7 +5636,7 @@ func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.
 	}
 
 	// Call service method
-	var respContent *RevokeDeployKeyResponse
+	var respContent *RevokePublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5647,7 +5647,7 @@ func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RevokeDeployKeyResponse and nil error while calling RevokeDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RevokePublishingKeyResponse and nil error while calling RevokePublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5671,7 +5671,7 @@ func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveAddAllowedDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveAddAllowedPublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -5679,9 +5679,9 @@ func (s *hubServer) serveAddAllowedDeployKey(ctx context.Context, resp http.Resp
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveAddAllowedDeployKeyJSON(ctx, resp, req)
+		s.serveAddAllowedPublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveAddAllowedDeployKeyProtobuf(ctx, resp, req)
+		s.serveAddAllowedPublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -5689,9 +5689,9 @@ func (s *hubServer) serveAddAllowedDeployKey(ctx context.Context, resp http.Resp
 	}
 }
 
-func (s *hubServer) serveAddAllowedDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveAddAllowedPublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5704,29 +5704,29 @@ func (s *hubServer) serveAddAllowedDeployKeyJSON(ctx context.Context, resp http.
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(AddAllowedDeployKeyRequest)
+	reqContent := new(AddAllowedPublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.AddAllowedDeployKey
+	handler := s.Hub.AddAllowedPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedDeployKeyRequest)
+					typedReq, ok := req.(*AddAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.AddAllowedDeployKey(ctx, typedReq)
+					return s.Hub.AddAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*AddAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5735,7 +5735,7 @@ func (s *hubServer) serveAddAllowedDeployKeyJSON(ctx context.Context, resp http.
 	}
 
 	// Call service method
-	var respContent *AddAllowedDeployKeyResponse
+	var respContent *AddAllowedPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5746,7 +5746,7 @@ func (s *hubServer) serveAddAllowedDeployKeyJSON(ctx context.Context, resp http.
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedDeployKeyResponse and nil error while calling AddAllowedDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedPublishingKeyResponse and nil error while calling AddAllowedPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5772,9 +5772,9 @@ func (s *hubServer) serveAddAllowedDeployKeyJSON(ctx context.Context, resp http.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveAddAllowedDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveAddAllowedPublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5786,28 +5786,28 @@ func (s *hubServer) serveAddAllowedDeployKeyProtobuf(ctx context.Context, resp h
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(AddAllowedDeployKeyRequest)
+	reqContent := new(AddAllowedPublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.AddAllowedDeployKey
+	handler := s.Hub.AddAllowedPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *AddAllowedPublishingKeyRequest) (*AddAllowedPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedDeployKeyRequest)
+					typedReq, ok := req.(*AddAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.AddAllowedDeployKey(ctx, typedReq)
+					return s.Hub.AddAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*AddAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5816,7 +5816,7 @@ func (s *hubServer) serveAddAllowedDeployKeyProtobuf(ctx context.Context, resp h
 	}
 
 	// Call service method
-	var respContent *AddAllowedDeployKeyResponse
+	var respContent *AddAllowedPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5827,7 +5827,7 @@ func (s *hubServer) serveAddAllowedDeployKeyProtobuf(ctx context.Context, resp h
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedDeployKeyResponse and nil error while calling AddAllowedDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedPublishingKeyResponse and nil error while calling AddAllowedPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5851,7 +5851,7 @@ func (s *hubServer) serveAddAllowedDeployKeyProtobuf(ctx context.Context, resp h
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRemoveAllowedDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRemoveAllowedPublishingKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -5859,9 +5859,9 @@ func (s *hubServer) serveRemoveAllowedDeployKey(ctx context.Context, resp http.R
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveRemoveAllowedDeployKeyJSON(ctx, resp, req)
+		s.serveRemoveAllowedPublishingKeyJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveRemoveAllowedDeployKeyProtobuf(ctx, resp, req)
+		s.serveRemoveAllowedPublishingKeyProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -5869,9 +5869,9 @@ func (s *hubServer) serveRemoveAllowedDeployKey(ctx context.Context, resp http.R
 	}
 }
 
-func (s *hubServer) serveRemoveAllowedDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRemoveAllowedPublishingKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5884,29 +5884,29 @@ func (s *hubServer) serveRemoveAllowedDeployKeyJSON(ctx context.Context, resp ht
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(RemoveAllowedDeployKeyRequest)
+	reqContent := new(RemoveAllowedPublishingKeyRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.Hub.RemoveAllowedDeployKey
+	handler := s.Hub.RemoveAllowedPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedDeployKeyRequest)
+					typedReq, ok := req.(*RemoveAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RemoveAllowedDeployKey(ctx, typedReq)
+					return s.Hub.RemoveAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*RemoveAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5915,7 +5915,7 @@ func (s *hubServer) serveRemoveAllowedDeployKeyJSON(ctx context.Context, resp ht
 	}
 
 	// Call service method
-	var respContent *RemoveAllowedDeployKeyResponse
+	var respContent *RemoveAllowedPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -5926,7 +5926,7 @@ func (s *hubServer) serveRemoveAllowedDeployKeyJSON(ctx context.Context, resp ht
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedDeployKeyResponse and nil error while calling RemoveAllowedDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedPublishingKeyResponse and nil error while calling RemoveAllowedPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -5952,9 +5952,9 @@ func (s *hubServer) serveRemoveAllowedDeployKeyJSON(ctx context.Context, resp ht
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveRemoveAllowedDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *hubServer) serveRemoveAllowedPublishingKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedDeployKey")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedPublishingKey")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -5966,28 +5966,28 @@ func (s *hubServer) serveRemoveAllowedDeployKeyProtobuf(ctx context.Context, res
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(RemoveAllowedDeployKeyRequest)
+	reqContent := new(RemoveAllowedPublishingKeyRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.Hub.RemoveAllowedDeployKey
+	handler := s.Hub.RemoveAllowedPublishingKey
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error) {
+		handler = func(ctx context.Context, req *RemoveAllowedPublishingKeyRequest) (*RemoveAllowedPublishingKeyResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedDeployKeyRequest)
+					typedReq, ok := req.(*RemoveAllowedPublishingKeyRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedDeployKeyRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedPublishingKeyRequest) when calling interceptor")
 					}
-					return s.Hub.RemoveAllowedDeployKey(ctx, typedReq)
+					return s.Hub.RemoveAllowedPublishingKey(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedDeployKeyResponse)
+				typedResp, ok := resp.(*RemoveAllowedPublishingKeyResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedDeployKeyResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedPublishingKeyResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -5996,7 +5996,7 @@ func (s *hubServer) serveRemoveAllowedDeployKeyProtobuf(ctx context.Context, res
 	}
 
 	// Call service method
-	var respContent *RemoveAllowedDeployKeyResponse
+	var respContent *RemoveAllowedPublishingKeyResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -6007,7 +6007,7 @@ func (s *hubServer) serveRemoveAllowedDeployKeyProtobuf(ctx context.Context, res
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedDeployKeyResponse and nil error while calling RemoveAllowedDeployKey. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedPublishingKeyResponse and nil error while calling RemoveAllowedPublishingKey. nil responses are not supported"))
 		return
 	}
 
@@ -6972,140 +6972,140 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 2153 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x59, 0xcd, 0x6e, 0xe3, 0xc8,
-	0x11, 0x0e, 0x25, 0xd9, 0x23, 0x95, 0xff, 0x38, 0x3d, 0x63, 0x5b, 0xa2, 0x2d, 0xdb, 0xc3, 0xd9,
-	0xc9, 0x78, 0xbc, 0xbb, 0x36, 0xd6, 0xf9, 0xdb, 0x00, 0x49, 0x16, 0xb2, 0xa5, 0xd1, 0x70, 0xed,
-	0x91, 0x04, 0x8a, 0x32, 0xe0, 0x20, 0x00, 0x97, 0x32, 0xdb, 0x16, 0x61, 0x89, 0x54, 0xc8, 0x96,
-	0x17, 0x06, 0xf6, 0x10, 0x20, 0xa7, 0x1c, 0x82, 0xbc, 0xc0, 0x22, 0x2f, 0x90, 0x4b, 0x90, 0x6b,
-	0x0e, 0xb9, 0xe5, 0x90, 0x5b, 0xce, 0x79, 0x8c, 0xbc, 0x40, 0x40, 0xb2, 0x49, 0x35, 0xff, 0x64,
-	0x67, 0x3d, 0x33, 0x7b, 0xb2, 0x58, 0x55, 0xdd, 0xf5, 0xd7, 0x55, 0x5d, 0x5f, 0x1b, 0x1e, 0x0f,
-	0x26, 0xfd, 0x03, 0x07, 0xdb, 0x37, 0xc6, 0x05, 0xde, 0x1f, 0xdb, 0x16, 0xb1, 0x50, 0x91, 0x10,
-	0xad, 0xbf, 0x3f, 0x98, 0xf4, 0xc5, 0x7f, 0x70, 0xb0, 0xd8, 0xb6, 0xaf, 0x34, 0xd3, 0x70, 0x34,
-	0x62, 0x58, 0x26, 0x5a, 0x86, 0x9c, 0xa1, 0x97, 0xb9, 0x1d, 0x6e, 0x37, 0x2f, 0xe7, 0x0c, 0x1d,
-	0xad, 0xc1, 0xbc, 0x6e, 0x8d, 0x34, 0xc3, 0x2c, 0xe7, 0x76, 0xb8, 0xdd, 0x92, 0x4c, 0xbf, 0x10,
-	0x82, 0x82, 0xa9, 0x8d, 0x70, 0x39, 0xef, 0x51, 0xbd, 0xdf, 0x48, 0x80, 0xa2, 0x36, 0x1e, 0xdb,
-	0xd6, 0x0d, 0xd6, 0xcb, 0x85, 0x1d, 0x6e, 0xb7, 0x28, 0x87, 0xdf, 0xa8, 0x02, 0x45, 0xc3, 0x51,
-	0xad, 0xaf, 0x4d, 0x6c, 0x97, 0xe7, 0x3c, 0xde, 0x23, 0xc3, 0x69, 0xbb, 0x9f, 0xa8, 0x0a, 0x70,
-	0x61, 0x63, 0x8d, 0x60, 0x5d, 0xd5, 0x48, 0x79, 0xde, 0xdb, 0xb0, 0x44, 0x29, 0x35, 0xe2, 0xb2,
-	0x27, 0x63, 0x3d, 0x60, 0x3f, 0xf2, 0xd9, 0x94, 0x52, 0x23, 0xe2, 0x7f, 0x39, 0x58, 0xac, 0xd9,
-	0xc4, 0xb8, 0xd4, 0x2e, 0x88, 0x64, 0x5e, 0x5a, 0x09, 0x0f, 0x44, 0x58, 0xb4, 0x18, 0x0f, 0xa9,
-	0x1f, 0x11, 0x1a, 0xda, 0x83, 0xc2, 0xb5, 0x61, 0xea, 0x9e, 0x37, 0xcb, 0x87, 0x6b, 0xfb, 0x41,
-	0x7c, 0xf6, 0x83, 0x9d, 0x4f, 0x0c, 0x53, 0x97, 0x3d, 0x99, 0xd0, 0xf3, 0x02, 0xe3, 0x79, 0xd4,
-	0x85, 0xb9, 0xb8, 0x0b, 0x6b, 0x30, 0x3f, 0x9e, 0xf4, 0x87, 0xc6, 0x85, 0xe7, 0x5d, 0x51, 0xa6,
-	0x5f, 0xe8, 0x73, 0x58, 0x74, 0x2e, 0x06, 0x78, 0xa4, 0xa9, 0x13, 0x47, 0xbb, 0xc2, 0x9e, 0x73,
-	0xcb, 0x87, 0xab, 0x53, 0xf5, 0x5d, 0x8f, 0xdb, 0x73, 0x99, 0xf2, 0x82, 0x33, 0xfd, 0x10, 0xff,
-	0xc3, 0xc1, 0xc2, 0x19, 0xb6, 0x1d, 0xc3, 0x32, 0x53, 0x9d, 0x2e, 0xc3, 0xa3, 0x1b, 0x9f, 0x4d,
-	0xfd, 0x0d, 0x3e, 0xd1, 0xaf, 0x60, 0xd9, 0x31, 0xae, 0x4c, 0x8d, 0x4c, 0x6c, 0xac, 0x92, 0xdb,
-	0x31, 0xa6, 0x4e, 0xaf, 0x33, 0x5a, 0x03, 0xbe, 0x72, 0x3b, 0xc6, 0xf2, 0x92, 0xc3, 0x7e, 0xa2,
-	0x57, 0xc0, 0xbb, 0x04, 0xc3, 0xbc, 0x52, 0x0d, 0x1d, 0x9b, 0xc4, 0x20, 0xb7, 0x34, 0x14, 0x2b,
-	0x94, 0x2e, 0x51, 0xb2, 0x6b, 0x84, 0x8d, 0x6f, 0xac, 0x6b, 0xac, 0x07, 0x29, 0xa7, 0x9f, 0x77,
-	0xa4, 0x5c, 0xfc, 0x02, 0x4a, 0x35, 0xc7, 0xc1, 0x7e, 0x3e, 0x05, 0x28, 0x5e, 0x1a, 0x43, 0xec,
-	0xc5, 0x9c, 0xf3, 0x24, 0xc3, 0x6f, 0x37, 0xb0, 0xce, 0x40, 0x3b, 0xfc, 0xc9, 0x4f, 0x83, 0xd3,
-	0xe9, 0x7f, 0x89, 0x7f, 0xe3, 0x60, 0xa9, 0x8e, 0xc7, 0x43, 0xeb, 0xf6, 0x04, 0xdf, 0xa6, 0x06,
-	0x68, 0x07, 0x16, 0x2e, 0x0d, 0xf3, 0x0a, 0xdb, 0x63, 0xdb, 0x30, 0x09, 0x5d, 0xce, 0x92, 0xbc,
-	0x73, 0xe7, 0x60, 0x5b, 0xc5, 0x23, 0xcd, 0x18, 0xd2, 0x73, 0x5e, 0x72, 0x29, 0x0d, 0x97, 0x80,
-	0x3e, 0x83, 0x79, 0x87, 0x68, 0x64, 0xe2, 0x78, 0xde, 0x2f, 0x1f, 0x56, 0xa6, 0xf1, 0x0b, 0x35,
-	0x77, 0x3d, 0x01, 0x99, 0x0a, 0xde, 0x71, 0x4a, 0xc4, 0x33, 0x58, 0xec, 0xb8, 0xe7, 0xc2, 0x19,
-	0x78, 0xce, 0x7f, 0x17, 0xc7, 0xdd, 0xc3, 0xa9, 0x6b, 0x44, 0xf3, 0xcc, 0x5d, 0x94, 0xbd, 0xdf,
-	0xa2, 0x00, 0xe5, 0x53, 0xc3, 0x21, 0x6c, 0x99, 0x3b, 0x32, 0xfe, 0xed, 0x04, 0x3b, 0x44, 0x3c,
-	0x87, 0x4a, 0x0a, 0xcf, 0x19, 0x5b, 0xa6, 0x83, 0xd1, 0x2f, 0x60, 0x89, 0xad, 0x12, 0xa7, 0xcc,
-	0xed, 0xe4, 0x77, 0x17, 0xd8, 0xf2, 0x60, 0xd7, 0xc9, 0x51, 0x61, 0xf1, 0x13, 0x10, 0x6a, 0x7e,
-	0xf5, 0x47, 0xa4, 0x7c, 0xc5, 0xf1, 0x7c, 0x88, 0x55, 0xd8, 0x48, 0x95, 0xf6, 0x4d, 0x11, 0xbf,
-	0x81, 0xa7, 0xae, 0x9d, 0x41, 0x39, 0x06, 0xf6, 0x87, 0x85, 0xcb, 0xdd, 0xa3, 0x70, 0xe3, 0xd5,
-	0x96, 0xbb, 0x77, 0xb5, 0xbd, 0x85, 0xd5, 0x98, 0x76, 0x1a, 0xa1, 0x1f, 0x43, 0x49, 0x0b, 0x88,
-	0xc9, 0xe8, 0xb0, 0x6d, 0x49, 0x9e, 0x0a, 0x8a, 0x0a, 0xa0, 0x26, 0x0e, 0x77, 0xfb, 0x2e, 0xae,
-	0x04, 0x3d, 0x28, 0x37, 0xed, 0x41, 0xe2, 0x37, 0xf0, 0x24, 0xb2, 0x2b, 0x35, 0xf1, 0x10, 0x8a,
-	0x81, 0x66, 0x6f, 0xeb, 0x6c, 0x0b, 0x43, 0x39, 0xf4, 0x19, 0x14, 0x69, 0xbb, 0x70, 0xca, 0x39,
-	0xcf, 0x2b, 0x26, 0x4a, 0x4c, 0xdb, 0x91, 0x43, 0x31, 0x71, 0x02, 0x15, 0x46, 0x3b, 0x95, 0x79,
-	0x47, 0xae, 0xb1, 0xdd, 0x2c, 0x1f, 0xe9, 0x66, 0xe2, 0xbf, 0x38, 0x10, 0xd2, 0xf4, 0x3e, 0xc0,
-	0xf9, 0x83, 0x68, 0xeb, 0xcc, 0xf4, 0x3d, 0xec, 0xa8, 0x02, 0x14, 0x47, 0x9a, 0x69, 0x5c, 0x62,
-	0x87, 0xd0, 0xba, 0x0b, 0xbf, 0xd1, 0xc7, 0x30, 0xaf, 0xb9, 0xc5, 0xec, 0x76, 0x09, 0x37, 0x8e,
-	0x4f, 0x18, 0xf5, 0x41, 0x87, 0x93, 0xa9, 0x88, 0xf8, 0x27, 0x0e, 0xd6, 0x19, 0x67, 0x3c, 0x81,
-	0xf7, 0x1e, 0xc2, 0x48, 0x9b, 0x29, 0x44, 0xdb, 0x8c, 0xd8, 0x87, 0x72, 0xd2, 0x20, 0x1a, 0xdb,
-	0x77, 0xd5, 0x9e, 0x88, 0xdf, 0x9e, 0xea, 0xd6, 0xc5, 0x64, 0x84, 0x4d, 0x12, 0xe9, 0x12, 0xef,
-	0xef, 0xe0, 0x7c, 0xe5, 0x37, 0xbe, 0x98, 0x56, 0xea, 0x1a, 0xb3, 0x8c, 0x8b, 0x06, 0xeb, 0x15,
-	0xcc, 0xb9, 0x4e, 0x06, 0x65, 0x91, 0x9a, 0x4e, 0x5f, 0x22, 0xc8, 0xe6, 0x87, 0xf5, 0xeb, 0x1e,
-	0xd9, 0x4c, 0x77, 0xf9, 0x5d, 0x65, 0xf3, 0x9f, 0x39, 0x58, 0xa5, 0xb7, 0xd8, 0x87, 0x6a, 0x02,
-	0x91, 0x02, 0x2c, 0xc4, 0x0a, 0x30, 0x39, 0xee, 0xcc, 0xfd, 0x5f, 0xe3, 0xce, 0x26, 0x94, 0x42,
-	0x82, 0x37, 0xa8, 0x2c, 0xca, 0x53, 0x42, 0xea, 0x30, 0xf4, 0x28, 0x7d, 0x18, 0xda, 0x0f, 0x3b,
-	0x41, 0x31, 0x7e, 0x4f, 0xb0, 0xb7, 0x7e, 0xd8, 0x0c, 0x7e, 0x06, 0x6b, 0xf1, 0x38, 0xd2, 0x54,
-	0x55, 0x01, 0xa8, 0xe7, 0x6a, 0x78, 0x85, 0x96, 0x28, 0x45, 0xd2, 0xc5, 0xbf, 0x73, 0xb0, 0x72,
-	0x34, 0x19, 0x5e, 0xd3, 0xd5, 0x12, 0xc1, 0xa3, 0x07, 0xc7, 0x7e, 0x56, 0x8b, 0x8b, 0x44, 0xa8,
-	0x10, 0x8f, 0xd0, 0xd4, 0xed, 0xb9, 0x7b, 0xb9, 0xfd, 0x6f, 0x0e, 0x2a, 0x8c, 0xf5, 0xb1, 0x33,
-	0x94, 0x5d, 0x98, 0xc9, 0x3c, 0xe7, 0x1e, 0x3c, 0xd6, 0xe6, 0xd3, 0x33, 0x79, 0x00, 0x73, 0x06,
-	0xc1, 0xa3, 0xa0, 0xa5, 0x33, 0x83, 0x5f, 0x2c, 0xec, 0xb2, 0x2f, 0x27, 0xfe, 0x12, 0x84, 0x34,
-	0x97, 0x68, 0x3a, 0xb7, 0x61, 0x61, 0x9a, 0x4e, 0x7f, 0x8a, 0xc8, 0xcb, 0x10, 0xe6, 0xd3, 0x11,
-	0xc7, 0xf0, 0x54, 0xf6, 0xe6, 0xe6, 0x0f, 0x76, 0xab, 0xae, 0xc3, 0x6a, 0x4c, 0x23, 0x1d, 0xc3,
-	0x7e, 0x0e, 0x65, 0x19, 0x5f, 0x19, 0x0e, 0xc1, 0x76, 0x38, 0xe4, 0x06, 0xe6, 0x54, 0x01, 0x7c,
-	0x58, 0xa3, 0x5e, 0xe3, 0x5b, 0xcf, 0xa8, 0x45, 0xb9, 0xe4, 0x53, 0x4e, 0xf0, 0xad, 0xf8, 0x31,
-	0x54, 0x52, 0x96, 0xd2, 0x18, 0xc4, 0xa7, 0x41, 0x0c, 0x1b, 0x81, 0x70, 0xdb, 0xbe, 0x4a, 0xa8,
-	0x7a, 0x09, 0x2b, 0xec, 0xac, 0x39, 0x2d, 0x83, 0x65, 0x96, 0x2c, 0xe9, 0x31, 0x9b, 0x72, 0x71,
-	0x9b, 0xf6, 0x61, 0x33, 0x5d, 0x4d, 0x86, 0x59, 0xeb, 0xfe, 0x1c, 0x18, 0x0a, 0x86, 0x63, 0xb4,
-	0x0c, 0x6b, 0x71, 0x06, 0xdd, 0xe2, 0x73, 0x58, 0xd0, 0x3d, 0xaa, 0x6b, 0x41, 0x30, 0x23, 0xae,
-	0xa7, 0x60, 0x05, 0xef, 0xea, 0x00, 0x3d, 0xdc, 0x41, 0x7c, 0x05, 0xeb, 0x74, 0x22, 0x4e, 0xf8,
-	0x1f, 0xb7, 0x4b, 0x80, 0x72, 0x52, 0x94, 0xa6, 0xec, 0x13, 0x10, 0xea, 0x58, 0xbb, 0x20, 0xc6,
-	0x8d, 0x46, 0xee, 0xde, 0xa9, 0x0a, 0x1b, 0xa9, 0xd2, 0x74, 0xb3, 0x3d, 0x28, 0xd7, 0xee, 0xbb,
-	0xd5, 0x06, 0x54, 0x6a, 0x99, 0x1b, 0xed, 0xc2, 0x9a, 0x7f, 0xc2, 0xee, 0xdc, 0xa6, 0x02, 0xeb,
-	0x09, 0x49, 0xba, 0xc9, 0xef, 0x38, 0x10, 0x6a, 0xba, 0x5e, 0x1b, 0x0e, 0xad, 0xaf, 0xb1, 0x9e,
-	0xd8, 0xe9, 0xa1, 0xf5, 0x21, 0xc2, 0xd2, 0x34, 0x75, 0xee, 0x19, 0xcb, 0x7b, 0x46, 0x2d, 0x84,
-	0x39, 0x92, 0x7c, 0xd8, 0x92, 0x66, 0x01, 0xb5, 0xf0, 0xf7, 0x1c, 0x54, 0x65, 0x3c, 0xb2, 0x6e,
-	0xf0, 0xf7, 0x69, 0xe4, 0x0e, 0x6c, 0x65, 0x19, 0x41, 0xed, 0xfc, 0x0a, 0xb6, 0x58, 0x80, 0xd3,
-	0xc1, 0xf6, 0xc8, 0x70, 0x1c, 0x06, 0x28, 0x3e, 0x18, 0x9d, 0xfc, 0x85, 0x83, 0xed, 0x4c, 0x15,
-	0xb4, 0x56, 0x9a, 0xf0, 0x44, 0xf3, 0x2d, 0x54, 0xd9, 0x9a, 0xc9, 0xcd, 0xae, 0x99, 0xc7, 0x5a,
-	0xcc, 0x2b, 0x07, 0x7d, 0x41, 0xcb, 0xde, 0x19, 0x60, 0xdb, 0x29, 0xe7, 0xbd, 0xf5, 0xdb, 0x49,
-	0x93, 0x3b, 0x81, 0x8c, 0x5f, 0x7b, 0xd3, 0x25, 0xe2, 0x0d, 0x6c, 0x76, 0x19, 0x54, 0x61, 0x38,
-	0x46, 0xdf, 0x18, 0x1a, 0xe4, 0x9d, 0x65, 0x6d, 0xfa, 0x20, 0x94, 0x67, 0x1f, 0x84, 0xc4, 0x6d,
-	0xa8, 0x66, 0xe8, 0xa5, 0x89, 0xfa, 0x03, 0x07, 0x7c, 0x5b, 0xaa, 0x1f, 0x77, 0x6c, 0xeb, 0xc6,
-	0xd0, 0x7d, 0xcb, 0x13, 0x6f, 0x1b, 0x69, 0x1a, 0x0f, 0x01, 0x2e, 0x2d, 0xfb, 0x2a, 0xf2, 0xe4,
-	0xc3, 0x4c, 0xaf, 0xaf, 0x5d, 0x9e, 0x77, 0x2f, 0x96, 0x2e, 0x83, 0x9f, 0x6e, 0xf7, 0x34, 0x1c,
-	0x67, 0x82, 0x6d, 0x75, 0x62, 0x0f, 0xe9, 0x34, 0x59, 0xf2, 0x29, 0x3d, 0x7b, 0x28, 0xfe, 0x91,
-	0x83, 0xd5, 0xd4, 0x50, 0x26, 0x0c, 0x7a, 0x0e, 0x4b, 0x63, 0x6a, 0xb0, 0xca, 0x58, 0xb6, 0x18,
-	0x10, 0x5b, 0xae, 0x85, 0x5b, 0x00, 0x36, 0x1e, 0x5b, 0x8e, 0x41, 0x2c, 0x3b, 0xb8, 0x7b, 0x19,
-	0x8a, 0x7b, 0x4f, 0xda, 0xf8, 0x52, 0x1d, 0x6b, 0x84, 0x60, 0xdb, 0xa4, 0xe6, 0x80, 0x8d, 0x2f,
-	0x3b, 0x3e, 0x65, 0x4f, 0x9b, 0x3e, 0x04, 0xba, 0xe1, 0x47, 0x55, 0xa8, 0xd4, 0x64, 0x45, 0x7a,
-	0x5d, 0x3b, 0x56, 0xd4, 0x13, 0xa9, 0x55, 0x57, 0x7b, 0xad, 0x6e, 0xa7, 0x71, 0x2c, 0xbd, 0x96,
-	0x1a, 0x75, 0xfe, 0x07, 0xa8, 0x0c, 0x4f, 0xa3, 0xec, 0xee, 0xf1, 0x9b, 0xc6, 0xdb, 0x1a, 0xcf,
-	0x25, 0x39, 0x9d, 0xd3, 0x5e, 0x53, 0x6a, 0xf1, 0xb9, 0xbd, 0x6b, 0x58, 0x8a, 0x4c, 0x11, 0x68,
-	0x0b, 0x84, 0xae, 0xd4, 0x6c, 0xd5, 0x94, 0x9e, 0xdc, 0x50, 0x95, 0xf3, 0x4e, 0x23, 0xa6, 0xa4,
-	0x0a, 0x95, 0x18, 0xbf, 0xde, 0xe8, 0x9c, 0xb6, 0xcf, 0xd5, 0x93, 0xc6, 0x39, 0xcf, 0xa1, 0x0d,
-	0x58, 0x8f, 0xb1, 0xbb, 0x52, 0xb3, 0xab, 0xb4, 0xe5, 0x06, 0x9f, 0xdb, 0xfb, 0x33, 0x07, 0xa5,
-	0x30, 0x2f, 0x48, 0x80, 0xb5, 0xd7, 0x6d, 0xb9, 0x99, 0xaa, 0x65, 0x15, 0x1e, 0x33, 0xbc, 0xa6,
-	0xa4, 0xbc, 0xe9, 0x1d, 0xf1, 0x5c, 0x92, 0x7c, 0x5a, 0x3b, 0xe2, 0x73, 0x68, 0x0d, 0x10, 0x43,
-	0xf6, 0x7e, 0x7e, 0xd9, 0xe6, 0xf3, 0xae, 0xdb, 0x0c, 0xfd, 0x48, 0x52, 0x8e, 0x7a, 0xc7, 0x27,
-	0x0d, 0x85, 0x2f, 0xc4, 0x36, 0x3a, 0xee, 0x75, 0x95, 0xf6, 0x5b, 0x7e, 0x6e, 0xef, 0xaf, 0x1c,
-	0xac, 0xc4, 0xde, 0xba, 0xd0, 0x33, 0xa8, 0x4e, 0x3d, 0x54, 0xbb, 0x4a, 0x4d, 0xe9, 0x75, 0x93,
-	0x31, 0x49, 0x8a, 0x74, 0x1a, 0xad, 0xba, 0xd4, 0x6a, 0xf2, 0x1c, 0xda, 0x84, 0x72, 0x92, 0x5d,
-	0x3b, 0x56, 0xa4, 0xb3, 0x06, 0x9f, 0x73, 0x03, 0x9e, 0xe4, 0x4a, 0x2d, 0xca, 0xcf, 0xa7, 0x6f,
-	0x2e, 0x37, 0xce, 0xda, 0x27, 0x8d, 0x3a, 0x5f, 0xd8, 0xfb, 0x96, 0x83, 0x05, 0xe6, 0x99, 0xc7,
-	0x55, 0xe6, 0xa7, 0x5d, 0xed, 0x75, 0x6b, 0xcd, 0x78, 0x5c, 0x05, 0x58, 0x8b, 0x70, 0x1b, 0x75,
-	0x49, 0x69, 0xcb, 0x52, 0xed, 0x94, 0xe7, 0xbc, 0xcc, 0xb2, 0xbc, 0xba, 0xd4, 0x55, 0x64, 0xe9,
-	0xa8, 0xa7, 0x48, 0xed, 0x16, 0x9f, 0x43, 0x15, 0x58, 0x8d, 0xb0, 0xbb, 0x0d, 0x45, 0x91, 0x5a,
-	0xcd, 0x2e, 0x9f, 0x4f, 0xb0, 0xde, 0x36, 0xba, 0xee, 0xdf, 0x2e, 0x5f, 0x38, 0xfc, 0x96, 0x87,
-	0xfc, 0x9b, 0x49, 0x1f, 0xfd, 0x06, 0x1e, 0x27, 0x9e, 0xe5, 0x90, 0x38, 0x2d, 0xd7, 0xac, 0xf7,
-	0x3c, 0xe1, 0xf9, 0x4c, 0x19, 0xda, 0x67, 0xfb, 0xf0, 0x24, 0xe5, 0xad, 0x0d, 0x7d, 0xc4, 0xb4,
-	0xb1, 0xcc, 0x87, 0x3b, 0xe1, 0xc5, 0x1d, 0x52, 0x54, 0x47, 0x07, 0x96, 0x22, 0x4f, 0x66, 0x68,
-	0x2b, 0x6a, 0x59, 0xfc, 0x25, 0x4f, 0xd8, 0xce, 0xe4, 0xd3, 0x1d, 0xbf, 0x84, 0x05, 0xe6, 0x2d,
-	0x02, 0x6d, 0x4e, 0xe5, 0x93, 0x8f, 0x69, 0x42, 0x35, 0x83, 0x4b, 0xf7, 0x52, 0x23, 0x2f, 0x70,
-	0x74, 0xca, 0x45, 0xcf, 0x53, 0x17, 0x45, 0xa7, 0x6e, 0xe1, 0xa3, 0xd9, 0x42, 0x54, 0xc1, 0x39,
-	0xf0, 0xf1, 0x87, 0x13, 0xf4, 0x2c, 0x75, 0x25, 0xfb, 0xca, 0x23, 0x88, 0xb3, 0x44, 0xe8, 0xd6,
-	0xf4, 0x6c, 0x44, 0x60, 0x7c, 0xfc, 0x6c, 0xa4, 0x3d, 0x3a, 0xc4, 0xcf, 0x46, 0xfa, 0x3b, 0x80,
-	0x6f, 0x78, 0x74, 0xf3, 0xa8, 0xe1, 0xa9, 0x7b, 0x8b, 0xb3, 0x44, 0xe8, 0xd6, 0x5d, 0x58, 0x8e,
-	0x42, 0x20, 0xb4, 0x9d, 0x00, 0x83, 0xb1, 0x60, 0xef, 0x64, 0x0b, 0x4c, 0x33, 0x99, 0xc4, 0x56,
-	0x6c, 0x26, 0x33, 0xc1, 0x24, 0x9b, 0xc9, 0x19, 0xf0, 0xac, 0x03, 0x4b, 0x11, 0x2c, 0xc4, 0x1e,
-	0xe4, 0x34, 0x58, 0xc6, 0x1e, 0xe4, 0x54, 0x10, 0xe5, 0x26, 0x30, 0x81, 0x84, 0xd8, 0x04, 0x66,
-	0x21, 0x2c, 0x36, 0x81, 0xd9, 0x50, 0x0a, 0xbb, 0x68, 0x31, 0x89, 0x69, 0xd0, 0x8b, 0xe4, 0xe2,
-	0x14, 0x68, 0x25, 0xfc, 0xf0, 0x2e, 0xb1, 0x69, 0x32, 0xa3, 0x88, 0x07, 0xc5, 0x0a, 0x38, 0x01,
-	0x92, 0xd8, 0x64, 0x66, 0x80, 0xa5, 0x73, 0xe0, 0xe3, 0x38, 0x86, 0x3d, 0x7c, 0x19, 0x70, 0x88,
-	0x3d, 0x7c, 0x59, 0x30, 0xc8, 0xed, 0x79, 0x29, 0xc0, 0x86, 0xed, 0x79, 0xd9, 0x28, 0x89, 0xed,
-	0x79, 0x33, 0xd0, 0x91, 0x9b, 0xd8, 0x04, 0xe2, 0x61, 0x13, 0x9b, 0x05, 0x9d, 0xd8, 0xc4, 0x66,
-	0x42, 0x26, 0x74, 0x06, 0x2b, 0x31, 0x20, 0x84, 0x76, 0xe2, 0x47, 0x2d, 0xb1, 0xf3, 0xb3, 0x19,
-	0x12, 0xcc, 0x6d, 0x90, 0x84, 0x30, 0x91, 0xdb, 0x20, 0x13, 0x63, 0x45, 0x6e, 0x83, 0x6c, 0x1c,
-	0x84, 0xae, 0x5d, 0xb8, 0x97, 0x86, 0x40, 0xd0, 0x4b, 0xd6, 0xc0, 0x19, 0x40, 0x49, 0xd8, 0xbd,
-	0x5b, 0x90, 0x2a, 0x33, 0x61, 0x3d, 0x03, 0x69, 0xa0, 0xdd, 0xf4, 0x4b, 0x26, 0x89, 0x77, 0x84,
-	0x57, 0xf7, 0x90, 0xa4, 0xfa, 0x06, 0xb0, 0x9a, 0x3a, 0xb4, 0x23, 0xa6, 0x96, 0x66, 0xa1, 0x09,
-	0xe1, 0xe5, 0x9d, 0x72, 0xbe, 0xa6, 0xa3, 0x17, 0xbf, 0x7e, 0x7e, 0x65, 0x10, 0x57, 0xee, 0xc2,
-	0x1a, 0x1d, 0xb8, 0x8b, 0x0e, 0xf0, 0x10, 0x8f, 0x07, 0x9a, 0x49, 0x3e, 0x25, 0xe4, 0x53, 0x6d,
-	0x6c, 0x1c, 0x0c, 0x26, 0xfd, 0xfe, 0xbc, 0xf7, 0x5f, 0xfe, 0x1f, 0xfd, 0x2f, 0x00, 0x00, 0xff,
-	0xff, 0x8c, 0xd0, 0x7f, 0x35, 0xfa, 0x1f, 0x00, 0x00,
+	// 2159 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5a, 0xdd, 0x6e, 0xdb, 0xc8,
+	0x15, 0x2e, 0x25, 0xd9, 0x91, 0x8e, 0xff, 0xe8, 0x49, 0x6c, 0xcb, 0xb4, 0xe5, 0x1f, 0x66, 0xb3,
+	0xeb, 0x78, 0x13, 0xbb, 0x75, 0xbb, 0x6d, 0x2f, 0xba, 0x5d, 0xc8, 0x96, 0xa2, 0x70, 0xed, 0x48,
+	0x02, 0x25, 0x05, 0x48, 0x51, 0x40, 0x4b, 0x59, 0x63, 0x69, 0x10, 0x89, 0xd4, 0x92, 0x94, 0x03,
+	0x03, 0xfb, 0x00, 0x2d, 0xd0, 0x62, 0x5f, 0xa0, 0xe8, 0x6b, 0x14, 0x68, 0x2f, 0x7a, 0x57, 0x14,
+	0xbd, 0xeb, 0x75, 0x1f, 0xa3, 0x2f, 0x50, 0x90, 0x1c, 0x92, 0x43, 0x72, 0x28, 0x7b, 0xd7, 0xd9,
+	0xa0, 0x57, 0x16, 0xcf, 0x39, 0x73, 0xfe, 0xe7, 0xcc, 0x7c, 0x03, 0xc3, 0xea, 0x70, 0xda, 0x3b,
+	0xb6, 0xb0, 0x79, 0x4d, 0x2e, 0xf1, 0xd1, 0xc4, 0x34, 0x6c, 0x03, 0xe5, 0x6d, 0x5b, 0xeb, 0x1d,
+	0x0d, 0xa7, 0x3d, 0xf9, 0xef, 0x02, 0x2c, 0x36, 0xcc, 0x81, 0xa6, 0x13, 0x4b, 0xb3, 0x89, 0xa1,
+	0xa3, 0x65, 0xc8, 0x90, 0x7e, 0x51, 0xd8, 0x13, 0x0e, 0xb2, 0x6a, 0x86, 0xf4, 0xd1, 0x3a, 0xcc,
+	0xf7, 0x8d, 0xb1, 0x46, 0xf4, 0x62, 0x66, 0x4f, 0x38, 0x28, 0xa8, 0xf4, 0x0b, 0x21, 0xc8, 0xe9,
+	0xda, 0x18, 0x17, 0xb3, 0x2e, 0xd5, 0xfd, 0x8d, 0x24, 0xc8, 0x6b, 0x93, 0x89, 0x69, 0x5c, 0xe3,
+	0x7e, 0x31, 0xb7, 0x27, 0x1c, 0xe4, 0xd5, 0xe0, 0x1b, 0x6d, 0x42, 0x9e, 0x58, 0x5d, 0xe3, 0x9d,
+	0x8e, 0xcd, 0xe2, 0x9c, 0xcb, 0x7b, 0x40, 0xac, 0x86, 0xf3, 0x89, 0x4a, 0x00, 0x97, 0x26, 0xd6,
+	0x6c, 0xdc, 0xef, 0x6a, 0x76, 0x71, 0xde, 0x55, 0x58, 0xa0, 0x94, 0xb2, 0xed, 0xb0, 0xa7, 0x93,
+	0xbe, 0xcf, 0x7e, 0xe0, 0xb1, 0x29, 0xa5, 0x6c, 0xcb, 0xff, 0x15, 0x60, 0xb1, 0x6c, 0xda, 0xe4,
+	0x4a, 0xbb, 0xb4, 0x15, 0xfd, 0xca, 0x48, 0x44, 0x20, 0xc3, 0xa2, 0xc1, 0x44, 0x48, 0xe3, 0x88,
+	0xd0, 0xd0, 0x21, 0xe4, 0xde, 0x12, 0xbd, 0xef, 0x46, 0xb3, 0x7c, 0xb2, 0x7e, 0xe4, 0xe7, 0xe7,
+	0xc8, 0xd7, 0x7c, 0x4e, 0xf4, 0xbe, 0xea, 0xca, 0x04, 0x91, 0xe7, 0x98, 0xc8, 0xa3, 0x21, 0xcc,
+	0xc5, 0x43, 0x58, 0x87, 0xf9, 0xc9, 0xb4, 0x37, 0x22, 0x97, 0x6e, 0x74, 0x79, 0x95, 0x7e, 0xa1,
+	0x5f, 0xc2, 0xa2, 0x75, 0x39, 0xc4, 0x63, 0xad, 0x3b, 0xb5, 0xb4, 0x01, 0x76, 0x83, 0x5b, 0x3e,
+	0x59, 0x0b, 0xcd, 0xb7, 0x5c, 0x6e, 0xc7, 0x61, 0xaa, 0x0b, 0x56, 0xf8, 0x21, 0xff, 0x47, 0x80,
+	0x85, 0xd7, 0xd8, 0xb4, 0x88, 0xa1, 0x73, 0x83, 0x2e, 0xc2, 0x83, 0x6b, 0x8f, 0x4d, 0xe3, 0xf5,
+	0x3f, 0xd1, 0xaf, 0x61, 0xd9, 0x22, 0x03, 0x5d, 0xb3, 0xa7, 0x26, 0xee, 0xda, 0x37, 0x13, 0x4c,
+	0x83, 0xde, 0x60, 0xac, 0xfa, 0xfc, 0xf6, 0xcd, 0x04, 0xab, 0x4b, 0x16, 0xfb, 0x89, 0x9e, 0x82,
+	0xe8, 0x10, 0x88, 0x3e, 0xe8, 0x92, 0x3e, 0xd6, 0x6d, 0x62, 0xdf, 0xd0, 0x54, 0xac, 0x50, 0xba,
+	0x42, 0xc9, 0x8e, 0x13, 0x26, 0xbe, 0x36, 0xde, 0xe2, 0xbe, 0x5f, 0x72, 0xfa, 0x79, 0x4b, 0xc9,
+	0xe5, 0x2f, 0xa0, 0x50, 0xb6, 0x2c, 0xec, 0xd5, 0x53, 0x82, 0xfc, 0x15, 0x19, 0x61, 0x37, 0xe7,
+	0x82, 0x2b, 0x19, 0x7c, 0x3b, 0x89, 0xb5, 0x86, 0xda, 0xc9, 0x67, 0x3f, 0xf7, 0xbb, 0xd3, 0xfb,
+	0x92, 0xff, 0x2a, 0xc0, 0x6a, 0xd3, 0xc9, 0xb1, 0x35, 0x24, 0xfa, 0xe0, 0x1c, 0xdf, 0x70, 0x93,
+	0xb4, 0x07, 0x0b, 0x57, 0x44, 0x1f, 0x60, 0x73, 0x62, 0x12, 0xdd, 0xa6, 0x2a, 0x58, 0x92, 0xdb,
+	0x7b, 0x16, 0x36, 0xbb, 0x78, 0xac, 0x91, 0x11, 0xed, 0xf5, 0x82, 0x43, 0xa9, 0x3a, 0x04, 0xf4,
+	0x19, 0xcc, 0x5b, 0xb6, 0x66, 0x4f, 0x2d, 0x37, 0x03, 0xcb, 0x27, 0xa5, 0x30, 0x87, 0x11, 0xeb,
+	0x2d, 0x57, 0x48, 0xa5, 0xc2, 0xb7, 0x74, 0x8b, 0xfc, 0x1a, 0x16, 0xe9, 0x6a, 0x37, 0x09, 0xdf,
+	0x27, 0x01, 0x4e, 0x93, 0xf6, 0x35, 0x5b, 0x73, 0x5d, 0x5e, 0x54, 0xdd, 0xdf, 0xb2, 0x04, 0xc5,
+	0x0b, 0x62, 0xd9, 0xec, 0x76, 0xb7, 0x54, 0xfc, 0xf5, 0x14, 0x5b, 0xb6, 0xfc, 0x06, 0x36, 0x39,
+	0x3c, 0x6b, 0x62, 0xe8, 0x16, 0x46, 0xbf, 0x82, 0x25, 0x76, 0xb7, 0x58, 0x45, 0x61, 0x2f, 0x7b,
+	0xb0, 0xc0, 0x6e, 0x13, 0x76, 0x9d, 0x1a, 0x15, 0x96, 0x9f, 0x81, 0x54, 0xf6, 0xa6, 0x40, 0x44,
+	0xca, 0x33, 0x1c, 0xaf, 0x89, 0x5c, 0x82, 0x2d, 0xae, 0xb4, 0xe7, 0x8a, 0xfc, 0x0d, 0x3c, 0x72,
+	0xfc, 0xf4, 0xb7, 0xa5, 0xef, 0x7f, 0xb0, 0x81, 0x85, 0x3b, 0x6c, 0xe0, 0xf8, 0xae, 0xcb, 0xdc,
+	0x79, 0xd7, 0xbd, 0x82, 0xb5, 0x98, 0x75, 0x9a, 0xa1, 0x9f, 0x41, 0x41, 0xf3, 0x89, 0xc9, 0xec,
+	0xb0, 0xe3, 0x49, 0x0d, 0x05, 0xe5, 0x36, 0xa0, 0x1a, 0x0e, 0xb4, 0x7d, 0x9f, 0x50, 0xfc, 0x59,
+	0x94, 0x09, 0x67, 0x91, 0xfc, 0x0d, 0x3c, 0x8c, 0x68, 0xa5, 0x2e, 0x9e, 0x40, 0xde, 0xb7, 0xec,
+	0xaa, 0x4e, 0xf7, 0x30, 0x90, 0x43, 0x3f, 0x81, 0x3c, 0x1d, 0x1b, 0x56, 0x31, 0xe3, 0x46, 0xc5,
+	0x64, 0x89, 0x19, 0x3f, 0x6a, 0x20, 0x26, 0x4f, 0x61, 0x93, 0xb1, 0x4e, 0x65, 0xde, 0x53, 0x68,
+	0xec, 0x54, 0xcb, 0x46, 0xa6, 0x9a, 0xfc, 0x2f, 0x01, 0x24, 0x9e, 0xdd, 0x7b, 0x04, 0x7f, 0x1c,
+	0x1d, 0xa1, 0xa9, 0xb1, 0x07, 0x93, 0x55, 0x82, 0xfc, 0x58, 0xd3, 0xc9, 0x15, 0xb6, 0x6c, 0xba,
+	0xef, 0x82, 0x6f, 0xf4, 0x29, 0xcc, 0x6b, 0xce, 0x66, 0x76, 0x26, 0x85, 0x93, 0xc7, 0x87, 0x8c,
+	0x79, 0x7f, 0xd2, 0xa9, 0x54, 0x44, 0xfe, 0x56, 0x80, 0x0d, 0x26, 0x18, 0x57, 0xe0, 0x07, 0x4f,
+	0x61, 0x64, 0xcc, 0xe4, 0xa2, 0x63, 0x46, 0xee, 0x41, 0x31, 0xe9, 0x10, 0xcd, 0xed, 0xfb, 0x1a,
+	0x4f, 0xb6, 0x37, 0x9e, 0x2a, 0xc6, 0xe5, 0x74, 0x8c, 0x75, 0x3b, 0x32, 0x25, 0x7e, 0xb8, 0xc6,
+	0xf9, 0xca, 0x1b, 0x7c, 0x31, 0xab, 0x34, 0x34, 0x66, 0x99, 0x10, 0x4d, 0xd6, 0x53, 0x98, 0x73,
+	0x82, 0xf4, 0xb7, 0x05, 0xb7, 0x9c, 0x9e, 0x84, 0x5f, 0xcd, 0x0f, 0x1b, 0xd7, 0x1d, 0xaa, 0xc9,
+	0x0f, 0xf9, 0x7d, 0x55, 0xf3, 0x1f, 0x19, 0x58, 0xa3, 0xa7, 0xd8, 0x87, 0x1a, 0x02, 0x91, 0x0d,
+	0x98, 0x8b, 0x6d, 0xc0, 0xe4, 0xb5, 0x67, 0xee, 0x3b, 0x5d, 0x7b, 0xb6, 0xa1, 0x10, 0x10, 0xdc,
+	0x0b, 0xcb, 0xa2, 0x1a, 0x12, 0xb8, 0x97, 0xa2, 0x07, 0xfc, 0x4b, 0xd1, 0x51, 0x30, 0x09, 0xf2,
+	0xf1, 0x73, 0x82, 0x3d, 0xf5, 0x83, 0x61, 0xf0, 0x0b, 0x58, 0x8f, 0xe7, 0x91, 0x96, 0xaa, 0x04,
+	0x40, 0x23, 0xef, 0x06, 0x47, 0x68, 0x81, 0x52, 0x94, 0xbe, 0xfc, 0x37, 0x01, 0x56, 0x4e, 0xa7,
+	0xa3, 0xb7, 0x74, 0xb5, 0x62, 0xe3, 0xf1, 0xbd, 0x73, 0x3f, 0x6b, 0xc4, 0x45, 0x32, 0x94, 0x8b,
+	0x67, 0x28, 0x0c, 0x7b, 0xee, 0x4e, 0x61, 0xff, 0x5b, 0x80, 0x4d, 0xc6, 0xfb, 0x58, 0x0f, 0xa5,
+	0x6f, 0xcc, 0x64, 0x9d, 0x33, 0xf7, 0xbe, 0xde, 0x66, 0xf9, 0x95, 0x3c, 0x86, 0x39, 0x62, 0xe3,
+	0xb1, 0x3f, 0xd2, 0x37, 0x43, 0x0b, 0xb1, 0xb4, 0xab, 0x9e, 0x9c, 0xfc, 0x39, 0x48, 0xbc, 0x90,
+	0x68, 0x39, 0x77, 0x61, 0x21, 0x2c, 0xa7, 0x77, 0x8b, 0xc8, 0xaa, 0x10, 0xd4, 0xd3, 0x92, 0x27,
+	0xf0, 0x48, 0x75, 0xef, 0xcf, 0x1f, 0xec, 0x54, 0xdd, 0x80, 0xb5, 0x98, 0x45, 0x7a, 0x0d, 0xfb,
+	0x1c, 0xb6, 0x55, 0x3c, 0x20, 0x96, 0x8d, 0xcd, 0xc8, 0x45, 0xd7, 0x77, 0xa9, 0x04, 0xe0, 0x41,
+	0x9c, 0xee, 0x5b, 0x7c, 0xe3, 0x3a, 0xb6, 0xa8, 0x16, 0x3c, 0xca, 0x39, 0xbe, 0x91, 0x8f, 0xa1,
+	0x94, 0xb2, 0x9c, 0xe6, 0x22, 0x7e, 0x2b, 0x24, 0xb0, 0xeb, 0x2f, 0x68, 0x98, 0x03, 0xae, 0xc9,
+	0x4f, 0x60, 0x85, 0xbd, 0x77, 0x86, 0x5b, 0x62, 0x99, 0x25, 0x2b, 0xfd, 0x98, 0x6f, 0x99, 0xb8,
+	0x6f, 0x27, 0xb0, 0x97, 0x6e, 0x2a, 0xc5, 0xbd, 0x2d, 0xef, 0x10, 0x89, 0x08, 0x07, 0x57, 0xeb,
+	0x1e, 0x48, 0x3c, 0x26, 0x55, 0x55, 0x81, 0x95, 0x49, 0xc0, 0x71, 0x3c, 0xf2, 0xef, 0x8f, 0x5b,
+	0x29, 0x58, 0xc2, 0x3d, 0x5a, 0x96, 0x27, 0x11, 0x6d, 0xf2, 0xf3, 0xe0, 0xd6, 0xcc, 0xcd, 0x4d,
+	0xdc, 0xdf, 0x1d, 0xd8, 0xe6, 0x8b, 0xd3, 0xf2, 0xfe, 0x18, 0x76, 0x2a, 0x58, 0xbb, 0xb4, 0xc9,
+	0xb5, 0x66, 0xdf, 0x4d, 0xe3, 0x3e, 0xec, 0xa6, 0xae, 0xa0, 0x4a, 0x8f, 0x60, 0xbb, 0xfc, 0x5d,
+	0x54, 0xee, 0x42, 0xa9, 0x3c, 0x53, 0xe1, 0x33, 0x90, 0xbc, 0xee, 0xbc, 0x93, 0xba, 0x12, 0x6c,
+	0x71, 0xa5, 0xa9, 0xb2, 0x3f, 0x08, 0xb0, 0x53, 0xee, 0xf7, 0xcb, 0xa3, 0x91, 0xf1, 0x0e, 0xf7,
+	0xb9, 0x1a, 0xef, 0xbb, 0xcf, 0x0e, 0x61, 0x35, 0x5a, 0x6a, 0xa7, 0x47, 0xb3, 0xae, 0x83, 0x2b,
+	0x91, 0x7a, 0x2a, 0x6e, 0x3e, 0x53, 0xbd, 0xa1, 0x1e, 0x7f, 0x2b, 0xc0, 0xbe, 0x8a, 0xc7, 0xc6,
+	0x35, 0xfe, 0x7f, 0x71, 0xfa, 0x23, 0x90, 0x67, 0x39, 0x44, 0xfd, 0xfe, 0x0a, 0x76, 0x58, 0x10,
+	0xd5, 0xc4, 0xe6, 0x98, 0x58, 0x16, 0x03, 0x46, 0xef, 0x8d, 0x80, 0xfe, 0x22, 0xc0, 0x6e, 0xaa,
+	0x09, 0xba, 0xef, 0x5a, 0xb0, 0xa1, 0x79, 0x5e, 0x76, 0xe3, 0xfb, 0x2f, 0x73, 0xfb, 0xfe, 0x5b,
+	0xd3, 0x38, 0x11, 0x5a, 0xe8, 0x0b, 0x3a, 0x5a, 0xac, 0x21, 0x36, 0xad, 0x62, 0xd6, 0xd5, 0xb3,
+	0x9b, 0x74, 0xbf, 0xe9, 0xcb, 0xb8, 0xba, 0x98, 0x25, 0xf2, 0x35, 0x6c, 0xb7, 0x18, 0x14, 0x43,
+	0x2c, 0xd2, 0x23, 0x23, 0x62, 0xbf, 0xb7, 0x6a, 0x86, 0x0f, 0x51, 0x59, 0xf6, 0x21, 0xca, 0xd9,
+	0x6b, 0x29, 0x76, 0x69, 0xd1, 0x7e, 0x2f, 0x80, 0xd8, 0x50, 0x2a, 0x67, 0x4d, 0xd3, 0xb8, 0x26,
+	0x7d, 0xcf, 0xf3, 0xc4, 0x7b, 0x0a, 0xcf, 0xe2, 0x09, 0xc0, 0x95, 0x61, 0x0e, 0x22, 0x4f, 0x4d,
+	0xcc, 0x6d, 0xf9, 0x85, 0xc3, 0x73, 0xcf, 0xe1, 0xc2, 0x95, 0xff, 0xd3, 0x99, 0xd0, 0xc4, 0xb2,
+	0xa6, 0xd8, 0xec, 0x4e, 0xcd, 0x11, 0xbd, 0xbd, 0x16, 0x3c, 0x4a, 0xc7, 0x1c, 0xc9, 0x7f, 0x14,
+	0x60, 0x8d, 0x9b, 0xca, 0x84, 0x43, 0x8f, 0x61, 0x69, 0x42, 0x1d, 0xee, 0x32, 0x9e, 0x2d, 0xfa,
+	0xc4, 0xba, 0xe3, 0xe1, 0x0e, 0x80, 0x89, 0x27, 0x86, 0x45, 0x6c, 0xc3, 0xf4, 0xcf, 0x7a, 0x86,
+	0xe2, 0x9c, 0xcb, 0x26, 0xbe, 0xea, 0x4e, 0x34, 0xdb, 0xc6, 0xa6, 0x4e, 0xdd, 0x01, 0x13, 0x5f,
+	0x35, 0x3d, 0xca, 0xa1, 0x16, 0x3e, 0x40, 0x3a, 0xe9, 0x47, 0x25, 0xd8, 0x2c, 0xab, 0x6d, 0xe5,
+	0x45, 0xf9, 0xac, 0xdd, 0x3d, 0x57, 0xea, 0x95, 0x6e, 0xa7, 0xde, 0x6a, 0x56, 0xcf, 0x94, 0x17,
+	0x4a, 0xb5, 0x22, 0xfe, 0x08, 0x15, 0xe1, 0x51, 0x94, 0xdd, 0x3a, 0x7b, 0x59, 0x7d, 0x55, 0x16,
+	0x85, 0x24, 0xa7, 0x79, 0xd1, 0xa9, 0x29, 0x75, 0x31, 0x73, 0x68, 0xc0, 0x52, 0xe4, 0xd6, 0x82,
+	0x76, 0x40, 0x6a, 0x29, 0xb5, 0x7a, 0xb9, 0xdd, 0x51, 0xab, 0xdd, 0xf6, 0x9b, 0x66, 0x35, 0x66,
+	0x64, 0x1f, 0x4a, 0x31, 0x7e, 0xb3, 0x73, 0x7a, 0xa1, 0xb4, 0x5e, 0x2a, 0xf5, 0x5a, 0xf7, 0xbc,
+	0xfa, 0x46, 0x14, 0xd0, 0x16, 0x6c, 0xc4, 0x44, 0x5a, 0x4a, 0xad, 0xd5, 0x6e, 0xa8, 0x55, 0x31,
+	0x73, 0xf8, 0x67, 0x01, 0x0a, 0x41, 0x6d, 0x90, 0x04, 0xeb, 0x2f, 0x1a, 0x6a, 0x8d, 0x6b, 0x69,
+	0x0d, 0x56, 0x19, 0x5e, 0x4d, 0x69, 0xbf, 0xec, 0x9c, 0x8a, 0x42, 0x92, 0x7c, 0x51, 0x3e, 0x15,
+	0x33, 0x68, 0x1d, 0x10, 0x43, 0x76, 0x7f, 0x7e, 0xd9, 0x10, 0xb3, 0x4e, 0xe8, 0x0c, 0xfd, 0x54,
+	0x69, 0x9f, 0x76, 0xce, 0xce, 0xab, 0x6d, 0x31, 0x17, 0x53, 0x74, 0xd6, 0x69, 0xb5, 0x1b, 0xaf,
+	0xc4, 0xb9, 0xc3, 0x7f, 0x0a, 0xf0, 0x90, 0xf3, 0xc6, 0x86, 0x9e, 0xc0, 0x7e, 0x34, 0xd2, 0x6e,
+	0xab, 0x5d, 0x6e, 0x77, 0x5a, 0xc9, 0xfc, 0xf0, 0xc5, 0x9a, 0xd5, 0x7a, 0x45, 0xa9, 0xd7, 0x44,
+	0x01, 0xed, 0xc1, 0x36, 0x5f, 0xa4, 0x7c, 0xd6, 0x56, 0x5e, 0x57, 0xc5, 0x0c, 0x92, 0x61, 0x87,
+	0x2f, 0xa1, 0xd4, 0xa9, 0x4c, 0x36, 0xdd, 0x90, 0x5a, 0x7d, 0xdd, 0x38, 0xaf, 0x56, 0xc4, 0xdc,
+	0xe1, 0x9f, 0x04, 0x58, 0x60, 0x9e, 0x9c, 0xd0, 0x36, 0x14, 0xbd, 0x96, 0xe8, 0x76, 0x5a, 0xe5,
+	0x5a, 0x3c, 0xdf, 0x12, 0xac, 0x47, 0xb8, 0xd5, 0x8a, 0xd2, 0x6e, 0xa8, 0x4a, 0xf9, 0x42, 0x14,
+	0x9c, 0xce, 0x8b, 0xf0, 0x2a, 0x4a, 0xab, 0xad, 0x2a, 0xa7, 0x9d, 0xb6, 0xd2, 0xa8, 0x8b, 0x19,
+	0xb4, 0x09, 0x6b, 0x11, 0x76, 0xab, 0xda, 0x6e, 0x2b, 0xf5, 0x5a, 0x4b, 0xcc, 0x26, 0x58, 0xaf,
+	0xaa, 0x2d, 0xe7, 0x6f, 0x4b, 0xcc, 0x9d, 0xfc, 0x6e, 0x15, 0xb2, 0x2f, 0xa7, 0x3d, 0xf4, 0x5b,
+	0x58, 0x4d, 0x3c, 0x11, 0x22, 0x39, 0xdc, 0xca, 0x69, 0x6f, 0x8b, 0xd2, 0xe3, 0x99, 0x32, 0x74,
+	0x1e, 0xf7, 0xe0, 0x21, 0xe7, 0xdd, 0x0f, 0x7d, 0xc4, 0x8c, 0xb8, 0xd4, 0x47, 0x44, 0xe9, 0xc9,
+	0x2d, 0x52, 0xd4, 0x46, 0x13, 0x96, 0x22, 0xcf, 0x77, 0x68, 0x27, 0xea, 0x59, 0xfc, 0x55, 0x51,
+	0xda, 0x4d, 0xe5, 0x53, 0x8d, 0x5f, 0xc2, 0x02, 0xf3, 0x2e, 0x82, 0xb6, 0x43, 0xf9, 0xe4, 0xc3,
+	0x9e, 0x54, 0x4a, 0xe1, 0x52, 0x5d, 0xdd, 0xc8, 0x6b, 0x20, 0xbd, 0x71, 0xa3, 0xc7, 0xdc, 0x45,
+	0x51, 0x04, 0x20, 0x7d, 0x34, 0x5b, 0x88, 0x1a, 0x78, 0x03, 0x62, 0xfc, 0x11, 0x07, 0xed, 0x73,
+	0x57, 0xb2, 0x2f, 0x4e, 0x92, 0x3c, 0x4b, 0x84, 0xaa, 0xa6, 0xbd, 0x11, 0x79, 0x52, 0x88, 0xf7,
+	0x06, 0xef, 0x01, 0x24, 0xde, 0x1b, 0xfc, 0x37, 0x09, 0xcf, 0xf1, 0xa8, 0xf2, 0xa8, 0xe3, 0x5c,
+	0xdd, 0xf2, 0x2c, 0x91, 0xe0, 0x1a, 0xb0, 0x1c, 0x85, 0x63, 0x68, 0x37, 0x71, 0xee, 0xc7, 0x92,
+	0xbd, 0x97, 0x2e, 0x10, 0x56, 0x32, 0x89, 0xf3, 0xd8, 0x4a, 0xa6, 0x02, 0x5b, 0xb6, 0x92, 0x33,
+	0xa0, 0x62, 0x13, 0x96, 0x22, 0xb8, 0x8c, 0x6d, 0x64, 0x1e, 0x44, 0x64, 0x1b, 0x99, 0x0b, 0xe8,
+	0xd0, 0xd0, 0x41, 0x7a, 0x1c, 0x44, 0x86, 0x3e, 0x66, 0x57, 0xa6, 0x23, 0x3e, 0xe9, 0x93, 0x5b,
+	0xe5, 0xa8, 0xa5, 0xaf, 0xa1, 0x98, 0x86, 0xaf, 0xd0, 0xd3, 0xa4, 0x92, 0x14, 0xb8, 0x27, 0x1d,
+	0xde, 0x45, 0x34, 0xac, 0x47, 0x12, 0x81, 0xa1, 0x58, 0xeb, 0x71, 0xc1, 0x1b, 0x5b, 0x8f, 0x19,
+	0x20, 0x0e, 0xc3, 0x23, 0x1e, 0x9e, 0x42, 0xc9, 0xb9, 0xc4, 0x8d, 0xe5, 0xe3, 0xdb, 0xc4, 0xa8,
+	0x19, 0x1d, 0x36, 0x52, 0x40, 0x16, 0x3a, 0x08, 0x55, 0xcc, 0x46, 0x6e, 0xd2, 0xd3, 0x3b, 0x48,
+	0x86, 0x4d, 0xc1, 0x45, 0x60, 0x6c, 0x53, 0xcc, 0x82, 0x74, 0x6c, 0x53, 0xcc, 0x84, 0x72, 0xce,
+	0xf4, 0xe7, 0x80, 0x33, 0x76, 0xfa, 0xa7, 0x23, 0x3d, 0x76, 0xfa, 0xcf, 0x40, 0x78, 0x4e, 0xf6,
+	0x52, 0x20, 0x15, 0x9b, 0xbd, 0xd9, 0x18, 0x90, 0xcd, 0xde, 0x2d, 0xf8, 0x0c, 0xbd, 0x73, 0xe0,
+	0x69, 0x1a, 0x1a, 0x42, 0x9f, 0xb2, 0x4e, 0xdf, 0x02, 0xe2, 0xa4, 0x67, 0x77, 0x13, 0x0e, 0x03,
+	0x4d, 0x41, 0x3f, 0x6c, 0xa0, 0xb3, 0x31, 0x18, 0x1b, 0xe8, 0x6d, 0x50, 0x6a, 0x08, 0x6b, 0x5c,
+	0xf0, 0xc0, 0xb6, 0xc9, 0x2c, 0x54, 0xc3, 0xb6, 0xc9, 0x4c, 0x14, 0x72, 0xfa, 0xe4, 0x37, 0x8f,
+	0x07, 0xc4, 0x76, 0xe4, 0x2e, 0x8d, 0xf1, 0xb1, 0xb3, 0xe8, 0x18, 0x8f, 0xf0, 0x64, 0xa8, 0xe9,
+	0xf6, 0x73, 0xdb, 0x7e, 0xae, 0x4d, 0xc8, 0xf1, 0x70, 0xda, 0xeb, 0xcd, 0xbb, 0xff, 0xe5, 0xf0,
+	0xd3, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x8a, 0x69, 0x11, 0x8e, 0xfa, 0x20, 0x00, 0x00,
 }
