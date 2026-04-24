@@ -30,43 +30,6 @@
       "ttab.hub.AddAllowedDeployKeyResponse": {
         "type": "object"
       },
-      "ttab.hub.AddAllowedSANRequest": {
-        "properties": {
-          "kind": {
-            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
-          },
-          "name": {
-            "description": "Full artifact name in reverse-domain notation.",
-            "type": "string"
-          },
-          "san_pattern": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.AddAllowedSANResponse": {
-        "type": "object"
-      },
-      "ttab.hub.AddGitHubOrgRequest": {
-        "properties": {
-          "github_org": {
-            "type": "string"
-          },
-          "organisation_id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.AddGitHubOrgResponse": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
       "ttab.hub.ApproveDeployKeyRequest": {
         "properties": {
           "id": {
@@ -110,6 +73,9 @@
           "public": {
             "description": "Whether the artifact is publicly visible. Private artifacts are only visible to members of the owning organisation.",
             "type": "boolean"
+          },
+          "schema_usage": {
+            "$ref": "#/components/schemas/ttab.hub.SchemaUsage"
           }
         },
         "type": "object"
@@ -122,6 +88,23 @@
         ],
         "type": "string"
       },
+      "ttab.hub.ArtifactPublisherInfo": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "provider_name": {
+            "type": "string"
+          },
+          "ref_pattern": {
+            "type": "string"
+          },
+          "repository": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ttab.hub.AssetInfo": {
         "properties": {
           "filename": {
@@ -129,6 +112,67 @@
           },
           "sha256": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.BulkPublishItem": {
+        "description": "A single item in a bulk publish request.",
+        "properties": {
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.PublishAsset"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "manifest": {
+            "description": "Raw manifest bytes.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full artifact name in reverse-domain notation (e.g. se.tt.my-schema).",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Ed25519 signature bytes for this manifest.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.BulkPublishVersionRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ttab.hub.BulkPublishItem"
+            },
+            "type": "array"
+          },
+          "signature_type": {
+            "$ref": "#/components/schemas/ttab.hub.SignatureType"
+          },
+          "signing_identity": {
+            "description": "Deploy key fingerprint (shared across all items).",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version string applied to all items.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.BulkPublishVersionResponse": {
+        "properties": {
+          "version_ids": {
+            "description": "Version IDs in the same order as the request items.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -171,6 +215,17 @@
           "DEPLOY_KEY_STATUS_ACTIVE",
           "DEPLOY_KEY_STATUS_INACTIVE",
           "DEPLOY_KEY_STATUS_REVOKED"
+        ],
+        "type": "string"
+      },
+      "ttab.hub.ForgeType": {
+        "enum": [
+          "FORGE_TYPE_UNSPECIFIED",
+          "FORGE_TYPE_GITHUB",
+          "FORGE_TYPE_GITLAB",
+          "FORGE_TYPE_FORGEJO",
+          "FORGE_TYPE_BITBUCKET",
+          "FORGE_TYPE_CUSTOM"
         ],
         "type": "string"
       },
@@ -303,26 +358,6 @@
         },
         "type": "object"
       },
-      "ttab.hub.GitHubOrgInfo": {
-        "properties": {
-          "created_at": {
-            "type": "string"
-          },
-          "github_org": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "org_domain": {
-            "type": "string"
-          },
-          "organisation_id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
       "ttab.hub.ListArtifactPermissionsRequest": {
         "properties": {
           "kind": {
@@ -343,9 +378,9 @@
             },
             "type": "array"
           },
-          "allowed_sans": {
+          "publishers": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ttab.hub.ArtifactPublisherInfo"
             },
             "type": "array"
           }
@@ -356,6 +391,9 @@
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
+          },
+          "schema_usage": {
+            "$ref": "#/components/schemas/ttab.hub.SchemaUsage"
           }
         },
         "type": "object"
@@ -416,20 +454,6 @@
         },
         "type": "object"
       },
-      "ttab.hub.ListGitHubOrgsRequest": {
-        "type": "object"
-      },
-      "ttab.hub.ListGitHubOrgsResponse": {
-        "properties": {
-          "github_orgs": {
-            "items": {
-              "$ref": "#/components/schemas/ttab.hub.GitHubOrgInfo"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
       "ttab.hub.ListOrganisationsRequest": {
         "type": "object"
       },
@@ -440,6 +464,23 @@
               "$ref": "#/components/schemas/ttab.hub.Organisation"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.OIDCProviderInfo": {
+        "properties": {
+          "forge_type": {
+            "$ref": "#/components/schemas/ttab.hub.ForgeType"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "issuer_url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -505,14 +546,14 @@
             "type": "string"
           },
           "signature": {
-            "description": "Signature bytes (Ed25519 sig or sigstore bundle).",
+            "description": "Ed25519 signature bytes.",
             "type": "string"
           },
           "signature_type": {
             "$ref": "#/components/schemas/ttab.hub.SignatureType"
           },
           "signing_identity": {
-            "description": "Identity that signed (key fingerprint or SAN).",
+            "description": "Deploy key fingerprint.",
             "type": "string"
           },
           "version": {
@@ -531,9 +572,6 @@
       },
       "ttab.hub.RegisterDeployKeyRequest": {
         "properties": {
-          "fingerprint": {
-            "type": "string"
-          },
           "public_key": {
             "description": "Ed25519 public key bytes.",
             "type": "string"
@@ -542,6 +580,26 @@
         "type": "object"
       },
       "ttab.hub.RegisterDeployKeyResponse": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RegisterOrgDeployKeyRequest": {
+        "properties": {
+          "organisation_id": {
+            "type": "integer"
+          },
+          "public_key": {
+            "description": "Ed25519 public key bytes.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.hub.RegisterOrgDeployKeyResponse": {
         "properties": {
           "id": {
             "type": "integer"
@@ -565,35 +623,6 @@
         "type": "object"
       },
       "ttab.hub.RemoveAllowedDeployKeyResponse": {
-        "type": "object"
-      },
-      "ttab.hub.RemoveAllowedSANRequest": {
-        "properties": {
-          "kind": {
-            "$ref": "#/components/schemas/ttab.hub.ArtifactKind"
-          },
-          "name": {
-            "description": "Full artifact name in reverse-domain notation.",
-            "type": "string"
-          },
-          "san_pattern": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.RemoveAllowedSANResponse": {
-        "type": "object"
-      },
-      "ttab.hub.RemoveGitHubOrgRequest": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ttab.hub.RemoveGitHubOrgResponse": {
         "type": "object"
       },
       "ttab.hub.RevokeDeployKeyRequest": {
@@ -624,6 +653,16 @@
       },
       "ttab.hub.RevokeVersionResponse": {
         "type": "object"
+      },
+      "ttab.hub.SchemaUsage": {
+        "enum": [
+          "SCHEMA_USAGE_UNSPECIFIED",
+          "SCHEMA_USAGE_EDITORIAL",
+          "SCHEMA_USAGE_DISTRIBUTION",
+          "SCHEMA_USAGE_SETTINGS",
+          "SCHEMA_USAGE_MESSAGES"
+        ],
+        "type": "string"
       },
       "ttab.hub.SetArtifactVisibilityRequest": {
         "properties": {
@@ -765,82 +804,6 @@
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/AddAllowedSAN": {
-      "post": {
-        "description": "AddAllowedSAN adds a cosign SAN pattern allowed to publish an artifact.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.AddAllowedSANRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.AddAllowedSANResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "AddAllowedSAN",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
-    "/twirp/ttab.hub.Hub/AddGitHubOrg": {
-      "post": {
-        "description": "AddGitHubOrg links a GitHub organisation to a hub organisation.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.AddGitHubOrgRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.AddGitHubOrgResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "AddGitHubOrg",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
     "/twirp/ttab.hub.Hub/ApproveDeployKey": {
       "post": {
         "description": "ApproveDeployKey approves a pending deploy key for publishing.",
@@ -912,6 +875,44 @@
           }
         ],
         "summary": "ApproveOrganisation",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
+    "/twirp/ttab.hub.Hub/BulkPublishVersion": {
+      "post": {
+        "description": "BulkPublishVersion publishes new versions of multiple artifacts in a single transaction. All items must use the same version and signing key.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.BulkPublishVersionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.BulkPublishVersionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "BulkPublishVersion",
         "tags": [
           "Hub"
         ]
@@ -1109,7 +1110,7 @@
     },
     "/twirp/ttab.hub.Hub/ListArtifactPermissions": {
       "post": {
-        "description": "ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.",
+        "description": "ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1259,44 +1260,6 @@
         ]
       }
     },
-    "/twirp/ttab.hub.Hub/ListGitHubOrgs": {
-      "post": {
-        "description": "ListGitHubOrgs lists all GitHub organisation mappings.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.ListGitHubOrgsRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.ListGitHubOrgsResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "ListGitHubOrgs",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
     "/twirp/ttab.hub.Hub/ListOrganisations": {
       "post": {
         "description": "ListOrganisations returns all registered organisations.",
@@ -1411,6 +1374,44 @@
         ]
       }
     },
+    "/twirp/ttab.hub.Hub/RegisterOrgDeployKey": {
+      "post": {
+        "description": "RegisterOrgDeployKey registers a CI deploy key owned by an organisation. Requires the caller to be an admin of the target organisation.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.hub.RegisterOrgDeployKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.hub.RegisterOrgDeployKeyResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "RegisterOrgDeployKey",
+        "tags": [
+          "Hub"
+        ]
+      }
+    },
     "/twirp/ttab.hub.Hub/RemoveAllowedDeployKey": {
       "post": {
         "description": "RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.",
@@ -1444,82 +1445,6 @@
           }
         ],
         "summary": "RemoveAllowedDeployKey",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
-    "/twirp/ttab.hub.Hub/RemoveAllowedSAN": {
-      "post": {
-        "description": "RemoveAllowedSAN removes an allowed SAN pattern from an artifact.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RemoveAllowedSANRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RemoveAllowedSANResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "RemoveAllowedSAN",
-        "tags": [
-          "Hub"
-        ]
-      }
-    },
-    "/twirp/ttab.hub.Hub/RemoveGitHubOrg": {
-      "post": {
-        "description": "RemoveGitHubOrg removes a GitHub organisation mapping.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ttab.hub.RemoveGitHubOrgRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ttab.hub.RemoveGitHubOrgResponse"
-                }
-              }
-            },
-            "description": "Method response"
-          },
-          "default": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "RemoveGitHubOrg",
         "tags": [
           "Hub"
         ]

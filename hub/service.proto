@@ -36,6 +36,9 @@ service Hub {
 
   // PublishVersion publishes a new version of a schema or plugin.
   rpc PublishVersion(PublishVersionRequest) returns (PublishVersionResponse);
+  // BulkPublishVersion publishes new versions of multiple artifacts in a
+  // single transaction. All items must use the same version and signing key.
+  rpc BulkPublishVersion(BulkPublishVersionRequest) returns (BulkPublishVersionResponse);
   // RevokeVersion marks a published version as revoked.
   rpc RevokeVersion(RevokeVersionRequest) returns (RevokeVersionResponse);
 
@@ -43,6 +46,9 @@ service Hub {
 
   // RegisterDeployKey registers a new deploy key for the authenticated user.
   rpc RegisterDeployKey(RegisterDeployKeyRequest) returns (RegisterDeployKeyResponse);
+  // RegisterOrgDeployKey registers a CI deploy key owned by an organisation.
+  // Requires the caller to be an admin of the target organisation.
+  rpc RegisterOrgDeployKey(RegisterOrgDeployKeyRequest) returns (RegisterOrgDeployKeyResponse);
   // ListDeployKeys lists registered deploy keys.
   rpc ListDeployKeys(ListDeployKeysRequest) returns (ListDeployKeysResponse);
   // ApproveDeployKey approves a pending deploy key for publishing.
@@ -56,15 +62,11 @@ service Hub {
 
   // --- Artifact permissions ---
 
-  // AddAllowedSAN adds a cosign SAN pattern allowed to publish an artifact.
-  rpc AddAllowedSAN(AddAllowedSANRequest) returns (AddAllowedSANResponse);
-  // RemoveAllowedSAN removes an allowed SAN pattern from an artifact.
-  rpc RemoveAllowedSAN(RemoveAllowedSANRequest) returns (RemoveAllowedSANResponse);
   // AddAllowedDeployKey adds a deploy key allowed to publish an artifact.
   rpc AddAllowedDeployKey(AddAllowedDeployKeyRequest) returns (AddAllowedDeployKeyResponse);
   // RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.
   rpc RemoveAllowedDeployKey(RemoveAllowedDeployKeyRequest) returns (RemoveAllowedDeployKeyResponse);
-  // ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.
+  // ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.
   rpc ListArtifactPermissions(ListArtifactPermissionsRequest) returns (ListArtifactPermissionsResponse);
 
   // --- Visibility ---
@@ -72,14 +74,6 @@ service Hub {
   // SetArtifactVisibility sets whether an artifact is publicly visible.
   rpc SetArtifactVisibility(SetArtifactVisibilityRequest) returns (SetArtifactVisibilityResponse);
 
-  // --- GitHub organisation management ---
-
-  // AddGitHubOrg links a GitHub organisation to a hub organisation.
-  rpc AddGitHubOrg(AddGitHubOrgRequest) returns (AddGitHubOrgResponse);
-  // RemoveGitHubOrg removes a GitHub organisation mapping.
-  rpc RemoveGitHubOrg(RemoveGitHubOrgRequest) returns (RemoveGitHubOrgResponse);
-  // ListGitHubOrgs lists all GitHub organisation mappings.
-  rpc ListGitHubOrgs(ListGitHubOrgsRequest) returns (ListGitHubOrgsResponse);
 }
 
 // --- Enums ---
@@ -93,7 +87,18 @@ enum ArtifactKind {
 enum SignatureType {
   SIGNATURE_TYPE_UNSPECIFIED = 0;
   SIGNATURE_TYPE_DEPLOY_KEY  = 1;
+  // Deprecated: sigstore signing is no longer supported for new publishes.
+  // Kept for reading historical versions.
   SIGNATURE_TYPE_SIGSTORE    = 2;
+}
+
+enum ForgeType {
+  FORGE_TYPE_UNSPECIFIED = 0;
+  FORGE_TYPE_GITHUB     = 1;
+  FORGE_TYPE_GITLAB     = 2;
+  FORGE_TYPE_FORGEJO    = 3;
+  FORGE_TYPE_BITBUCKET  = 4;
+  FORGE_TYPE_CUSTOM     = 5;
 }
 
 enum DeployKeyStatus {
@@ -102,6 +107,14 @@ enum DeployKeyStatus {
   DEPLOY_KEY_STATUS_ACTIVE      = 2;
   DEPLOY_KEY_STATUS_INACTIVE    = 3;
   DEPLOY_KEY_STATUS_REVOKED     = 4;
+}
+
+enum SchemaUsage {
+  SCHEMA_USAGE_UNSPECIFIED  = 0;
+  SCHEMA_USAGE_EDITORIAL    = 1;
+  SCHEMA_USAGE_DISTRIBUTION = 2;
+  SCHEMA_USAGE_SETTINGS     = 3;
+  SCHEMA_USAGE_MESSAGES     = 4;
 }
 
 // --- Common types ---
@@ -126,6 +139,8 @@ message ArtifactInfo {
   // Whether the artifact is publicly visible. Private artifacts are only
   // visible to members of the owning organisation.
   bool         public       = 6;
+  // Schema usage category. Only meaningful when kind is ARTIFACT_KIND_SCHEMA.
+  SchemaUsage  schema_usage = 7;
 }
 
 message VersionInfo {
@@ -173,7 +188,9 @@ message ApproveOrganisationResponse {}
 
 message ListArtifactsRequest {
   // Optional filter by kind.
-  ArtifactKind kind = 1;
+  ArtifactKind kind         = 1;
+  // Optional filter by schema usage. Only applies when kind is SCHEMA.
+  SchemaUsage  schema_usage = 2;
 }
 message ListArtifactsResponse {
   repeated ArtifactInfo artifacts = 1;
@@ -257,14 +274,40 @@ message PublishVersionRequest {
   // Raw manifest bytes.
   bytes          manifest         = 4;
   SignatureType  signature_type   = 5;
-  // Signature bytes (Ed25519 sig or sigstore bundle).
+  // Ed25519 signature bytes.
   bytes          signature        = 6;
-  // Identity that signed (key fingerprint or SAN).
+  // Deploy key fingerprint.
   string         signing_identity = 7;
   repeated PublishAsset assets    = 8;
 }
 message PublishVersionResponse {
   int64 version_id = 1;
+}
+
+// A single item in a bulk publish request.
+message BulkPublishItem {
+  ArtifactKind          kind      = 1;
+  // Full artifact name in reverse-domain notation (e.g. se.tt.my-schema).
+  string                name      = 2;
+  // Raw manifest bytes.
+  bytes                 manifest  = 3;
+  // Ed25519 signature bytes for this manifest.
+  bytes                 signature = 4;
+  repeated PublishAsset assets    = 5;
+}
+
+message BulkPublishVersionRequest {
+  // Version string applied to all items.
+  string                   version          = 1;
+  SignatureType            signature_type   = 2;
+  // Deploy key fingerprint (shared across all items).
+  string                   signing_identity = 3;
+  repeated BulkPublishItem items            = 4;
+}
+
+message BulkPublishVersionResponse {
+  // Version IDs in the same order as the request items.
+  repeated int64 version_ids = 1;
 }
 
 message RevokeVersionRequest {
@@ -279,10 +322,18 @@ message RevokeVersionResponse {}
 
 message RegisterDeployKeyRequest {
   // Ed25519 public key bytes.
-  bytes  public_key  = 1;
-  string fingerprint = 2;
+  bytes public_key = 1;
 }
 message RegisterDeployKeyResponse {
+  int64 id = 1;
+}
+
+message RegisterOrgDeployKeyRequest {
+  int64 organisation_id = 1;
+  // Ed25519 public key bytes.
+  bytes public_key      = 2;
+}
+message RegisterOrgDeployKeyResponse {
   int64 id = 1;
 }
 
@@ -313,22 +364,6 @@ message RevokeDeployKeyResponse {}
 
 // --- Permission requests/responses ---
 
-message AddAllowedSANRequest {
-  ArtifactKind kind  = 1;
-  // Full artifact name in reverse-domain notation.
-  string name        = 2;
-  string san_pattern = 3;
-}
-message AddAllowedSANResponse {}
-
-message RemoveAllowedSANRequest {
-  ArtifactKind kind  = 1;
-  // Full artifact name in reverse-domain notation.
-  string name        = 2;
-  string san_pattern = 3;
-}
-message RemoveAllowedSANResponse {}
-
 message AddAllowedDeployKeyRequest {
   ArtifactKind kind    = 1;
   // Full artifact name in reverse-domain notation.
@@ -351,8 +386,8 @@ message ListArtifactPermissionsRequest {
   string name       = 2;
 }
 message ListArtifactPermissionsResponse {
-  repeated string       allowed_sans        = 1;
   repeated DeployKeyInfo allowed_deploy_keys = 2;
+  repeated ArtifactPublisherInfo publishers  = 3;
 }
 
 // --- Visibility requests/responses ---
@@ -365,30 +400,18 @@ message SetArtifactVisibilityRequest {
 }
 message SetArtifactVisibilityResponse {}
 
-// --- GitHub organisation requests/responses ---
+// --- OIDC / CI publisher types ---
 
-message GitHubOrgInfo {
-  int64  id              = 1;
-  string github_org      = 2;
-  int64  organisation_id = 3;
-  string org_domain      = 4;
-  string created_at      = 5;
+message OIDCProviderInfo {
+  int64     id         = 1;
+  string    name       = 2;
+  ForgeType forge_type = 3;
+  string    issuer_url = 4;
 }
 
-message AddGitHubOrgRequest {
-  int64  organisation_id = 1;
-  string github_org      = 2;
-}
-message AddGitHubOrgResponse {
-  int64 id = 1;
-}
-
-message RemoveGitHubOrgRequest {
-  int64 id = 1;
-}
-message RemoveGitHubOrgResponse {}
-
-message ListGitHubOrgsRequest {}
-message ListGitHubOrgsResponse {
-  repeated GitHubOrgInfo github_orgs = 1;
+message ArtifactPublisherInfo {
+  int64  id            = 1;
+  string provider_name = 2;
+  string repository    = 3;
+  string ref_pattern   = 4;
 }

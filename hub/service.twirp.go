@@ -61,11 +61,19 @@ type Hub interface {
 	// PublishVersion publishes a new version of a schema or plugin.
 	PublishVersion(context.Context, *PublishVersionRequest) (*PublishVersionResponse, error)
 
+	// BulkPublishVersion publishes new versions of multiple artifacts in a
+	// single transaction. All items must use the same version and signing key.
+	BulkPublishVersion(context.Context, *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error)
+
 	// RevokeVersion marks a published version as revoked.
 	RevokeVersion(context.Context, *RevokeVersionRequest) (*RevokeVersionResponse, error)
 
 	// RegisterDeployKey registers a new deploy key for the authenticated user.
 	RegisterDeployKey(context.Context, *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error)
+
+	// RegisterOrgDeployKey registers a CI deploy key owned by an organisation.
+	// Requires the caller to be an admin of the target organisation.
+	RegisterOrgDeployKey(context.Context, *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error)
 
 	// ListDeployKeys lists registered deploy keys.
 	ListDeployKeys(context.Context, *ListDeployKeysRequest) (*ListDeployKeysResponse, error)
@@ -82,32 +90,17 @@ type Hub interface {
 	// RevokeDeployKey permanently revokes a compromised deploy key.
 	RevokeDeployKey(context.Context, *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error)
 
-	// AddAllowedSAN adds a cosign SAN pattern allowed to publish an artifact.
-	AddAllowedSAN(context.Context, *AddAllowedSANRequest) (*AddAllowedSANResponse, error)
-
-	// RemoveAllowedSAN removes an allowed SAN pattern from an artifact.
-	RemoveAllowedSAN(context.Context, *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error)
-
 	// AddAllowedDeployKey adds a deploy key allowed to publish an artifact.
 	AddAllowedDeployKey(context.Context, *AddAllowedDeployKeyRequest) (*AddAllowedDeployKeyResponse, error)
 
 	// RemoveAllowedDeployKey removes a deploy key from an artifact's allow list.
 	RemoveAllowedDeployKey(context.Context, *RemoveAllowedDeployKeyRequest) (*RemoveAllowedDeployKeyResponse, error)
 
-	// ListArtifactPermissions lists the SANs and deploy keys allowed for an artifact.
+	// ListArtifactPermissions lists the deploy keys and CI publishers allowed for an artifact.
 	ListArtifactPermissions(context.Context, *ListArtifactPermissionsRequest) (*ListArtifactPermissionsResponse, error)
 
 	// SetArtifactVisibility sets whether an artifact is publicly visible.
 	SetArtifactVisibility(context.Context, *SetArtifactVisibilityRequest) (*SetArtifactVisibilityResponse, error)
-
-	// AddGitHubOrg links a GitHub organisation to a hub organisation.
-	AddGitHubOrg(context.Context, *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error)
-
-	// RemoveGitHubOrg removes a GitHub organisation mapping.
-	RemoveGitHubOrg(context.Context, *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error)
-
-	// ListGitHubOrgs lists all GitHub organisation mappings.
-	ListGitHubOrgs(context.Context, *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error)
 }
 
 // ===================
@@ -116,7 +109,7 @@ type Hub interface {
 
 type hubProtobufClient struct {
 	client      HTTPClient
-	urls        [25]string
+	urls        [22]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -144,7 +137,7 @@ func NewHubProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.hub", "Hub")
-	urls := [25]string{
+	urls := [22]string{
 		serviceURL + "ListOrganisations",
 		serviceURL + "ApproveOrganisation",
 		serviceURL + "ListArtifacts",
@@ -154,22 +147,19 @@ func NewHubProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 		serviceURL + "ListDocumentation",
 		serviceURL + "GetDocumentation",
 		serviceURL + "PublishVersion",
+		serviceURL + "BulkPublishVersion",
 		serviceURL + "RevokeVersion",
 		serviceURL + "RegisterDeployKey",
+		serviceURL + "RegisterOrgDeployKey",
 		serviceURL + "ListDeployKeys",
 		serviceURL + "ApproveDeployKey",
 		serviceURL + "DeactivateDeployKey",
 		serviceURL + "ActivateDeployKey",
 		serviceURL + "RevokeDeployKey",
-		serviceURL + "AddAllowedSAN",
-		serviceURL + "RemoveAllowedSAN",
 		serviceURL + "AddAllowedDeployKey",
 		serviceURL + "RemoveAllowedDeployKey",
 		serviceURL + "ListArtifactPermissions",
 		serviceURL + "SetArtifactVisibility",
-		serviceURL + "AddGitHubOrg",
-		serviceURL + "RemoveGitHubOrg",
-		serviceURL + "ListGitHubOrgs",
 	}
 
 	return &hubProtobufClient{
@@ -594,6 +584,52 @@ func (c *hubProtobufClient) callPublishVersion(ctx context.Context, in *PublishV
 	return out, nil
 }
 
+func (c *hubProtobufClient) BulkPublishVersion(ctx context.Context, in *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
+	ctx = ctxsetters.WithServiceName(ctx, "Hub")
+	ctx = ctxsetters.WithMethodName(ctx, "BulkPublishVersion")
+	caller := c.callBulkPublishVersion
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*BulkPublishVersionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*BulkPublishVersionRequest) when calling interceptor")
+					}
+					return c.callBulkPublishVersion(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*BulkPublishVersionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*BulkPublishVersionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *hubProtobufClient) callBulkPublishVersion(ctx context.Context, in *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+	out := new(BulkPublishVersionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *hubProtobufClient) RevokeVersion(ctx context.Context, in *RevokeVersionRequest) (*RevokeVersionResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
@@ -625,7 +661,7 @@ func (c *hubProtobufClient) RevokeVersion(ctx context.Context, in *RevokeVersion
 
 func (c *hubProtobufClient) callRevokeVersion(ctx context.Context, in *RevokeVersionRequest) (*RevokeVersionResponse, error) {
 	out := new(RevokeVersionResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -671,7 +707,53 @@ func (c *hubProtobufClient) RegisterDeployKey(ctx context.Context, in *RegisterD
 
 func (c *hubProtobufClient) callRegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
 	out := new(RegisterDeployKeyResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *hubProtobufClient) RegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
+	ctx = ctxsetters.WithServiceName(ctx, "Hub")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	caller := c.callRegisterOrgDeployKey
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+					}
+					return c.callRegisterOrgDeployKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *hubProtobufClient) callRegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+	out := new(RegisterOrgDeployKeyResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -717,7 +799,7 @@ func (c *hubProtobufClient) ListDeployKeys(ctx context.Context, in *ListDeployKe
 
 func (c *hubProtobufClient) callListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
 	out := new(ListDeployKeysResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -763,7 +845,7 @@ func (c *hubProtobufClient) ApproveDeployKey(ctx context.Context, in *ApproveDep
 
 func (c *hubProtobufClient) callApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
 	out := new(ApproveDeployKeyResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -809,7 +891,7 @@ func (c *hubProtobufClient) DeactivateDeployKey(ctx context.Context, in *Deactiv
 
 func (c *hubProtobufClient) callDeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
 	out := new(DeactivateDeployKeyResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -855,7 +937,7 @@ func (c *hubProtobufClient) ActivateDeployKey(ctx context.Context, in *ActivateD
 
 func (c *hubProtobufClient) callActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
 	out := new(ActivateDeployKeyResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -901,98 +983,6 @@ func (c *hubProtobufClient) RevokeDeployKey(ctx context.Context, in *RevokeDeplo
 
 func (c *hubProtobufClient) callRevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
 	out := new(RevokeDeployKeyResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubProtobufClient) AddAllowedSAN(ctx context.Context, in *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedSAN")
-	caller := c.callAddAllowedSAN
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedSANRequest) when calling interceptor")
-					}
-					return c.callAddAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubProtobufClient) callAddAllowedSAN(ctx context.Context, in *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-	out := new(AddAllowedSANResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubProtobufClient) RemoveAllowedSAN(ctx context.Context, in *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedSAN")
-	caller := c.callRemoveAllowedSAN
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedSANRequest) when calling interceptor")
-					}
-					return c.callRemoveAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubProtobufClient) callRemoveAllowedSAN(ctx context.Context, in *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-	out := new(RemoveAllowedSANResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[17], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1192,151 +1182,13 @@ func (c *hubProtobufClient) callSetArtifactVisibility(ctx context.Context, in *S
 	return out, nil
 }
 
-func (c *hubProtobufClient) AddGitHubOrg(ctx context.Context, in *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddGitHubOrg")
-	caller := c.callAddGitHubOrg
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddGitHubOrgRequest) when calling interceptor")
-					}
-					return c.callAddGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubProtobufClient) callAddGitHubOrg(ctx context.Context, in *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-	out := new(AddGitHubOrgResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[22], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubProtobufClient) RemoveGitHubOrg(ctx context.Context, in *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveGitHubOrg")
-	caller := c.callRemoveGitHubOrg
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveGitHubOrgRequest) when calling interceptor")
-					}
-					return c.callRemoveGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubProtobufClient) callRemoveGitHubOrg(ctx context.Context, in *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-	out := new(RemoveGitHubOrgResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[23], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubProtobufClient) ListGitHubOrgs(ctx context.Context, in *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ListGitHubOrgs")
-	caller := c.callListGitHubOrgs
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListGitHubOrgsRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListGitHubOrgsRequest) when calling interceptor")
-					}
-					return c.callListGitHubOrgs(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListGitHubOrgsResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListGitHubOrgsResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubProtobufClient) callListGitHubOrgs(ctx context.Context, in *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-	out := new(ListGitHubOrgsResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[24], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 // ===============
 // Hub JSON Client
 // ===============
 
 type hubJSONClient struct {
 	client      HTTPClient
-	urls        [25]string
+	urls        [22]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -1364,7 +1216,7 @@ func NewHubJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.hub", "Hub")
-	urls := [25]string{
+	urls := [22]string{
 		serviceURL + "ListOrganisations",
 		serviceURL + "ApproveOrganisation",
 		serviceURL + "ListArtifacts",
@@ -1374,22 +1226,19 @@ func NewHubJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 		serviceURL + "ListDocumentation",
 		serviceURL + "GetDocumentation",
 		serviceURL + "PublishVersion",
+		serviceURL + "BulkPublishVersion",
 		serviceURL + "RevokeVersion",
 		serviceURL + "RegisterDeployKey",
+		serviceURL + "RegisterOrgDeployKey",
 		serviceURL + "ListDeployKeys",
 		serviceURL + "ApproveDeployKey",
 		serviceURL + "DeactivateDeployKey",
 		serviceURL + "ActivateDeployKey",
 		serviceURL + "RevokeDeployKey",
-		serviceURL + "AddAllowedSAN",
-		serviceURL + "RemoveAllowedSAN",
 		serviceURL + "AddAllowedDeployKey",
 		serviceURL + "RemoveAllowedDeployKey",
 		serviceURL + "ListArtifactPermissions",
 		serviceURL + "SetArtifactVisibility",
-		serviceURL + "AddGitHubOrg",
-		serviceURL + "RemoveGitHubOrg",
-		serviceURL + "ListGitHubOrgs",
 	}
 
 	return &hubJSONClient{
@@ -1814,6 +1663,52 @@ func (c *hubJSONClient) callPublishVersion(ctx context.Context, in *PublishVersi
 	return out, nil
 }
 
+func (c *hubJSONClient) BulkPublishVersion(ctx context.Context, in *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
+	ctx = ctxsetters.WithServiceName(ctx, "Hub")
+	ctx = ctxsetters.WithMethodName(ctx, "BulkPublishVersion")
+	caller := c.callBulkPublishVersion
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*BulkPublishVersionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*BulkPublishVersionRequest) when calling interceptor")
+					}
+					return c.callBulkPublishVersion(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*BulkPublishVersionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*BulkPublishVersionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *hubJSONClient) callBulkPublishVersion(ctx context.Context, in *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+	out := new(BulkPublishVersionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *hubJSONClient) RevokeVersion(ctx context.Context, in *RevokeVersionRequest) (*RevokeVersionResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
 	ctx = ctxsetters.WithServiceName(ctx, "Hub")
@@ -1845,7 +1740,7 @@ func (c *hubJSONClient) RevokeVersion(ctx context.Context, in *RevokeVersionRequ
 
 func (c *hubJSONClient) callRevokeVersion(ctx context.Context, in *RevokeVersionRequest) (*RevokeVersionResponse, error) {
 	out := new(RevokeVersionResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -1891,7 +1786,53 @@ func (c *hubJSONClient) RegisterDeployKey(ctx context.Context, in *RegisterDeplo
 
 func (c *hubJSONClient) callRegisterDeployKey(ctx context.Context, in *RegisterDeployKeyRequest) (*RegisterDeployKeyResponse, error) {
 	out := new(RegisterDeployKeyResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *hubJSONClient) RegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
+	ctx = ctxsetters.WithServiceName(ctx, "Hub")
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	caller := c.callRegisterOrgDeployKey
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+					}
+					return c.callRegisterOrgDeployKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *hubJSONClient) callRegisterOrgDeployKey(ctx context.Context, in *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+	out := new(RegisterOrgDeployKeyResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -1937,7 +1878,7 @@ func (c *hubJSONClient) ListDeployKeys(ctx context.Context, in *ListDeployKeysRe
 
 func (c *hubJSONClient) callListDeployKeys(ctx context.Context, in *ListDeployKeysRequest) (*ListDeployKeysResponse, error) {
 	out := new(ListDeployKeysResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -1983,7 +1924,7 @@ func (c *hubJSONClient) ApproveDeployKey(ctx context.Context, in *ApproveDeployK
 
 func (c *hubJSONClient) callApproveDeployKey(ctx context.Context, in *ApproveDeployKeyRequest) (*ApproveDeployKeyResponse, error) {
 	out := new(ApproveDeployKeyResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[12], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -2029,7 +1970,7 @@ func (c *hubJSONClient) DeactivateDeployKey(ctx context.Context, in *DeactivateD
 
 func (c *hubJSONClient) callDeactivateDeployKey(ctx context.Context, in *DeactivateDeployKeyRequest) (*DeactivateDeployKeyResponse, error) {
 	out := new(DeactivateDeployKeyResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[13], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -2075,7 +2016,7 @@ func (c *hubJSONClient) ActivateDeployKey(ctx context.Context, in *ActivateDeplo
 
 func (c *hubJSONClient) callActivateDeployKey(ctx context.Context, in *ActivateDeployKeyRequest) (*ActivateDeployKeyResponse, error) {
 	out := new(ActivateDeployKeyResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[14], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -2121,98 +2062,6 @@ func (c *hubJSONClient) RevokeDeployKey(ctx context.Context, in *RevokeDeployKey
 
 func (c *hubJSONClient) callRevokeDeployKey(ctx context.Context, in *RevokeDeployKeyRequest) (*RevokeDeployKeyResponse, error) {
 	out := new(RevokeDeployKeyResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubJSONClient) AddAllowedSAN(ctx context.Context, in *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedSAN")
-	caller := c.callAddAllowedSAN
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedSANRequest) when calling interceptor")
-					}
-					return c.callAddAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubJSONClient) callAddAllowedSAN(ctx context.Context, in *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-	out := new(AddAllowedSANResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[16], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubJSONClient) RemoveAllowedSAN(ctx context.Context, in *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedSAN")
-	caller := c.callRemoveAllowedSAN
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedSANRequest) when calling interceptor")
-					}
-					return c.callRemoveAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubJSONClient) callRemoveAllowedSAN(ctx context.Context, in *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-	out := new(RemoveAllowedSANResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[17], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -2412,144 +2261,6 @@ func (c *hubJSONClient) callSetArtifactVisibility(ctx context.Context, in *SetAr
 	return out, nil
 }
 
-func (c *hubJSONClient) AddGitHubOrg(ctx context.Context, in *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "AddGitHubOrg")
-	caller := c.callAddGitHubOrg
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddGitHubOrgRequest) when calling interceptor")
-					}
-					return c.callAddGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubJSONClient) callAddGitHubOrg(ctx context.Context, in *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-	out := new(AddGitHubOrgResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[22], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubJSONClient) RemoveGitHubOrg(ctx context.Context, in *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveGitHubOrg")
-	caller := c.callRemoveGitHubOrg
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveGitHubOrgRequest) when calling interceptor")
-					}
-					return c.callRemoveGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubJSONClient) callRemoveGitHubOrg(ctx context.Context, in *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-	out := new(RemoveGitHubOrgResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[23], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *hubJSONClient) ListGitHubOrgs(ctx context.Context, in *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "ttab.hub")
-	ctx = ctxsetters.WithServiceName(ctx, "Hub")
-	ctx = ctxsetters.WithMethodName(ctx, "ListGitHubOrgs")
-	caller := c.callListGitHubOrgs
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListGitHubOrgsRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListGitHubOrgsRequest) when calling interceptor")
-					}
-					return c.callListGitHubOrgs(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListGitHubOrgsResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListGitHubOrgsResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *hubJSONClient) callListGitHubOrgs(ctx context.Context, in *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-	out := new(ListGitHubOrgsResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[24], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 // ==================
 // Hub Server Handler
 // ==================
@@ -2674,11 +2385,17 @@ func (s *hubServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	case "PublishVersion":
 		s.servePublishVersion(ctx, resp, req)
 		return
+	case "BulkPublishVersion":
+		s.serveBulkPublishVersion(ctx, resp, req)
+		return
 	case "RevokeVersion":
 		s.serveRevokeVersion(ctx, resp, req)
 		return
 	case "RegisterDeployKey":
 		s.serveRegisterDeployKey(ctx, resp, req)
+		return
+	case "RegisterOrgDeployKey":
+		s.serveRegisterOrgDeployKey(ctx, resp, req)
 		return
 	case "ListDeployKeys":
 		s.serveListDeployKeys(ctx, resp, req)
@@ -2695,12 +2412,6 @@ func (s *hubServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	case "RevokeDeployKey":
 		s.serveRevokeDeployKey(ctx, resp, req)
 		return
-	case "AddAllowedSAN":
-		s.serveAddAllowedSAN(ctx, resp, req)
-		return
-	case "RemoveAllowedSAN":
-		s.serveRemoveAllowedSAN(ctx, resp, req)
-		return
 	case "AddAllowedDeployKey":
 		s.serveAddAllowedDeployKey(ctx, resp, req)
 		return
@@ -2712,15 +2423,6 @@ func (s *hubServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	case "SetArtifactVisibility":
 		s.serveSetArtifactVisibility(ctx, resp, req)
-		return
-	case "AddGitHubOrg":
-		s.serveAddGitHubOrg(ctx, resp, req)
-		return
-	case "RemoveGitHubOrg":
-		s.serveRemoveGitHubOrg(ctx, resp, req)
-		return
-	case "ListGitHubOrgs":
-		s.serveListGitHubOrgs(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -4349,6 +4051,186 @@ func (s *hubServer) servePublishVersionProtobuf(ctx context.Context, resp http.R
 	callResponseSent(ctx, s.hooks)
 }
 
+func (s *hubServer) serveBulkPublishVersion(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveBulkPublishVersionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveBulkPublishVersionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *hubServer) serveBulkPublishVersionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "BulkPublishVersion")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(BulkPublishVersionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Hub.BulkPublishVersion
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*BulkPublishVersionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*BulkPublishVersionRequest) when calling interceptor")
+					}
+					return s.Hub.BulkPublishVersion(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*BulkPublishVersionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*BulkPublishVersionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *BulkPublishVersionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *BulkPublishVersionResponse and nil error while calling BulkPublishVersion. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *hubServer) serveBulkPublishVersionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "BulkPublishVersion")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(BulkPublishVersionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Hub.BulkPublishVersion
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *BulkPublishVersionRequest) (*BulkPublishVersionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*BulkPublishVersionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*BulkPublishVersionRequest) when calling interceptor")
+					}
+					return s.Hub.BulkPublishVersion(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*BulkPublishVersionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*BulkPublishVersionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *BulkPublishVersionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *BulkPublishVersionResponse and nil error while calling BulkPublishVersion. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
 func (s *hubServer) serveRevokeVersion(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
@@ -4686,6 +4568,186 @@ func (s *hubServer) serveRegisterDeployKeyProtobuf(ctx context.Context, resp htt
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterDeployKeyResponse and nil error while calling RegisterDeployKey. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *hubServer) serveRegisterOrgDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveRegisterOrgDeployKeyJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveRegisterOrgDeployKeyProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *hubServer) serveRegisterOrgDeployKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(RegisterOrgDeployKeyRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Hub.RegisterOrgDeployKey
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+					}
+					return s.Hub.RegisterOrgDeployKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RegisterOrgDeployKeyResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgDeployKeyResponse and nil error while calling RegisterOrgDeployKey. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *hubServer) serveRegisterOrgDeployKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RegisterOrgDeployKey")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(RegisterOrgDeployKeyRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Hub.RegisterOrgDeployKey
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RegisterOrgDeployKeyRequest) (*RegisterOrgDeployKeyResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RegisterOrgDeployKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RegisterOrgDeployKeyRequest) when calling interceptor")
+					}
+					return s.Hub.RegisterOrgDeployKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RegisterOrgDeployKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RegisterOrgDeployKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RegisterOrgDeployKeyResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RegisterOrgDeployKeyResponse and nil error while calling RegisterOrgDeployKey. nil responses are not supported"))
 		return
 	}
 
@@ -5609,366 +5671,6 @@ func (s *hubServer) serveRevokeDeployKeyProtobuf(ctx context.Context, resp http.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveAddAllowedSAN(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveAddAllowedSANJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveAddAllowedSANProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *hubServer) serveAddAllowedSANJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedSAN")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(AddAllowedSANRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Hub.AddAllowedSAN
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedSANRequest) when calling interceptor")
-					}
-					return s.Hub.AddAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *AddAllowedSANResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedSANResponse and nil error while calling AddAllowedSAN. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveAddAllowedSANProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddAllowedSAN")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(AddAllowedSANRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Hub.AddAllowedSAN
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddAllowedSANRequest) (*AddAllowedSANResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddAllowedSANRequest) when calling interceptor")
-					}
-					return s.Hub.AddAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *AddAllowedSANResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddAllowedSANResponse and nil error while calling AddAllowedSAN. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveRemoveAllowedSAN(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveRemoveAllowedSANJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveRemoveAllowedSANProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *hubServer) serveRemoveAllowedSANJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedSAN")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(RemoveAllowedSANRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Hub.RemoveAllowedSAN
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedSANRequest) when calling interceptor")
-					}
-					return s.Hub.RemoveAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *RemoveAllowedSANResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedSANResponse and nil error while calling RemoveAllowedSAN. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveRemoveAllowedSANProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveAllowedSAN")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(RemoveAllowedSANRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Hub.RemoveAllowedSAN
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveAllowedSANRequest) (*RemoveAllowedSANResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveAllowedSANRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveAllowedSANRequest) when calling interceptor")
-					}
-					return s.Hub.RemoveAllowedSAN(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveAllowedSANResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveAllowedSANResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *RemoveAllowedSANResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveAllowedSANResponse and nil error while calling RemoveAllowedSAN. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
 func (s *hubServer) serveAddAllowedDeployKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
@@ -6689,546 +6391,6 @@ func (s *hubServer) serveSetArtifactVisibilityProtobuf(ctx context.Context, resp
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *hubServer) serveAddGitHubOrg(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveAddGitHubOrgJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveAddGitHubOrgProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *hubServer) serveAddGitHubOrgJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddGitHubOrg")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(AddGitHubOrgRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Hub.AddGitHubOrg
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddGitHubOrgRequest) when calling interceptor")
-					}
-					return s.Hub.AddGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *AddGitHubOrgResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddGitHubOrgResponse and nil error while calling AddGitHubOrg. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveAddGitHubOrgProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "AddGitHubOrg")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(AddGitHubOrgRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Hub.AddGitHubOrg
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *AddGitHubOrgRequest) (*AddGitHubOrgResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*AddGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*AddGitHubOrgRequest) when calling interceptor")
-					}
-					return s.Hub.AddGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*AddGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*AddGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *AddGitHubOrgResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddGitHubOrgResponse and nil error while calling AddGitHubOrg. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveRemoveGitHubOrg(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveRemoveGitHubOrgJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveRemoveGitHubOrgProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *hubServer) serveRemoveGitHubOrgJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveGitHubOrg")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(RemoveGitHubOrgRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Hub.RemoveGitHubOrg
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveGitHubOrgRequest) when calling interceptor")
-					}
-					return s.Hub.RemoveGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *RemoveGitHubOrgResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveGitHubOrgResponse and nil error while calling RemoveGitHubOrg. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveRemoveGitHubOrgProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "RemoveGitHubOrg")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(RemoveGitHubOrgRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Hub.RemoveGitHubOrg
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *RemoveGitHubOrgRequest) (*RemoveGitHubOrgResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*RemoveGitHubOrgRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*RemoveGitHubOrgRequest) when calling interceptor")
-					}
-					return s.Hub.RemoveGitHubOrg(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*RemoveGitHubOrgResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RemoveGitHubOrgResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *RemoveGitHubOrgResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveGitHubOrgResponse and nil error while calling RemoveGitHubOrg. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveListGitHubOrgs(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveListGitHubOrgsJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveListGitHubOrgsProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *hubServer) serveListGitHubOrgsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListGitHubOrgs")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(ListGitHubOrgsRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Hub.ListGitHubOrgs
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListGitHubOrgsRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListGitHubOrgsRequest) when calling interceptor")
-					}
-					return s.Hub.ListGitHubOrgs(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListGitHubOrgsResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListGitHubOrgsResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *ListGitHubOrgsResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListGitHubOrgsResponse and nil error while calling ListGitHubOrgs. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *hubServer) serveListGitHubOrgsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListGitHubOrgs")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(ListGitHubOrgsRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Hub.ListGitHubOrgs
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListGitHubOrgsRequest) (*ListGitHubOrgsResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListGitHubOrgsRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListGitHubOrgsRequest) when calling interceptor")
-					}
-					return s.Hub.ListGitHubOrgs(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListGitHubOrgsResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListGitHubOrgsResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *ListGitHubOrgsResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListGitHubOrgsResponse and nil error while calling ListGitHubOrgs. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
 func (s *hubServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor0, 0
 }
@@ -7810,128 +6972,140 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 1956 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x59, 0xcd, 0x6f, 0xdb, 0xc8,
-	0x15, 0x2f, 0x65, 0xc7, 0x91, 0x9e, 0x65, 0x47, 0x19, 0xc7, 0x96, 0xc4, 0x44, 0xfe, 0x60, 0x76,
-	0x37, 0x8e, 0x77, 0xd7, 0xc6, 0xba, 0x9f, 0x87, 0xa2, 0x05, 0x37, 0xd2, 0x3a, 0xaa, 0x13, 0x5b,
-	0xa0, 0x14, 0x03, 0xee, 0x07, 0xb8, 0x94, 0x39, 0x96, 0x09, 0xdb, 0xa4, 0x4a, 0x8e, 0x1c, 0xb8,
-	0xe8, 0xa1, 0x40, 0xcf, 0x45, 0xff, 0x8a, 0xde, 0x8b, 0xde, 0x7a, 0xea, 0xad, 0x87, 0xfe, 0x0b,
-	0xfd, 0x5b, 0x0a, 0x14, 0x24, 0x87, 0xe4, 0xcc, 0x70, 0x28, 0x65, 0x37, 0xde, 0xec, 0xcd, 0x7c,
-	0xef, 0xe9, 0x7d, 0xcf, 0x9b, 0xf7, 0x1b, 0xc3, 0xc3, 0x8b, 0xc9, 0x70, 0x2f, 0xc0, 0xfe, 0x8d,
-	0x73, 0x86, 0x77, 0xc7, 0xbe, 0x47, 0x3c, 0x54, 0x26, 0xc4, 0x1a, 0xee, 0x5e, 0x4c, 0x86, 0xda,
-	0xbf, 0x14, 0xa8, 0x1e, 0xfb, 0x23, 0xcb, 0x75, 0x02, 0x8b, 0x38, 0x9e, 0x8b, 0x96, 0xa1, 0xe4,
-	0xd8, 0x0d, 0x65, 0x53, 0xd9, 0x9e, 0x33, 0x4a, 0x8e, 0x8d, 0xd6, 0x60, 0xc1, 0xf6, 0xae, 0x2d,
-	0xc7, 0x6d, 0x94, 0x36, 0x95, 0xed, 0x8a, 0x41, 0xbf, 0x10, 0x82, 0x79, 0xd7, 0xba, 0xc6, 0x8d,
-	0xb9, 0x88, 0x1a, 0xfd, 0x8d, 0x54, 0x28, 0x5b, 0xe3, 0xb1, 0xef, 0xdd, 0x60, 0xbb, 0x31, 0xbf,
-	0xa9, 0x6c, 0x97, 0x8d, 0xf4, 0x1b, 0x35, 0xa1, 0xec, 0x04, 0xa6, 0xf7, 0xd6, 0xc5, 0x7e, 0xe3,
-	0x5e, 0xc4, 0xbb, 0xef, 0x04, 0xc7, 0xe1, 0x27, 0x6a, 0x01, 0x9c, 0xf9, 0xd8, 0x22, 0xd8, 0x36,
-	0x2d, 0xd2, 0x58, 0x88, 0x14, 0x56, 0x28, 0x45, 0x27, 0x21, 0x7b, 0x32, 0xb6, 0x13, 0xf6, 0xfd,
-	0x98, 0x4d, 0x29, 0x3a, 0xd1, 0xfe, 0xa9, 0x40, 0x55, 0xf7, 0x89, 0x73, 0x6e, 0x9d, 0x91, 0xae,
-	0x7b, 0xee, 0xe5, 0x22, 0xd0, 0xa0, 0xea, 0x31, 0x11, 0xd2, 0x38, 0x38, 0x1a, 0xda, 0x81, 0xf9,
-	0x4b, 0xc7, 0xb5, 0xa3, 0x68, 0x96, 0xf7, 0xd7, 0x76, 0x93, 0xfc, 0xec, 0x26, 0x9a, 0x0f, 0x1d,
-	0xd7, 0x36, 0x22, 0x99, 0x34, 0xf2, 0x79, 0x26, 0x72, 0x3e, 0x84, 0x7b, 0x62, 0x08, 0x6b, 0xb0,
-	0x30, 0x9e, 0x0c, 0xaf, 0x9c, 0xb3, 0x28, 0xba, 0xb2, 0x41, 0xbf, 0xb4, 0xff, 0x2a, 0xb0, 0x78,
-	0x82, 0xfd, 0xc0, 0xf1, 0x5c, 0xa9, 0xeb, 0x0d, 0xb8, 0x7f, 0x13, 0xb3, 0xa9, 0xd7, 0xc9, 0x27,
-	0xfa, 0x05, 0x2c, 0x07, 0xce, 0xc8, 0xb5, 0xc8, 0xc4, 0xc7, 0x26, 0xb9, 0x1d, 0x63, 0xea, 0x7a,
-	0x3d, 0x73, 0xbd, 0x9f, 0xf0, 0x07, 0xb7, 0x63, 0x6c, 0x2c, 0x05, 0xec, 0x27, 0x7a, 0x0e, 0xb5,
-	0x90, 0xe0, 0xb8, 0x23, 0xd3, 0xb1, 0xb1, 0x4b, 0x1c, 0x72, 0x4b, 0x03, 0x7a, 0x40, 0xe9, 0x5d,
-	0x4a, 0x0e, 0x9d, 0xf0, 0xf1, 0x8d, 0x77, 0x89, 0xed, 0xa4, 0x70, 0xf4, 0x73, 0x46, 0xe1, 0xb4,
-	0x5f, 0x42, 0x45, 0x0f, 0x02, 0x1c, 0x57, 0x45, 0x85, 0xf2, 0xb9, 0x73, 0x85, 0xa3, 0xcc, 0x29,
-	0x91, 0x64, 0xfa, 0x1d, 0xa6, 0x27, 0xb8, 0xb0, 0xf6, 0x7f, 0xfc, 0x93, 0xa4, 0xc7, 0xe2, 0x2f,
-	0xed, 0x1f, 0x0a, 0x2c, 0xb5, 0xf1, 0xf8, 0xca, 0xbb, 0x3d, 0xc4, 0xb7, 0xd2, 0x04, 0x6d, 0xc2,
-	0xe2, 0xb9, 0xe3, 0x8e, 0xb0, 0x3f, 0xf6, 0x1d, 0x97, 0xd0, 0x9f, 0xb3, 0xa4, 0xa8, 0x7b, 0x02,
-	0xec, 0x9b, 0xf8, 0xda, 0x72, 0xae, 0x68, 0xb7, 0x56, 0x42, 0x4a, 0x27, 0x24, 0xa0, 0x2f, 0x60,
-	0x21, 0x20, 0x16, 0x99, 0x04, 0x51, 0xf4, 0xcb, 0xfb, 0xcd, 0x2c, 0x7f, 0xa9, 0xe5, 0x7e, 0x24,
-	0x60, 0x50, 0xc1, 0x19, 0xb5, 0xd6, 0x4e, 0xa0, 0xda, 0x0b, 0xab, 0x1b, 0x5c, 0x44, 0xc1, 0x7f,
-	0x9b, 0xc0, 0xc3, 0x16, 0xb3, 0x2d, 0x62, 0x45, 0xee, 0x56, 0x8d, 0xe8, 0x6f, 0x4d, 0x85, 0xc6,
-	0x2b, 0x27, 0x20, 0xec, 0x61, 0x0d, 0x0c, 0xfc, 0xfb, 0x09, 0x0e, 0x88, 0x76, 0x0a, 0x4d, 0x09,
-	0x2f, 0x18, 0x7b, 0x6e, 0x80, 0xd1, 0xcf, 0x61, 0x89, 0xed, 0xf5, 0xa0, 0xa1, 0x6c, 0xce, 0x6d,
-	0x2f, 0xb2, 0x4d, 0xce, 0xfe, 0xce, 0xe0, 0x85, 0xb5, 0xcf, 0x40, 0xd5, 0xe3, 0x33, 0xcc, 0x49,
-	0xc5, 0x86, 0xc5, 0x7a, 0x68, 0x2d, 0x78, 0x2c, 0x95, 0x8e, 0x5d, 0xd1, 0xbe, 0x84, 0x47, 0xa1,
-	0x9f, 0xc9, 0xa1, 0x4a, 0xfc, 0x4f, 0x8f, 0x9f, 0x32, 0xfb, 0xf8, 0x69, 0xaf, 0x61, 0x55, 0xd0,
-	0x41, 0xe3, 0xfc, 0x11, 0x54, 0xac, 0x84, 0x98, 0x8f, 0x91, 0x1d, 0x11, 0x46, 0x26, 0xa8, 0x0d,
-	0x00, 0x1d, 0xe0, 0x54, 0xdb, 0xb7, 0x70, 0x28, 0x9d, 0x07, 0xa5, 0x6c, 0x1e, 0x68, 0x7f, 0x84,
-	0x15, 0x4e, 0x2b, 0x75, 0x71, 0x1f, 0xca, 0x89, 0xe5, 0x48, 0x75, 0xb1, 0x87, 0xa9, 0x1c, 0xfa,
-	0x02, 0xca, 0xf4, 0xd0, 0x07, 0x8d, 0x52, 0x14, 0xd5, 0x6a, 0xf6, 0x1b, 0x66, 0x78, 0x18, 0xa9,
-	0x98, 0x36, 0x81, 0x26, 0x63, 0x9d, 0xca, 0xdc, 0x51, 0x68, 0xec, 0x4c, 0x9a, 0xe3, 0x66, 0x92,
-	0xf6, 0x1f, 0x05, 0x54, 0x99, 0xdd, 0xf7, 0x08, 0x7e, 0x8f, 0x1f, 0x80, 0x85, 0xb1, 0xa7, 0x73,
-	0x51, 0x85, 0xf2, 0xb5, 0xe5, 0x3a, 0xe7, 0x38, 0x20, 0xf4, 0xf4, 0xa4, 0xdf, 0xe8, 0x53, 0x58,
-	0xb0, 0xc2, 0x23, 0x19, 0x9e, 0xf5, 0x30, 0x8f, 0x2b, 0x8c, 0xf9, 0x64, 0x4e, 0x19, 0x54, 0x44,
-	0xfb, 0xab, 0x02, 0x75, 0x26, 0x98, 0x48, 0xe0, 0x3b, 0x4f, 0x21, 0x37, 0x2c, 0xe6, 0xf9, 0x61,
-	0xa1, 0x0d, 0xa1, 0x91, 0x77, 0x88, 0xe6, 0xf6, 0xae, 0x86, 0x0c, 0x89, 0x87, 0x4c, 0xdb, 0x3b,
-	0x9b, 0x5c, 0x63, 0x97, 0x70, 0x67, 0xfd, 0xbb, 0x6b, 0x9c, 0xaf, 0xe3, 0xf1, 0x25, 0x58, 0xa5,
-	0xa1, 0x31, 0x3f, 0x53, 0xf8, 0x64, 0x3d, 0x87, 0x7b, 0x61, 0x90, 0xc9, 0xb1, 0x90, 0x96, 0x33,
-	0x96, 0x48, 0xaa, 0xf9, 0x61, 0xe3, 0x7a, 0x87, 0x6a, 0xca, 0x43, 0xbe, 0xab, 0x6a, 0xfe, 0xbb,
-	0x04, 0xab, 0xf4, 0x2e, 0xfa, 0x50, 0x43, 0x80, 0x3b, 0x80, 0xf3, 0xc2, 0x01, 0xcc, 0x2f, 0x2d,
-	0xf7, 0xbe, 0xd1, 0xd2, 0xf2, 0x04, 0x2a, 0x29, 0x21, 0x5a, 0x37, 0xaa, 0x46, 0x46, 0x90, 0xae,
-	0x34, 0xf7, 0xe5, 0x2b, 0xcd, 0x6e, 0x3a, 0x09, 0xca, 0xe2, 0x3d, 0xc1, 0xde, 0xdd, 0xe9, 0x30,
-	0xf8, 0x29, 0xac, 0x89, 0x79, 0xa4, 0xa5, 0x6a, 0x01, 0xd0, 0xc8, 0xcd, 0xf4, 0x22, 0xac, 0x50,
-	0x4a, 0xd7, 0xd6, 0xc6, 0xf0, 0xc8, 0x88, 0x96, 0xa5, 0x0f, 0x36, 0x84, 0xeb, 0xb0, 0x2a, 0x58,
-	0xa4, 0x77, 0xef, 0x6f, 0xa0, 0x61, 0xe0, 0x91, 0x13, 0x10, 0xec, 0xa7, 0x9b, 0x4d, 0xe2, 0x4e,
-	0x0b, 0x20, 0xde, 0x48, 0xcd, 0x4b, 0x7c, 0x1b, 0x39, 0x55, 0x35, 0x2a, 0x31, 0xe5, 0x10, 0xdf,
-	0xce, 0xde, 0xb2, 0xb4, 0x4f, 0xa1, 0x29, 0x51, 0x4e, 0x73, 0x24, 0x2e, 0x09, 0xf5, 0xf8, 0x06,
-	0x4f, 0x05, 0xd3, 0x35, 0xc6, 0x80, 0x35, 0x91, 0x41, 0x55, 0xfc, 0x0c, 0x16, 0xed, 0x88, 0x1a,
-	0x3a, 0x98, 0xdc, 0xee, 0x75, 0xc9, 0xae, 0x16, 0x1d, 0x7a, 0xb0, 0x53, 0x0d, 0xda, 0x73, 0xa8,
-	0xd3, 0x8d, 0x24, 0x17, 0xb5, 0xe8, 0x97, 0x0a, 0x8d, 0xbc, 0x28, 0xcd, 0xde, 0x67, 0xa0, 0xb6,
-	0xb1, 0x75, 0x46, 0x9c, 0x1b, 0x8b, 0xcc, 0xd6, 0xd4, 0x82, 0xc7, 0x52, 0x69, 0xaa, 0x6c, 0x07,
-	0x1a, 0xfa, 0xbb, 0xaa, 0x7a, 0x0c, 0x4d, 0xbd, 0x50, 0xd1, 0x36, 0xac, 0xc5, 0xc5, 0x9e, 0xa9,
-	0xa6, 0x09, 0xf5, 0x9c, 0x24, 0x55, 0xf2, 0x16, 0x1e, 0xe9, 0xb6, 0xad, 0x5f, 0x5d, 0x79, 0x6f,
-	0xb1, 0xdd, 0xd7, 0x8f, 0xee, 0xaa, 0x47, 0x37, 0x60, 0x31, 0xb0, 0x5c, 0x73, 0x6c, 0x11, 0x82,
-	0xfd, 0xa4, 0x4f, 0x21, 0xb0, 0xdc, 0x5e, 0x4c, 0x09, 0xfb, 0x40, 0x30, 0x4c, 0x3d, 0xfa, 0x43,
-	0xe8, 0xec, 0xb5, 0x77, 0x83, 0xbf, 0x07, 0xa7, 0xd4, 0xf0, 0x98, 0x88, 0xb6, 0xa9, 0x5f, 0x7f,
-	0x52, 0x40, 0xcd, 0x3c, 0xce, 0xe5, 0xfc, 0x7d, 0x7d, 0xd3, 0x60, 0x29, 0x6b, 0xf2, 0x70, 0x9c,
-	0xcc, 0x45, 0xe5, 0x5b, 0x4c, 0xbb, 0xb9, 0x1b, 0x2f, 0xd8, 0x32, 0x0f, 0xa8, 0x87, 0x7f, 0x56,
-	0xa0, 0xc5, 0xb9, 0xff, 0xbd, 0x38, 0xb9, 0x09, 0xeb, 0x45, 0x4e, 0x50, 0x3f, 0xbf, 0x86, 0x75,
-	0x76, 0x89, 0xef, 0x61, 0xff, 0xda, 0x09, 0x02, 0x06, 0xd2, 0xbc, 0xf7, 0x06, 0xfe, 0x17, 0x05,
-	0x36, 0x0a, 0x4d, 0xd0, 0xa9, 0xb2, 0x05, 0x55, 0x2b, 0xf6, 0xd0, 0x0c, 0x2c, 0x0a, 0x8c, 0x2a,
-	0xc6, 0x22, 0xa5, 0xf5, 0x2d, 0x37, 0x40, 0x07, 0xb0, 0x92, 0x88, 0xb0, 0x03, 0xa8, 0x34, 0x7d,
-	0x00, 0x3d, 0xb4, 0x84, 0xc0, 0x03, 0xed, 0x06, 0x9e, 0xf4, 0x99, 0xdd, 0xd8, 0x09, 0x9c, 0xa1,
-	0x73, 0xe5, 0x90, 0x3b, 0xab, 0x4b, 0xf6, 0xc4, 0x30, 0xc7, 0x3d, 0x31, 0x6c, 0x40, 0xab, 0xc0,
-	0x2e, 0x2d, 0xc5, 0xdf, 0x14, 0x58, 0x3a, 0x70, 0xc8, 0xcb, 0xc9, 0xf0, 0xd8, 0x1f, 0x49, 0x41,
-	0x76, 0x0b, 0x60, 0xe4, 0x90, 0x8b, 0xc9, 0xd0, 0xf4, 0xfc, 0x11, 0x35, 0x5a, 0x89, 0x29, 0xc7,
-	0xfe, 0x08, 0x3d, 0x83, 0x07, 0x2c, 0x64, 0xcc, 0x7a, 0x62, 0x99, 0x25, 0x77, 0x23, 0x3d, 0x9e,
-	0x3f, 0x32, 0xe9, 0x73, 0x52, 0xbc, 0x10, 0x55, 0x3c, 0x7f, 0xd4, 0x8e, 0x5f, 0x94, 0x66, 0xe0,
-	0xea, 0xdf, 0xc1, 0x8a, 0x6e, 0xdb, 0xa9, 0xa7, 0x49, 0xde, 0x24, 0xd6, 0x95, 0x22, 0xeb, 0x53,
-	0xa2, 0xd0, 0x3e, 0x89, 0xa6, 0x20, 0xa3, 0xbe, 0xe0, 0xf2, 0x8a, 0x46, 0x6e, 0xd8, 0xdb, 0x39,
-	0x4f, 0xa4, 0x23, 0x57, 0x90, 0xa4, 0x39, 0xa7, 0x37, 0x60, 0xca, 0x10, 0x6f, 0x40, 0x96, 0x91,
-	0xdd, 0x80, 0x99, 0xfb, 0x92, 0x1b, 0x90, 0x2b, 0xa1, 0x01, 0x69, 0x60, 0xc1, 0x8e, 0x95, 0xbd,
-	0x8f, 0x85, 0x3d, 0x84, 0x5a, 0xd0, 0xd4, 0x8d, 0x41, 0xf7, 0x2b, 0xfd, 0xc5, 0xc0, 0x3c, 0xec,
-	0x1e, 0xb5, 0xcd, 0x37, 0x47, 0xfd, 0x5e, 0xe7, 0x45, 0xf7, 0xab, 0x6e, 0xa7, 0x5d, 0xfb, 0x01,
-	0x6a, 0xc0, 0x23, 0x9e, 0xdd, 0x7f, 0xf1, 0xb2, 0xf3, 0x5a, 0xaf, 0x29, 0x79, 0x4e, 0xef, 0xd5,
-	0x9b, 0x83, 0xee, 0x51, 0xad, 0xb4, 0x73, 0x09, 0x4b, 0xdc, 0xe2, 0x86, 0xd6, 0x41, 0xed, 0x77,
-	0x0f, 0x8e, 0xf4, 0xc1, 0x1b, 0xa3, 0x63, 0x0e, 0x4e, 0x7b, 0x1d, 0xc1, 0x48, 0x0b, 0x9a, 0x02,
-	0xbf, 0xdd, 0xe9, 0xbd, 0x3a, 0x3e, 0x35, 0x0f, 0x3b, 0xa7, 0x35, 0x05, 0x3d, 0x86, 0xba, 0xc0,
-	0xee, 0x77, 0x0f, 0xfa, 0x83, 0x63, 0xa3, 0x53, 0x2b, 0xed, 0xfc, 0x5d, 0x81, 0x07, 0xc2, 0xdb,
-	0x0c, 0xda, 0x82, 0x56, 0xa6, 0xc0, 0xec, 0x0f, 0xf4, 0xc1, 0x9b, 0x7e, 0xde, 0x64, 0x5e, 0xa4,
-	0xd7, 0x39, 0x6a, 0x77, 0x8f, 0x0e, 0x6a, 0x0a, 0x7a, 0x02, 0x8d, 0x3c, 0x5b, 0x7f, 0x31, 0xe8,
-	0x9e, 0x74, 0x6a, 0xa5, 0x30, 0x9e, 0x3c, 0xb7, 0x7b, 0x44, 0xf9, 0x73, 0x72, 0xe5, 0x46, 0xe7,
-	0xe4, 0xf8, 0xb0, 0xd3, 0xae, 0xcd, 0xef, 0xff, 0xef, 0x21, 0xcc, 0xbd, 0x9c, 0x0c, 0xd1, 0x6f,
-	0xe1, 0x61, 0xee, 0x9d, 0x06, 0x69, 0x59, 0x11, 0x8b, 0x1e, 0x78, 0xd4, 0xa7, 0x53, 0x65, 0x68,
-	0x8b, 0x0c, 0x61, 0x45, 0xf2, 0xf8, 0x82, 0x3e, 0x62, 0x66, 0x49, 0xe1, 0x4b, 0x8e, 0xfa, 0xf1,
-	0x0c, 0x29, 0x6a, 0xa3, 0x07, 0x4b, 0xdc, 0xeb, 0x0b, 0x5a, 0xe7, 0x3d, 0x13, 0x9f, 0x76, 0xd4,
-	0x8d, 0x42, 0x3e, 0xd5, 0xf8, 0x2b, 0x58, 0x64, 0x60, 0x2d, 0x7a, 0xc2, 0xb4, 0x74, 0xee, 0x5d,
-	0x46, 0x6d, 0x15, 0x70, 0xa9, 0x2e, 0x93, 0x7b, 0xcc, 0xa1, 0x1b, 0x30, 0x7a, 0x2a, 0xfd, 0x11,
-	0xbf, 0x91, 0xab, 0x1f, 0x4d, 0x17, 0xa2, 0x06, 0x4e, 0xa1, 0x26, 0x62, 0x70, 0xb4, 0x25, 0xfd,
-	0x25, 0xfb, 0x60, 0xa0, 0x6a, 0xd3, 0x44, 0xa8, 0x6a, 0xda, 0x1b, 0x1c, 0x22, 0x14, 0x7b, 0x43,
-	0x86, 0x5f, 0xc5, 0xde, 0x90, 0x43, 0xca, 0xd8, 0x71, 0x5e, 0x39, 0xef, 0xb8, 0x54, 0xb7, 0x36,
-	0x4d, 0x84, 0xaa, 0xee, 0xc3, 0x32, 0x0f, 0x8e, 0xd0, 0x46, 0x0e, 0x4e, 0x09, 0xc9, 0xde, 0x2c,
-	0x16, 0xc8, 0xfa, 0x8c, 0x83, 0x31, 0x6c, 0x9f, 0xc9, 0x10, 0x15, 0xdb, 0x67, 0x52, 0xfc, 0x13,
-	0xe6, 0x37, 0x07, 0x51, 0xd8, 0xfc, 0x16, 0x81, 0x23, 0x36, 0xbf, 0xc5, 0x18, 0xa7, 0x0f, 0xcb,
-	0x3c, 0x74, 0x41, 0x42, 0xe3, 0xe7, 0xd0, 0x0e, 0x9b, 0x84, 0x02, 0xd4, 0x73, 0x0a, 0x35, 0x11,
-	0x90, 0xb0, 0x45, 0x2b, 0xc0, 0x35, 0x6c, 0xd1, 0x8a, 0xf0, 0x4c, 0x38, 0x2b, 0x24, 0x08, 0x85,
-	0x9d, 0x15, 0xc5, 0x70, 0x87, 0x9d, 0x15, 0x53, 0x60, 0x4e, 0x98, 0xf1, 0x1c, 0x74, 0x61, 0x33,
-	0x5e, 0x84, 0x81, 0xd8, 0x8c, 0x17, 0x62, 0x1f, 0x74, 0x02, 0x0f, 0x04, 0x44, 0x83, 0x36, 0xc5,
-	0x1e, 0xc8, 0x69, 0xde, 0x9a, 0x22, 0x91, 0x75, 0x1e, 0x87, 0x4a, 0xd8, 0xce, 0x93, 0xe1, 0x24,
-	0xb6, 0xf3, 0xa4, 0x70, 0x26, 0x2c, 0xa3, 0x08, 0x29, 0x10, 0xe7, 0x88, 0x14, 0xea, 0xa8, 0xda,
-	0x34, 0x11, 0x66, 0xe4, 0xe7, 0xe1, 0x00, 0x37, 0xf2, 0x0b, 0xf1, 0x0a, 0x37, 0xf2, 0x8b, 0x31,
-	0x05, 0xba, 0x4c, 0x36, 0x9e, 0x9c, 0x99, 0x67, 0x05, 0x1e, 0xe6, 0x2c, 0x6d, 0xcf, 0x16, 0xa4,
-	0xc6, 0x5c, 0xa8, 0x17, 0x6c, 0xed, 0x68, 0x5b, 0x7e, 0x93, 0xe4, 0xb1, 0x83, 0xfa, 0xfc, 0x1d,
-	0x24, 0xa9, 0xbd, 0x0b, 0x58, 0x95, 0xae, 0xc7, 0xe8, 0x13, 0xe6, 0x4d, 0x6a, 0xca, 0xde, 0xae,
-	0x3e, 0x9b, 0x29, 0x47, 0x2d, 0xbd, 0x86, 0x2a, 0xbb, 0x60, 0xa2, 0x16, 0x97, 0x7d, 0x71, 0x9b,
-	0x54, 0xd7, 0x8b, 0xd8, 0x6c, 0xfb, 0x73, 0xdb, 0x25, 0xdf, 0xfe, 0xb2, 0x15, 0x55, 0xdd, 0x9a,
-	0x22, 0xc1, 0x0f, 0xb2, 0x6c, 0x03, 0x15, 0x07, 0x59, 0x6e, 0x69, 0x15, 0x07, 0x59, 0x7e, 0x79,
-	0xfd, 0xf2, 0xe3, 0x5f, 0x3f, 0x8d, 0x17, 0xd2, 0xdd, 0x33, 0xef, 0x7a, 0x2f, 0x94, 0xde, 0xc3,
-	0x57, 0x78, 0x7c, 0x61, 0xb9, 0xe4, 0x73, 0x42, 0x3e, 0xb7, 0xc6, 0xce, 0xde, 0xc5, 0x64, 0x38,
-	0x5c, 0x88, 0xfe, 0x3b, 0xfd, 0xc3, 0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0xad, 0x1d, 0xe8, 0x34,
-	0xb2, 0x1e, 0x00, 0x00,
+	// 2153 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x59, 0xcd, 0x6e, 0xe3, 0xc8,
+	0x11, 0x0e, 0x25, 0xd9, 0x23, 0x95, 0xff, 0x38, 0x3d, 0x63, 0x5b, 0xa2, 0x2d, 0xdb, 0xc3, 0xd9,
+	0xc9, 0x78, 0xbc, 0xbb, 0x36, 0xd6, 0xf9, 0xdb, 0x00, 0x49, 0x16, 0xb2, 0xa5, 0xd1, 0x70, 0xed,
+	0x91, 0x04, 0x8a, 0x32, 0xe0, 0x20, 0x00, 0x97, 0x32, 0xdb, 0x16, 0x61, 0x89, 0x54, 0xc8, 0x96,
+	0x17, 0x06, 0xf6, 0x10, 0x20, 0xa7, 0x1c, 0x82, 0xbc, 0xc0, 0x22, 0x2f, 0x90, 0x4b, 0x90, 0x6b,
+	0x0e, 0xb9, 0xe5, 0x90, 0x5b, 0xce, 0x79, 0x8c, 0xbc, 0x40, 0x40, 0xb2, 0x49, 0x35, 0xff, 0x64,
+	0x67, 0x3d, 0x33, 0x7b, 0xb2, 0x58, 0x55, 0xdd, 0xf5, 0xd7, 0x55, 0x5d, 0x5f, 0x1b, 0x1e, 0x0f,
+	0x26, 0xfd, 0x03, 0x07, 0xdb, 0x37, 0xc6, 0x05, 0xde, 0x1f, 0xdb, 0x16, 0xb1, 0x50, 0x91, 0x10,
+	0xad, 0xbf, 0x3f, 0x98, 0xf4, 0xc5, 0x7f, 0x70, 0xb0, 0xd8, 0xb6, 0xaf, 0x34, 0xd3, 0x70, 0x34,
+	0x62, 0x58, 0x26, 0x5a, 0x86, 0x9c, 0xa1, 0x97, 0xb9, 0x1d, 0x6e, 0x37, 0x2f, 0xe7, 0x0c, 0x1d,
+	0xad, 0xc1, 0xbc, 0x6e, 0x8d, 0x34, 0xc3, 0x2c, 0xe7, 0x76, 0xb8, 0xdd, 0x92, 0x4c, 0xbf, 0x10,
+	0x82, 0x82, 0xa9, 0x8d, 0x70, 0x39, 0xef, 0x51, 0xbd, 0xdf, 0x48, 0x80, 0xa2, 0x36, 0x1e, 0xdb,
+	0xd6, 0x0d, 0xd6, 0xcb, 0x85, 0x1d, 0x6e, 0xb7, 0x28, 0x87, 0xdf, 0xa8, 0x02, 0x45, 0xc3, 0x51,
+	0xad, 0xaf, 0x4d, 0x6c, 0x97, 0xe7, 0x3c, 0xde, 0x23, 0xc3, 0x69, 0xbb, 0x9f, 0xa8, 0x0a, 0x70,
+	0x61, 0x63, 0x8d, 0x60, 0x5d, 0xd5, 0x48, 0x79, 0xde, 0xdb, 0xb0, 0x44, 0x29, 0x35, 0xe2, 0xb2,
+	0x27, 0x63, 0x3d, 0x60, 0x3f, 0xf2, 0xd9, 0x94, 0x52, 0x23, 0xe2, 0x7f, 0x39, 0x58, 0xac, 0xd9,
+	0xc4, 0xb8, 0xd4, 0x2e, 0x88, 0x64, 0x5e, 0x5a, 0x09, 0x0f, 0x44, 0x58, 0xb4, 0x18, 0x0f, 0xa9,
+	0x1f, 0x11, 0x1a, 0xda, 0x83, 0xc2, 0xb5, 0x61, 0xea, 0x9e, 0x37, 0xcb, 0x87, 0x6b, 0xfb, 0x41,
+	0x7c, 0xf6, 0x83, 0x9d, 0x4f, 0x0c, 0x53, 0x97, 0x3d, 0x99, 0xd0, 0xf3, 0x02, 0xe3, 0x79, 0xd4,
+	0x85, 0xb9, 0xb8, 0x0b, 0x6b, 0x30, 0x3f, 0x9e, 0xf4, 0x87, 0xc6, 0x85, 0xe7, 0x5d, 0x51, 0xa6,
+	0x5f, 0xe8, 0x73, 0x58, 0x74, 0x2e, 0x06, 0x78, 0xa4, 0xa9, 0x13, 0x47, 0xbb, 0xc2, 0x9e, 0x73,
+	0xcb, 0x87, 0xab, 0x53, 0xf5, 0x5d, 0x8f, 0xdb, 0x73, 0x99, 0xf2, 0x82, 0x33, 0xfd, 0x10, 0xff,
+	0xc3, 0xc1, 0xc2, 0x19, 0xb6, 0x1d, 0xc3, 0x32, 0x53, 0x9d, 0x2e, 0xc3, 0xa3, 0x1b, 0x9f, 0x4d,
+	0xfd, 0x0d, 0x3e, 0xd1, 0xaf, 0x60, 0xd9, 0x31, 0xae, 0x4c, 0x8d, 0x4c, 0x6c, 0xac, 0x92, 0xdb,
+	0x31, 0xa6, 0x4e, 0xaf, 0x33, 0x5a, 0x03, 0xbe, 0x72, 0x3b, 0xc6, 0xf2, 0x92, 0xc3, 0x7e, 0xa2,
+	0x57, 0xc0, 0xbb, 0x04, 0xc3, 0xbc, 0x52, 0x0d, 0x1d, 0x9b, 0xc4, 0x20, 0xb7, 0x34, 0x14, 0x2b,
+	0x94, 0x2e, 0x51, 0xb2, 0x6b, 0x84, 0x8d, 0x6f, 0xac, 0x6b, 0xac, 0x07, 0x29, 0xa7, 0x9f, 0x77,
+	0xa4, 0x5c, 0xfc, 0x02, 0x4a, 0x35, 0xc7, 0xc1, 0x7e, 0x3e, 0x05, 0x28, 0x5e, 0x1a, 0x43, 0xec,
+	0xc5, 0x9c, 0xf3, 0x24, 0xc3, 0x6f, 0x37, 0xb0, 0xce, 0x40, 0x3b, 0xfc, 0xc9, 0x4f, 0x83, 0xd3,
+	0xe9, 0x7f, 0x89, 0x7f, 0xe3, 0x60, 0xa9, 0x8e, 0xc7, 0x43, 0xeb, 0xf6, 0x04, 0xdf, 0xa6, 0x06,
+	0x68, 0x07, 0x16, 0x2e, 0x0d, 0xf3, 0x0a, 0xdb, 0x63, 0xdb, 0x30, 0x09, 0x5d, 0xce, 0x92, 0xbc,
+	0x73, 0xe7, 0x60, 0x5b, 0xc5, 0x23, 0xcd, 0x18, 0xd2, 0x73, 0x5e, 0x72, 0x29, 0x0d, 0x97, 0x80,
+	0x3e, 0x83, 0x79, 0x87, 0x68, 0x64, 0xe2, 0x78, 0xde, 0x2f, 0x1f, 0x56, 0xa6, 0xf1, 0x0b, 0x35,
+	0x77, 0x3d, 0x01, 0x99, 0x0a, 0xde, 0x71, 0x4a, 0xc4, 0x33, 0x58, 0xec, 0xb8, 0xe7, 0xc2, 0x19,
+	0x78, 0xce, 0x7f, 0x17, 0xc7, 0xdd, 0xc3, 0xa9, 0x6b, 0x44, 0xf3, 0xcc, 0x5d, 0x94, 0xbd, 0xdf,
+	0xa2, 0x00, 0xe5, 0x53, 0xc3, 0x21, 0x6c, 0x99, 0x3b, 0x32, 0xfe, 0xed, 0x04, 0x3b, 0x44, 0x3c,
+	0x87, 0x4a, 0x0a, 0xcf, 0x19, 0x5b, 0xa6, 0x83, 0xd1, 0x2f, 0x60, 0x89, 0xad, 0x12, 0xa7, 0xcc,
+	0xed, 0xe4, 0x77, 0x17, 0xd8, 0xf2, 0x60, 0xd7, 0xc9, 0x51, 0x61, 0xf1, 0x13, 0x10, 0x6a, 0x7e,
+	0xf5, 0x47, 0xa4, 0x7c, 0xc5, 0xf1, 0x7c, 0x88, 0x55, 0xd8, 0x48, 0x95, 0xf6, 0x4d, 0x11, 0xbf,
+	0x81, 0xa7, 0xae, 0x9d, 0x41, 0x39, 0x06, 0xf6, 0x87, 0x85, 0xcb, 0xdd, 0xa3, 0x70, 0xe3, 0xd5,
+	0x96, 0xbb, 0x77, 0xb5, 0xbd, 0x85, 0xd5, 0x98, 0x76, 0x1a, 0xa1, 0x1f, 0x43, 0x49, 0x0b, 0x88,
+	0xc9, 0xe8, 0xb0, 0x6d, 0x49, 0x9e, 0x0a, 0x8a, 0x0a, 0xa0, 0x26, 0x0e, 0x77, 0xfb, 0x2e, 0xae,
+	0x04, 0x3d, 0x28, 0x37, 0xed, 0x41, 0xe2, 0x37, 0xf0, 0x24, 0xb2, 0x2b, 0x35, 0xf1, 0x10, 0x8a,
+	0x81, 0x66, 0x6f, 0xeb, 0x6c, 0x0b, 0x43, 0x39, 0xf4, 0x19, 0x14, 0x69, 0xbb, 0x70, 0xca, 0x39,
+	0xcf, 0x2b, 0x26, 0x4a, 0x4c, 0xdb, 0x91, 0x43, 0x31, 0x71, 0x02, 0x15, 0x46, 0x3b, 0x95, 0x79,
+	0x47, 0xae, 0xb1, 0xdd, 0x2c, 0x1f, 0xe9, 0x66, 0xe2, 0xbf, 0x38, 0x10, 0xd2, 0xf4, 0x3e, 0xc0,
+	0xf9, 0x83, 0x68, 0xeb, 0xcc, 0xf4, 0x3d, 0xec, 0xa8, 0x02, 0x14, 0x47, 0x9a, 0x69, 0x5c, 0x62,
+	0x87, 0xd0, 0xba, 0x0b, 0xbf, 0xd1, 0xc7, 0x30, 0xaf, 0xb9, 0xc5, 0xec, 0x76, 0x09, 0x37, 0x8e,
+	0x4f, 0x18, 0xf5, 0x41, 0x87, 0x93, 0xa9, 0x88, 0xf8, 0x27, 0x0e, 0xd6, 0x19, 0x67, 0x3c, 0x81,
+	0xf7, 0x1e, 0xc2, 0x48, 0x9b, 0x29, 0x44, 0xdb, 0x8c, 0xd8, 0x87, 0x72, 0xd2, 0x20, 0x1a, 0xdb,
+	0x77, 0xd5, 0x9e, 0x88, 0xdf, 0x9e, 0xea, 0xd6, 0xc5, 0x64, 0x84, 0x4d, 0x12, 0xe9, 0x12, 0xef,
+	0xef, 0xe0, 0x7c, 0xe5, 0x37, 0xbe, 0x98, 0x56, 0xea, 0x1a, 0xb3, 0x8c, 0x8b, 0x06, 0xeb, 0x15,
+	0xcc, 0xb9, 0x4e, 0x06, 0x65, 0x91, 0x9a, 0x4e, 0x5f, 0x22, 0xc8, 0xe6, 0x87, 0xf5, 0xeb, 0x1e,
+	0xd9, 0x4c, 0x77, 0xf9, 0x5d, 0x65, 0xf3, 0x9f, 0x39, 0x58, 0xa5, 0xb7, 0xd8, 0x87, 0x6a, 0x02,
+	0x91, 0x02, 0x2c, 0xc4, 0x0a, 0x30, 0x39, 0xee, 0xcc, 0xfd, 0x5f, 0xe3, 0xce, 0x26, 0x94, 0x42,
+	0x82, 0x37, 0xa8, 0x2c, 0xca, 0x53, 0x42, 0xea, 0x30, 0xf4, 0x28, 0x7d, 0x18, 0xda, 0x0f, 0x3b,
+	0x41, 0x31, 0x7e, 0x4f, 0xb0, 0xb7, 0x7e, 0xd8, 0x0c, 0x7e, 0x06, 0x6b, 0xf1, 0x38, 0xd2, 0x54,
+	0x55, 0x01, 0xa8, 0xe7, 0x6a, 0x78, 0x85, 0x96, 0x28, 0x45, 0xd2, 0xc5, 0xbf, 0x73, 0xb0, 0x72,
+	0x34, 0x19, 0x5e, 0xd3, 0xd5, 0x12, 0xc1, 0xa3, 0x07, 0xc7, 0x7e, 0x56, 0x8b, 0x8b, 0x44, 0xa8,
+	0x10, 0x8f, 0xd0, 0xd4, 0xed, 0xb9, 0x7b, 0xb9, 0xfd, 0x6f, 0x0e, 0x2a, 0x8c, 0xf5, 0xb1, 0x33,
+	0x94, 0x5d, 0x98, 0xc9, 0x3c, 0xe7, 0x1e, 0x3c, 0xd6, 0xe6, 0xd3, 0x33, 0x79, 0x00, 0x73, 0x06,
+	0xc1, 0xa3, 0xa0, 0xa5, 0x33, 0x83, 0x5f, 0x2c, 0xec, 0xb2, 0x2f, 0x27, 0xfe, 0x12, 0x84, 0x34,
+	0x97, 0x68, 0x3a, 0xb7, 0x61, 0x61, 0x9a, 0x4e, 0x7f, 0x8a, 0xc8, 0xcb, 0x10, 0xe6, 0xd3, 0x11,
+	0xc7, 0xf0, 0x54, 0xf6, 0xe6, 0xe6, 0x0f, 0x76, 0xab, 0xae, 0xc3, 0x6a, 0x4c, 0x23, 0x1d, 0xc3,
+	0x7e, 0x0e, 0x65, 0x19, 0x5f, 0x19, 0x0e, 0xc1, 0x76, 0x38, 0xe4, 0x06, 0xe6, 0x54, 0x01, 0x7c,
+	0x58, 0xa3, 0x5e, 0xe3, 0x5b, 0xcf, 0xa8, 0x45, 0xb9, 0xe4, 0x53, 0x4e, 0xf0, 0xad, 0xf8, 0x31,
+	0x54, 0x52, 0x96, 0xd2, 0x18, 0xc4, 0xa7, 0x41, 0x0c, 0x1b, 0x81, 0x70, 0xdb, 0xbe, 0x4a, 0xa8,
+	0x7a, 0x09, 0x2b, 0xec, 0xac, 0x39, 0x2d, 0x83, 0x65, 0x96, 0x2c, 0xe9, 0x31, 0x9b, 0x72, 0x71,
+	0x9b, 0xf6, 0x61, 0x33, 0x5d, 0x4d, 0x86, 0x59, 0xeb, 0xfe, 0x1c, 0x18, 0x0a, 0x86, 0x63, 0xb4,
+	0x0c, 0x6b, 0x71, 0x06, 0xdd, 0xe2, 0x73, 0x58, 0xd0, 0x3d, 0xaa, 0x6b, 0x41, 0x30, 0x23, 0xae,
+	0xa7, 0x60, 0x05, 0xef, 0xea, 0x00, 0x3d, 0xdc, 0x41, 0x7c, 0x05, 0xeb, 0x74, 0x22, 0x4e, 0xf8,
+	0x1f, 0xb7, 0x4b, 0x80, 0x72, 0x52, 0x94, 0xa6, 0xec, 0x13, 0x10, 0xea, 0x58, 0xbb, 0x20, 0xc6,
+	0x8d, 0x46, 0xee, 0xde, 0xa9, 0x0a, 0x1b, 0xa9, 0xd2, 0x74, 0xb3, 0x3d, 0x28, 0xd7, 0xee, 0xbb,
+	0xd5, 0x06, 0x54, 0x6a, 0x99, 0x1b, 0xed, 0xc2, 0x9a, 0x7f, 0xc2, 0xee, 0xdc, 0xa6, 0x02, 0xeb,
+	0x09, 0x49, 0xba, 0xc9, 0xef, 0x38, 0x10, 0x6a, 0xba, 0x5e, 0x1b, 0x0e, 0xad, 0xaf, 0xb1, 0x9e,
+	0xd8, 0xe9, 0xa1, 0xf5, 0x21, 0xc2, 0xd2, 0x34, 0x75, 0xee, 0x19, 0xcb, 0x7b, 0x46, 0x2d, 0x84,
+	0x39, 0x92, 0x7c, 0xd8, 0x92, 0x66, 0x01, 0xb5, 0xf0, 0xf7, 0x1c, 0x54, 0x65, 0x3c, 0xb2, 0x6e,
+	0xf0, 0xf7, 0x69, 0xe4, 0x0e, 0x6c, 0x65, 0x19, 0x41, 0xed, 0xfc, 0x0a, 0xb6, 0x58, 0x80, 0xd3,
+	0xc1, 0xf6, 0xc8, 0x70, 0x1c, 0x06, 0x28, 0x3e, 0x18, 0x9d, 0xfc, 0x85, 0x83, 0xed, 0x4c, 0x15,
+	0xb4, 0x56, 0x9a, 0xf0, 0x44, 0xf3, 0x2d, 0x54, 0xd9, 0x9a, 0xc9, 0xcd, 0xae, 0x99, 0xc7, 0x5a,
+	0xcc, 0x2b, 0x07, 0x7d, 0x41, 0xcb, 0xde, 0x19, 0x60, 0xdb, 0x29, 0xe7, 0xbd, 0xf5, 0xdb, 0x49,
+	0x93, 0x3b, 0x81, 0x8c, 0x5f, 0x7b, 0xd3, 0x25, 0xe2, 0x0d, 0x6c, 0x76, 0x19, 0x54, 0x61, 0x38,
+	0x46, 0xdf, 0x18, 0x1a, 0xe4, 0x9d, 0x65, 0x6d, 0xfa, 0x20, 0x94, 0x67, 0x1f, 0x84, 0xc4, 0x6d,
+	0xa8, 0x66, 0xe8, 0xa5, 0x89, 0xfa, 0x03, 0x07, 0x7c, 0x5b, 0xaa, 0x1f, 0x77, 0x6c, 0xeb, 0xc6,
+	0xd0, 0x7d, 0xcb, 0x13, 0x6f, 0x1b, 0x69, 0x1a, 0x0f, 0x01, 0x2e, 0x2d, 0xfb, 0x2a, 0xf2, 0xe4,
+	0xc3, 0x4c, 0xaf, 0xaf, 0x5d, 0x9e, 0x77, 0x2f, 0x96, 0x2e, 0x83, 0x9f, 0x6e, 0xf7, 0x34, 0x1c,
+	0x67, 0x82, 0x6d, 0x75, 0x62, 0x0f, 0xe9, 0x34, 0x59, 0xf2, 0x29, 0x3d, 0x7b, 0x28, 0xfe, 0x91,
+	0x83, 0xd5, 0xd4, 0x50, 0x26, 0x0c, 0x7a, 0x0e, 0x4b, 0x63, 0x6a, 0xb0, 0xca, 0x58, 0xb6, 0x18,
+	0x10, 0x5b, 0xae, 0x85, 0x5b, 0x00, 0x36, 0x1e, 0x5b, 0x8e, 0x41, 0x2c, 0x3b, 0xb8, 0x7b, 0x19,
+	0x8a, 0x7b, 0x4f, 0xda, 0xf8, 0x52, 0x1d, 0x6b, 0x84, 0x60, 0xdb, 0xa4, 0xe6, 0x80, 0x8d, 0x2f,
+	0x3b, 0x3e, 0x65, 0x4f, 0x9b, 0x3e, 0x04, 0xba, 0xe1, 0x47, 0x55, 0xa8, 0xd4, 0x64, 0x45, 0x7a,
+	0x5d, 0x3b, 0x56, 0xd4, 0x13, 0xa9, 0x55, 0x57, 0x7b, 0xad, 0x6e, 0xa7, 0x71, 0x2c, 0xbd, 0x96,
+	0x1a, 0x75, 0xfe, 0x07, 0xa8, 0x0c, 0x4f, 0xa3, 0xec, 0xee, 0xf1, 0x9b, 0xc6, 0xdb, 0x1a, 0xcf,
+	0x25, 0x39, 0x9d, 0xd3, 0x5e, 0x53, 0x6a, 0xf1, 0xb9, 0xbd, 0x6b, 0x58, 0x8a, 0x4c, 0x11, 0x68,
+	0x0b, 0x84, 0xae, 0xd4, 0x6c, 0xd5, 0x94, 0x9e, 0xdc, 0x50, 0x95, 0xf3, 0x4e, 0x23, 0xa6, 0xa4,
+	0x0a, 0x95, 0x18, 0xbf, 0xde, 0xe8, 0x9c, 0xb6, 0xcf, 0xd5, 0x93, 0xc6, 0x39, 0xcf, 0xa1, 0x0d,
+	0x58, 0x8f, 0xb1, 0xbb, 0x52, 0xb3, 0xab, 0xb4, 0xe5, 0x06, 0x9f, 0xdb, 0xfb, 0x33, 0x07, 0xa5,
+	0x30, 0x2f, 0x48, 0x80, 0xb5, 0xd7, 0x6d, 0xb9, 0x99, 0xaa, 0x65, 0x15, 0x1e, 0x33, 0xbc, 0xa6,
+	0xa4, 0xbc, 0xe9, 0x1d, 0xf1, 0x5c, 0x92, 0x7c, 0x5a, 0x3b, 0xe2, 0x73, 0x68, 0x0d, 0x10, 0x43,
+	0xf6, 0x7e, 0x7e, 0xd9, 0xe6, 0xf3, 0xae, 0xdb, 0x0c, 0xfd, 0x48, 0x52, 0x8e, 0x7a, 0xc7, 0x27,
+	0x0d, 0x85, 0x2f, 0xc4, 0x36, 0x3a, 0xee, 0x75, 0x95, 0xf6, 0x5b, 0x7e, 0x6e, 0xef, 0xaf, 0x1c,
+	0xac, 0xc4, 0xde, 0xba, 0xd0, 0x33, 0xa8, 0x4e, 0x3d, 0x54, 0xbb, 0x4a, 0x4d, 0xe9, 0x75, 0x93,
+	0x31, 0x49, 0x8a, 0x74, 0x1a, 0xad, 0xba, 0xd4, 0x6a, 0xf2, 0x1c, 0xda, 0x84, 0x72, 0x92, 0x5d,
+	0x3b, 0x56, 0xa4, 0xb3, 0x06, 0x9f, 0x73, 0x03, 0x9e, 0xe4, 0x4a, 0x2d, 0xca, 0xcf, 0xa7, 0x6f,
+	0x2e, 0x37, 0xce, 0xda, 0x27, 0x8d, 0x3a, 0x5f, 0xd8, 0xfb, 0x96, 0x83, 0x05, 0xe6, 0x99, 0xc7,
+	0x55, 0xe6, 0xa7, 0x5d, 0xed, 0x75, 0x6b, 0xcd, 0x78, 0x5c, 0x05, 0x58, 0x8b, 0x70, 0x1b, 0x75,
+	0x49, 0x69, 0xcb, 0x52, 0xed, 0x94, 0xe7, 0xbc, 0xcc, 0xb2, 0xbc, 0xba, 0xd4, 0x55, 0x64, 0xe9,
+	0xa8, 0xa7, 0x48, 0xed, 0x16, 0x9f, 0x43, 0x15, 0x58, 0x8d, 0xb0, 0xbb, 0x0d, 0x45, 0x91, 0x5a,
+	0xcd, 0x2e, 0x9f, 0x4f, 0xb0, 0xde, 0x36, 0xba, 0xee, 0xdf, 0x2e, 0x5f, 0x38, 0xfc, 0x96, 0x87,
+	0xfc, 0x9b, 0x49, 0x1f, 0xfd, 0x06, 0x1e, 0x27, 0x9e, 0xe5, 0x90, 0x38, 0x2d, 0xd7, 0xac, 0xf7,
+	0x3c, 0xe1, 0xf9, 0x4c, 0x19, 0xda, 0x67, 0xfb, 0xf0, 0x24, 0xe5, 0xad, 0x0d, 0x7d, 0xc4, 0xb4,
+	0xb1, 0xcc, 0x87, 0x3b, 0xe1, 0xc5, 0x1d, 0x52, 0x54, 0x47, 0x07, 0x96, 0x22, 0x4f, 0x66, 0x68,
+	0x2b, 0x6a, 0x59, 0xfc, 0x25, 0x4f, 0xd8, 0xce, 0xe4, 0xd3, 0x1d, 0xbf, 0x84, 0x05, 0xe6, 0x2d,
+	0x02, 0x6d, 0x4e, 0xe5, 0x93, 0x8f, 0x69, 0x42, 0x35, 0x83, 0x4b, 0xf7, 0x52, 0x23, 0x2f, 0x70,
+	0x74, 0xca, 0x45, 0xcf, 0x53, 0x17, 0x45, 0xa7, 0x6e, 0xe1, 0xa3, 0xd9, 0x42, 0x54, 0xc1, 0x39,
+	0xf0, 0xf1, 0x87, 0x13, 0xf4, 0x2c, 0x75, 0x25, 0xfb, 0xca, 0x23, 0x88, 0xb3, 0x44, 0xe8, 0xd6,
+	0xf4, 0x6c, 0x44, 0x60, 0x7c, 0xfc, 0x6c, 0xa4, 0x3d, 0x3a, 0xc4, 0xcf, 0x46, 0xfa, 0x3b, 0x80,
+	0x6f, 0x78, 0x74, 0xf3, 0xa8, 0xe1, 0xa9, 0x7b, 0x8b, 0xb3, 0x44, 0xe8, 0xd6, 0x5d, 0x58, 0x8e,
+	0x42, 0x20, 0xb4, 0x9d, 0x00, 0x83, 0xb1, 0x60, 0xef, 0x64, 0x0b, 0x4c, 0x33, 0x99, 0xc4, 0x56,
+	0x6c, 0x26, 0x33, 0xc1, 0x24, 0x9b, 0xc9, 0x19, 0xf0, 0xac, 0x03, 0x4b, 0x11, 0x2c, 0xc4, 0x1e,
+	0xe4, 0x34, 0x58, 0xc6, 0x1e, 0xe4, 0x54, 0x10, 0xe5, 0x26, 0x30, 0x81, 0x84, 0xd8, 0x04, 0x66,
+	0x21, 0x2c, 0x36, 0x81, 0xd9, 0x50, 0x0a, 0xbb, 0x68, 0x31, 0x89, 0x69, 0xd0, 0x8b, 0xe4, 0xe2,
+	0x14, 0x68, 0x25, 0xfc, 0xf0, 0x2e, 0xb1, 0x69, 0x32, 0xa3, 0x88, 0x07, 0xc5, 0x0a, 0x38, 0x01,
+	0x92, 0xd8, 0x64, 0x66, 0x80, 0xa5, 0x73, 0xe0, 0xe3, 0x38, 0x86, 0x3d, 0x7c, 0x19, 0x70, 0x88,
+	0x3d, 0x7c, 0x59, 0x30, 0xc8, 0xed, 0x79, 0x29, 0xc0, 0x86, 0xed, 0x79, 0xd9, 0x28, 0x89, 0xed,
+	0x79, 0x33, 0xd0, 0x91, 0x9b, 0xd8, 0x04, 0xe2, 0x61, 0x13, 0x9b, 0x05, 0x9d, 0xd8, 0xc4, 0x66,
+	0x42, 0x26, 0x74, 0x06, 0x2b, 0x31, 0x20, 0x84, 0x76, 0xe2, 0x47, 0x2d, 0xb1, 0xf3, 0xb3, 0x19,
+	0x12, 0xcc, 0x6d, 0x90, 0x84, 0x30, 0x91, 0xdb, 0x20, 0x13, 0x63, 0x45, 0x6e, 0x83, 0x6c, 0x1c,
+	0x84, 0xae, 0x5d, 0xb8, 0x97, 0x86, 0x40, 0xd0, 0x4b, 0xd6, 0xc0, 0x19, 0x40, 0x49, 0xd8, 0xbd,
+	0x5b, 0x90, 0x2a, 0x33, 0x61, 0x3d, 0x03, 0x69, 0xa0, 0xdd, 0xf4, 0x4b, 0x26, 0x89, 0x77, 0x84,
+	0x57, 0xf7, 0x90, 0xa4, 0xfa, 0x06, 0xb0, 0x9a, 0x3a, 0xb4, 0x23, 0xa6, 0x96, 0x66, 0xa1, 0x09,
+	0xe1, 0xe5, 0x9d, 0x72, 0xbe, 0xa6, 0xa3, 0x17, 0xbf, 0x7e, 0x7e, 0x65, 0x10, 0x57, 0xee, 0xc2,
+	0x1a, 0x1d, 0xb8, 0x8b, 0x0e, 0xf0, 0x10, 0x8f, 0x07, 0x9a, 0x49, 0x3e, 0x25, 0xe4, 0x53, 0x6d,
+	0x6c, 0x1c, 0x0c, 0x26, 0xfd, 0xfe, 0xbc, 0xf7, 0x5f, 0xfe, 0x1f, 0xfd, 0x2f, 0x00, 0x00, 0xff,
+	0xff, 0x8c, 0xd0, 0x7f, 0x35, 0xfa, 0x1f, 0x00, 0x00,
 }
