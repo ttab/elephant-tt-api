@@ -590,6 +590,27 @@
             "description": "Creator filter (photographer).",
             "type": "string"
           },
+          "distributor_names": {
+            "description": "Filter by distributor names.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "editorial_topics": {
+            "description": "Filter by editorial topics.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "events": {
+            "description": "Filter by events.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "file_type": {
             "$ref": "#/components/schemas/ttab.ntb.FileType"
           },
@@ -641,6 +662,13 @@
             "description": "Set to true to search against items outside of your subscription agreement.",
             "type": "boolean"
           },
+          "persons": {
+            "description": "Filter by persons.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "query": {
             "description": "Query - freetext query.",
             "type": "string"
@@ -654,6 +682,13 @@
           },
           "sort": {
             "$ref": "#/components/schemas/ttab.ntb.Sort"
+          },
+          "subject_terms": {
+            "description": "Filter by subject terms.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"

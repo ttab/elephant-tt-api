@@ -161,6 +161,16 @@ message SearchRequest {
   string created_max           = 22;
   // Set to true to search against items outside of your subscription agreement.
   bool outside_subscription    = 23;
+  // Filter by editorial topics.
+  repeated string editorial_topics  = 24;
+  // Filter by distributor names.
+  repeated string distributor_names = 25;
+  // Filter by events.
+  repeated string events            = 26;
+  // Filter by subject terms.
+  repeated string subject_terms     = 27;
+  // Filter by persons.
+  repeated string persons           = 28;
 }
 
 message Sort {
