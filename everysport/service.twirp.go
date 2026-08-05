@@ -34,6 +34,34 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 type Manage interface {
 	// ManualImport re-imports calendar events based on a search query.
 	ManualImport(context.Context, *ManualImportRequest) (*ManualImportResponse, error)
+
+	// ListSports lists the sports in the import configuration.
+	ListSports(context.Context, *ListSportsRequest) (*ListSportsResponse, error)
+
+	// ListCategories lists the competition categories of a sport. Categories
+	// are identity only, they carry no import settings.
+	ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error)
+
+	// ListCompetitions lists competitions in the import configuration.
+	ListCompetitions(context.Context, *ListCompetitionsRequest) (*ListCompetitionsResponse, error)
+
+	// GetSport returns a single sport configuration.
+	GetSport(context.Context, *GetSportRequest) (*GetSportResponse, error)
+
+	// GetCompetition returns a single competition configuration.
+	GetCompetition(context.Context, *GetCompetitionRequest) (*GetCompetitionResponse, error)
+
+	// UpdateSport replaces the editable settings of a sport.
+	UpdateSport(context.Context, *UpdateSportRequest) (*UpdateSportResponse, error)
+
+	// UpdateCompetition replaces the editable settings of a competition.
+	UpdateCompetition(context.Context, *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error)
+
+	// UpdateCategory updates the editable fields of a competition category.
+	UpdateCategory(context.Context, *UpdateCategoryRequest) (*UpdateCategoryResponse, error)
+
+	// ExportConfig returns the full import configuration as CSV.
+	ExportConfig(context.Context, *ExportConfigRequest) (*ExportConfigResponse, error)
 }
 
 // ======================
@@ -42,7 +70,7 @@ type Manage interface {
 
 type manageProtobufClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [10]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -70,8 +98,17 @@ func NewManageProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Cl
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.everysport", "Manage")
-	urls := [1]string{
+	urls := [10]string{
 		serviceURL + "ManualImport",
+		serviceURL + "ListSports",
+		serviceURL + "ListCategories",
+		serviceURL + "ListCompetitions",
+		serviceURL + "GetSport",
+		serviceURL + "GetCompetition",
+		serviceURL + "UpdateSport",
+		serviceURL + "UpdateCompetition",
+		serviceURL + "UpdateCategory",
+		serviceURL + "ExportConfig",
 	}
 
 	return &manageProtobufClient{
@@ -128,13 +165,427 @@ func (c *manageProtobufClient) callManualImport(ctx context.Context, in *ManualI
 	return out, nil
 }
 
+func (c *manageProtobufClient) ListSports(ctx context.Context, in *ListSportsRequest) (*ListSportsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSports")
+	caller := c.callListSports
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSportsRequest) (*ListSportsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSportsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSportsRequest) when calling interceptor")
+					}
+					return c.callListSports(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSportsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSportsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callListSports(ctx context.Context, in *ListSportsRequest) (*ListSportsResponse, error) {
+	out := new(ListSportsResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) ListCategories(ctx context.Context, in *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListCategories")
+	caller := c.callListCategories
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCategoriesRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCategoriesRequest) when calling interceptor")
+					}
+					return c.callListCategories(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCategoriesResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCategoriesResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callListCategories(ctx context.Context, in *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	out := new(ListCategoriesResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) ListCompetitions(ctx context.Context, in *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListCompetitions")
+	caller := c.callListCompetitions
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCompetitionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCompetitionsRequest) when calling interceptor")
+					}
+					return c.callListCompetitions(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCompetitionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCompetitionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callListCompetitions(ctx context.Context, in *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+	out := new(ListCompetitionsResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) GetSport(ctx context.Context, in *GetSportRequest) (*GetSportResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSport")
+	caller := c.callGetSport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSportRequest) (*GetSportResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSportRequest) when calling interceptor")
+					}
+					return c.callGetSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callGetSport(ctx context.Context, in *GetSportRequest) (*GetSportResponse, error) {
+	out := new(GetSportResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) GetCompetition(ctx context.Context, in *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "GetCompetition")
+	caller := c.callGetCompetition
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetCompetitionRequest) when calling interceptor")
+					}
+					return c.callGetCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callGetCompetition(ctx context.Context, in *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+	out := new(GetCompetitionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) UpdateSport(ctx context.Context, in *UpdateSportRequest) (*UpdateSportResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateSport")
+	caller := c.callUpdateSport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateSportRequest) (*UpdateSportResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateSportRequest) when calling interceptor")
+					}
+					return c.callUpdateSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callUpdateSport(ctx context.Context, in *UpdateSportRequest) (*UpdateSportResponse, error) {
+	out := new(UpdateSportResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) UpdateCompetition(ctx context.Context, in *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCompetition")
+	caller := c.callUpdateCompetition
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCompetitionRequest) when calling interceptor")
+					}
+					return c.callUpdateCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callUpdateCompetition(ctx context.Context, in *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+	out := new(UpdateCompetitionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) UpdateCategory(ctx context.Context, in *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCategory")
+	caller := c.callUpdateCategory
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCategoryRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCategoryRequest) when calling interceptor")
+					}
+					return c.callUpdateCategory(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCategoryResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCategoryResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callUpdateCategory(ctx context.Context, in *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	out := new(UpdateCategoryResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageProtobufClient) ExportConfig(ctx context.Context, in *ExportConfigRequest) (*ExportConfigResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ExportConfig")
+	caller := c.callExportConfig
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ExportConfigRequest) (*ExportConfigResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ExportConfigRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ExportConfigRequest) when calling interceptor")
+					}
+					return c.callExportConfig(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ExportConfigResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ExportConfigResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageProtobufClient) callExportConfig(ctx context.Context, in *ExportConfigRequest) (*ExportConfigResponse, error) {
+	out := new(ExportConfigResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // ==================
 // Manage JSON Client
 // ==================
 
 type manageJSONClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [10]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -162,8 +613,17 @@ func NewManageJSONClient(baseURL string, client HTTPClient, opts ...twirp.Client
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "ttab.everysport", "Manage")
-	urls := [1]string{
+	urls := [10]string{
 		serviceURL + "ManualImport",
+		serviceURL + "ListSports",
+		serviceURL + "ListCategories",
+		serviceURL + "ListCompetitions",
+		serviceURL + "GetSport",
+		serviceURL + "GetCompetition",
+		serviceURL + "UpdateSport",
+		serviceURL + "UpdateCompetition",
+		serviceURL + "UpdateCategory",
+		serviceURL + "ExportConfig",
 	}
 
 	return &manageJSONClient{
@@ -206,6 +666,420 @@ func (c *manageJSONClient) ManualImport(ctx context.Context, in *ManualImportReq
 func (c *manageJSONClient) callManualImport(ctx context.Context, in *ManualImportRequest) (*ManualImportResponse, error) {
 	out := new(ManualImportResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) ListSports(ctx context.Context, in *ListSportsRequest) (*ListSportsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSports")
+	caller := c.callListSports
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSportsRequest) (*ListSportsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSportsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSportsRequest) when calling interceptor")
+					}
+					return c.callListSports(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSportsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSportsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callListSports(ctx context.Context, in *ListSportsRequest) (*ListSportsResponse, error) {
+	out := new(ListSportsResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) ListCategories(ctx context.Context, in *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListCategories")
+	caller := c.callListCategories
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCategoriesRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCategoriesRequest) when calling interceptor")
+					}
+					return c.callListCategories(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCategoriesResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCategoriesResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callListCategories(ctx context.Context, in *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	out := new(ListCategoriesResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) ListCompetitions(ctx context.Context, in *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ListCompetitions")
+	caller := c.callListCompetitions
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCompetitionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCompetitionsRequest) when calling interceptor")
+					}
+					return c.callListCompetitions(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCompetitionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCompetitionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callListCompetitions(ctx context.Context, in *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+	out := new(ListCompetitionsResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) GetSport(ctx context.Context, in *GetSportRequest) (*GetSportResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSport")
+	caller := c.callGetSport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSportRequest) (*GetSportResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSportRequest) when calling interceptor")
+					}
+					return c.callGetSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callGetSport(ctx context.Context, in *GetSportRequest) (*GetSportResponse, error) {
+	out := new(GetSportResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) GetCompetition(ctx context.Context, in *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "GetCompetition")
+	caller := c.callGetCompetition
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetCompetitionRequest) when calling interceptor")
+					}
+					return c.callGetCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callGetCompetition(ctx context.Context, in *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+	out := new(GetCompetitionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) UpdateSport(ctx context.Context, in *UpdateSportRequest) (*UpdateSportResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateSport")
+	caller := c.callUpdateSport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateSportRequest) (*UpdateSportResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateSportRequest) when calling interceptor")
+					}
+					return c.callUpdateSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callUpdateSport(ctx context.Context, in *UpdateSportRequest) (*UpdateSportResponse, error) {
+	out := new(UpdateSportResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) UpdateCompetition(ctx context.Context, in *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCompetition")
+	caller := c.callUpdateCompetition
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCompetitionRequest) when calling interceptor")
+					}
+					return c.callUpdateCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callUpdateCompetition(ctx context.Context, in *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+	out := new(UpdateCompetitionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) UpdateCategory(ctx context.Context, in *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCategory")
+	caller := c.callUpdateCategory
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCategoryRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCategoryRequest) when calling interceptor")
+					}
+					return c.callUpdateCategory(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCategoryResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCategoryResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callUpdateCategory(ctx context.Context, in *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	out := new(UpdateCategoryResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *manageJSONClient) ExportConfig(ctx context.Context, in *ExportConfigRequest) (*ExportConfigResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "ttab.everysport")
+	ctx = ctxsetters.WithServiceName(ctx, "Manage")
+	ctx = ctxsetters.WithMethodName(ctx, "ExportConfig")
+	caller := c.callExportConfig
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ExportConfigRequest) (*ExportConfigResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ExportConfigRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ExportConfigRequest) when calling interceptor")
+					}
+					return c.callExportConfig(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ExportConfigResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ExportConfigResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *manageJSONClient) callExportConfig(ctx context.Context, in *ExportConfigRequest) (*ExportConfigResponse, error) {
+	out := new(ExportConfigResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -319,6 +1193,33 @@ func (s *manageServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	switch method {
 	case "ManualImport":
 		s.serveManualImport(ctx, resp, req)
+		return
+	case "ListSports":
+		s.serveListSports(ctx, resp, req)
+		return
+	case "ListCategories":
+		s.serveListCategories(ctx, resp, req)
+		return
+	case "ListCompetitions":
+		s.serveListCompetitions(ctx, resp, req)
+		return
+	case "GetSport":
+		s.serveGetSport(ctx, resp, req)
+		return
+	case "GetCompetition":
+		s.serveGetCompetition(ctx, resp, req)
+		return
+	case "UpdateSport":
+		s.serveUpdateSport(ctx, resp, req)
+		return
+	case "UpdateCompetition":
+		s.serveUpdateCompetition(ctx, resp, req)
+		return
+	case "UpdateCategory":
+		s.serveUpdateCategory(ctx, resp, req)
+		return
+	case "ExportConfig":
+		s.serveExportConfig(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -484,6 +1385,1626 @@ func (s *manageServer) serveManualImportProtobuf(ctx context.Context, resp http.
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *ManualImportResponse and nil error while calling ManualImport. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListSports(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListSportsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListSportsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveListSportsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSports")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListSportsRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.ListSports
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSportsRequest) (*ListSportsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSportsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSportsRequest) when calling interceptor")
+					}
+					return s.Manage.ListSports(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSportsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSportsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSportsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSportsResponse and nil error while calling ListSports. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListSportsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSports")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListSportsRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.ListSports
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSportsRequest) (*ListSportsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSportsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSportsRequest) when calling interceptor")
+					}
+					return s.Manage.ListSports(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSportsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSportsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSportsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSportsResponse and nil error while calling ListSports. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListCategories(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListCategoriesJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListCategoriesProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveListCategoriesJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListCategories")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListCategoriesRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.ListCategories
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCategoriesRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCategoriesRequest) when calling interceptor")
+					}
+					return s.Manage.ListCategories(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCategoriesResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCategoriesResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListCategoriesResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListCategoriesResponse and nil error while calling ListCategories. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListCategoriesProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListCategories")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListCategoriesRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.ListCategories
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCategoriesRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCategoriesRequest) when calling interceptor")
+					}
+					return s.Manage.ListCategories(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCategoriesResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCategoriesResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListCategoriesResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListCategoriesResponse and nil error while calling ListCategories. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListCompetitions(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListCompetitionsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListCompetitionsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveListCompetitionsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListCompetitions")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListCompetitionsRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.ListCompetitions
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCompetitionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCompetitionsRequest) when calling interceptor")
+					}
+					return s.Manage.ListCompetitions(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCompetitionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCompetitionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListCompetitionsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListCompetitionsResponse and nil error while calling ListCompetitions. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveListCompetitionsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListCompetitions")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListCompetitionsRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.ListCompetitions
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListCompetitionsRequest) (*ListCompetitionsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListCompetitionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListCompetitionsRequest) when calling interceptor")
+					}
+					return s.Manage.ListCompetitions(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListCompetitionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListCompetitionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListCompetitionsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListCompetitionsResponse and nil error while calling ListCompetitions. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveGetSport(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetSportJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetSportProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveGetSportJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSport")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(GetSportRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.GetSport
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSportRequest) (*GetSportResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSportRequest) when calling interceptor")
+					}
+					return s.Manage.GetSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSportResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSportResponse and nil error while calling GetSport. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveGetSportProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSport")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(GetSportRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.GetSport
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSportRequest) (*GetSportResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSportRequest) when calling interceptor")
+					}
+					return s.Manage.GetSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSportResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSportResponse and nil error while calling GetSport. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveGetCompetition(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetCompetitionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetCompetitionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveGetCompetitionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetCompetition")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(GetCompetitionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.GetCompetition
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetCompetitionRequest) when calling interceptor")
+					}
+					return s.Manage.GetCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetCompetitionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetCompetitionResponse and nil error while calling GetCompetition. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveGetCompetitionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetCompetition")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(GetCompetitionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.GetCompetition
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetCompetitionRequest) (*GetCompetitionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetCompetitionRequest) when calling interceptor")
+					}
+					return s.Manage.GetCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetCompetitionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetCompetitionResponse and nil error while calling GetCompetition. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateSport(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveUpdateSportJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveUpdateSportProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveUpdateSportJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateSport")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(UpdateSportRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.UpdateSport
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateSportRequest) (*UpdateSportResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateSportRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateSportResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateSportResponse and nil error while calling UpdateSport. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateSportProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateSport")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(UpdateSportRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.UpdateSport
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateSportRequest) (*UpdateSportResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateSportRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateSportRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateSport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateSportResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateSportResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateSportResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateSportResponse and nil error while calling UpdateSport. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateCompetition(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveUpdateCompetitionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveUpdateCompetitionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveUpdateCompetitionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCompetition")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(UpdateCompetitionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.UpdateCompetition
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCompetitionRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateCompetitionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateCompetitionResponse and nil error while calling UpdateCompetition. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateCompetitionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCompetition")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(UpdateCompetitionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.UpdateCompetition
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateCompetitionRequest) (*UpdateCompetitionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCompetitionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCompetitionRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateCompetition(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCompetitionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCompetitionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateCompetitionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateCompetitionResponse and nil error while calling UpdateCompetition. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateCategory(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveUpdateCategoryJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveUpdateCategoryProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveUpdateCategoryJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCategory")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(UpdateCategoryRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.UpdateCategory
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCategoryRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCategoryRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateCategory(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCategoryResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCategoryResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateCategoryResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateCategoryResponse and nil error while calling UpdateCategory. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveUpdateCategoryProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "UpdateCategory")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(UpdateCategoryRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.UpdateCategory
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*UpdateCategoryRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*UpdateCategoryRequest) when calling interceptor")
+					}
+					return s.Manage.UpdateCategory(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*UpdateCategoryResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdateCategoryResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *UpdateCategoryResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdateCategoryResponse and nil error while calling UpdateCategory. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveExportConfig(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveExportConfigJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveExportConfigProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *manageServer) serveExportConfigJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ExportConfig")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ExportConfigRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Manage.ExportConfig
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ExportConfigRequest) (*ExportConfigResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ExportConfigRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ExportConfigRequest) when calling interceptor")
+					}
+					return s.Manage.ExportConfig(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ExportConfigResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ExportConfigResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ExportConfigResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ExportConfigResponse and nil error while calling ExportConfig. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *manageServer) serveExportConfigProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ExportConfig")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ExportConfigRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Manage.ExportConfig
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ExportConfigRequest) (*ExportConfigResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ExportConfigRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ExportConfigRequest) when calling interceptor")
+					}
+					return s.Manage.ExportConfig(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ExportConfigResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ExportConfigResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ExportConfigResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ExportConfigResponse and nil error while calling ExportConfig. nil responses are not supported"))
 		return
 	}
 
@@ -1088,23 +3609,85 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 279 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0x4f, 0x4b, 0xf3, 0x40,
-	0x10, 0xc6, 0xc9, 0x9b, 0xb7, 0x31, 0x1d, 0xff, 0xc1, 0x5a, 0x30, 0xd4, 0x4b, 0x28, 0x16, 0x82,
-	0xd8, 0x04, 0xf4, 0xec, 0x45, 0xbc, 0x78, 0xe8, 0x25, 0x47, 0x3d, 0x94, 0x4d, 0x3a, 0x4d, 0x17,
-	0x9a, 0xcc, 0x76, 0x77, 0x52, 0xe8, 0xa7, 0xf1, 0xab, 0x4a, 0x36, 0x60, 0xab, 0x08, 0x1e, 0xe7,
-	0xf7, 0x9b, 0x1d, 0x1e, 0x9e, 0x85, 0x08, 0x77, 0x68, 0xf6, 0x56, 0x93, 0xe1, 0xcc, 0xa2, 0xd9,
-	0xa9, 0x12, 0x53, 0x6d, 0x88, 0x49, 0x5c, 0x32, 0xcb, 0x22, 0x3d, 0xe8, 0xc9, 0x87, 0x07, 0x57,
-	0x73, 0xd9, 0xb4, 0x72, 0xf3, 0x5a, 0x77, 0x20, 0xc7, 0x6d, 0x8b, 0x96, 0xc5, 0x0d, 0x0c, 0x57,
-	0x86, 0xea, 0xc5, 0x52, 0x32, 0x46, 0x5e, 0xec, 0x25, 0xc3, 0x3c, 0xec, 0xc0, 0x8b, 0x64, 0x14,
-	0xd7, 0x70, 0xc2, 0xd4, 0xab, 0x7f, 0x4e, 0x05, 0x4c, 0x4e, 0x8c, 0x21, 0x2c, 0x25, 0x63, 0x45,
-	0x66, 0x1f, 0xf9, 0xb1, 0x97, 0xf8, 0xf9, 0xd7, 0x2c, 0x62, 0x38, 0x2d, 0xa9, 0xd6, 0xc8, 0x8a,
-	0x15, 0x35, 0xd1, 0x7f, 0xa7, 0x8f, 0x91, 0x18, 0xc1, 0x60, 0x45, 0xa6, 0xc4, 0x68, 0x10, 0x7b,
-	0x49, 0x98, 0xf7, 0xc3, 0xe4, 0x09, 0x46, 0xdf, 0x03, 0x5a, 0x4d, 0x8d, 0x45, 0x31, 0x85, 0x8b,
-	0x6d, 0x8b, 0x2d, 0x2e, 0x17, 0xca, 0x09, 0xeb, 0x62, 0xfa, 0xf9, 0x79, 0x4f, 0xfb, 0x6d, 0xfb,
-	0x80, 0x10, 0xcc, 0x65, 0x23, 0x2b, 0x14, 0xef, 0x70, 0x76, 0x7c, 0x48, 0xdc, 0xa6, 0x3f, 0xca,
-	0x48, 0x7f, 0x29, 0x62, 0x3c, 0xfd, 0x63, 0xab, 0x4f, 0xf3, 0x7c, 0xff, 0x76, 0x57, 0x29, 0x5e,
-	0xb7, 0x45, 0x5a, 0x52, 0x9d, 0x75, 0x4f, 0x32, 0xdc, 0xa0, 0x5e, 0xcb, 0x86, 0x67, 0xcc, 0x33,
-	0xa9, 0x55, 0x76, 0x38, 0x51, 0x04, 0xee, 0x37, 0x1e, 0x3f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x97,
-	0x6a, 0x79, 0x1f, 0xa9, 0x01, 0x00, 0x00,
+	// 1269 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0xdb, 0x6e, 0xdb, 0x46,
+	0x10, 0x2d, 0x45, 0xeb, 0x36, 0xb2, 0x15, 0x79, 0x7d, 0x09, 0xa3, 0xa4, 0x8d, 0xcc, 0x24, 0xad,
+	0x62, 0x34, 0x36, 0xaa, 0xf6, 0xa9, 0x41, 0x51, 0xd8, 0x96, 0x6c, 0xa8, 0x48, 0x9c, 0x80, 0x8a,
+	0xd1, 0x4b, 0xd0, 0x08, 0xb4, 0xb8, 0x56, 0x58, 0x50, 0xa4, 0x4c, 0x2e, 0x9d, 0xf8, 0xb5, 0x40,
+	0x9f, 0xfb, 0x05, 0x45, 0xff, 0xa5, 0x1f, 0xd0, 0x0f, 0xe8, 0x6b, 0x81, 0x7e, 0x47, 0xb1, 0x17,
+	0x4a, 0xcb, 0x8b, 0xe4, 0x4b, 0xfc, 0xb6, 0x33, 0x3b, 0xbb, 0x3b, 0x73, 0x66, 0xe6, 0x0c, 0x25,
+	0xd0, 0xf0, 0x19, 0xf6, 0xcf, 0x83, 0xb1, 0xe7, 0x93, 0xed, 0x00, 0xfb, 0x67, 0xf6, 0x00, 0x6f,
+	0x8d, 0x7d, 0x8f, 0x78, 0xe8, 0x16, 0x21, 0xe6, 0xf1, 0xd6, 0x74, 0x5b, 0xff, 0x53, 0x81, 0x95,
+	0xe7, 0xa6, 0x1b, 0x9a, 0x4e, 0x77, 0x44, 0x15, 0x06, 0x3e, 0x0d, 0x71, 0x40, 0xd0, 0x5d, 0x28,
+	0x9f, 0xf8, 0xde, 0xa8, 0x6f, 0x99, 0x04, 0x6b, 0x4a, 0x43, 0x69, 0x96, 0x8d, 0x12, 0x55, 0xb4,
+	0x4d, 0x82, 0xd1, 0x6d, 0x28, 0x12, 0x8f, 0x6f, 0xe5, 0xd8, 0x56, 0x81, 0x78, 0x6c, 0xa3, 0x0e,
+	0xa5, 0x81, 0x49, 0xf0, 0xd0, 0xf3, 0xcf, 0x35, 0xb5, 0xa1, 0x34, 0x55, 0x63, 0x22, 0xa3, 0x06,
+	0x54, 0x06, 0xde, 0x68, 0x8c, 0x89, 0x4d, 0x6c, 0xcf, 0xd5, 0x16, 0xd8, 0xb6, 0xac, 0x42, 0xab,
+	0x90, 0x3f, 0xf1, 0xfc, 0x01, 0xd6, 0xf2, 0x0d, 0xa5, 0x59, 0x32, 0xb8, 0xa0, 0x7f, 0x03, 0xab,
+	0x71, 0x07, 0x83, 0xb1, 0xe7, 0x06, 0x18, 0x3d, 0x82, 0xea, 0x69, 0x88, 0x43, 0x6c, 0xf5, 0x6d,
+	0xb6, 0x11, 0x30, 0x37, 0x55, 0x63, 0x89, 0x6b, 0xb9, 0x75, 0xa0, 0xff, 0xa3, 0x40, 0x95, 0xaf,
+	0x7b, 0x98, 0x10, 0xdb, 0x1d, 0x06, 0xa8, 0x05, 0xf9, 0x80, 0x44, 0x71, 0x55, 0x5b, 0xf7, 0xb6,
+	0x12, 0xa0, 0x6c, 0xed, 0x79, 0xee, 0x89, 0x3d, 0xec, 0x51, 0x1b, 0x83, 0x9b, 0xa2, 0x7b, 0x50,
+	0x76, 0xf1, 0xbb, 0xe0, 0xcc, 0x74, 0x42, 0x1e, 0x74, 0xde, 0x98, 0x2a, 0xd0, 0x03, 0x58, 0x1a,
+	0x61, 0x7f, 0x88, 0xfb, 0x01, 0x7f, 0x83, 0x05, 0x5f, 0x36, 0x16, 0x99, 0x52, 0xbc, 0x8b, 0x36,
+	0x80, 0xcb, 0x7d, 0x7c, 0x86, 0x5d, 0x12, 0x30, 0x04, 0x4a, 0x46, 0x85, 0xe9, 0x3a, 0x4c, 0x45,
+	0x11, 0x60, 0x1e, 0x68, 0xf9, 0x86, 0xda, 0x2c, 0x1b, 0x5c, 0x40, 0x1a, 0x14, 0x07, 0xde, 0x68,
+	0x84, 0x5d, 0xa2, 0x15, 0xd8, 0xbd, 0x91, 0xa8, 0xf7, 0x60, 0x89, 0xfb, 0xfa, 0xbd, 0xe9, 0xbb,
+	0xf4, 0x0d, 0x04, 0x0b, 0x03, 0xcf, 0x8a, 0x32, 0xc6, 0xd6, 0x0c, 0x56, 0x1b, 0x3b, 0x96, 0xc8,
+	0x15, 0x17, 0xe8, 0xa5, 0x23, 0x1c, 0x04, 0xe6, 0x10, 0x0b, 0x67, 0x23, 0x51, 0xff, 0x35, 0x07,
+	0x95, 0x1e, 0x7d, 0x98, 0x5f, 0x8d, 0xaa, 0x90, 0xb3, 0x2d, 0x01, 0x6e, 0xce, 0xb6, 0xe8, 0x1b,
+	0xae, 0x39, 0x8a, 0x52, 0xcf, 0xd6, 0x54, 0x17, 0x38, 0x61, 0x14, 0x37, 0x5b, 0xa3, 0xa7, 0x50,
+	0x12, 0x70, 0xf0, 0x58, 0x2b, 0xad, 0xfb, 0x29, 0xa4, 0xe3, 0x99, 0x31, 0x26, 0x07, 0xd0, 0x17,
+	0xb0, 0x3a, 0xc6, 0xae, 0x65, 0xbb, 0xc3, 0xbe, 0x54, 0x22, 0x01, 0x2b, 0x0d, 0xd5, 0x58, 0x11,
+	0x7b, 0x7b, 0xd2, 0x16, 0xf3, 0x01, 0x63, 0x57, 0x60, 0xc4, 0xd6, 0x34, 0xca, 0x70, 0x4c, 0x0b,
+	0xd5, 0xd2, 0x8a, 0x3c, 0x4a, 0x21, 0xa2, 0x8f, 0x01, 0xc4, 0xb2, 0x7f, 0x7c, 0xae, 0x95, 0xd8,
+	0x66, 0x59, 0x68, 0x76, 0xcf, 0xf5, 0xbf, 0x15, 0xa8, 0xee, 0x89, 0xd2, 0x9d, 0x81, 0xc3, 0x1d,
+	0x28, 0xb1, 0x20, 0xfa, 0x36, 0x87, 0x56, 0x35, 0x8a, 0x4c, 0xee, 0x4e, 0x21, 0x52, 0x25, 0x88,
+	0xd6, 0xa1, 0x30, 0xc4, 0xae, 0x85, 0x7d, 0x06, 0x46, 0xd9, 0x10, 0x92, 0x9c, 0xdd, 0x7c, 0x2c,
+	0xbb, 0x37, 0x1b, 0xd0, 0x7f, 0x39, 0x58, 0x96, 0xe0, 0x12, 0x31, 0xc9, 0x31, 0x28, 0xf1, 0x18,
+	0xee, 0x42, 0x99, 0x96, 0xbe, 0x3d, 0x98, 0xc6, 0x57, 0xe2, 0x8a, 0xae, 0x45, 0x9b, 0x4f, 0x4a,
+	0x0b, 0xb5, 0xe0, 0xed, 0xbe, 0x24, 0x69, 0xbb, 0x16, 0xba, 0x0f, 0x95, 0xa8, 0xff, 0xa9, 0x0d,
+	0xef, 0x79, 0x88, 0x54, 0x12, 0x50, 0x79, 0x09, 0x28, 0x4a, 0x3d, 0xa1, 0xe3, 0xf4, 0xd9, 0x46,
+	0x41, 0x50, 0x4f, 0xe8, 0x38, 0x87, 0x71, 0x14, 0x8b, 0x31, 0x14, 0xe5, 0x62, 0x2b, 0x5d, 0xb5,
+	0xd8, 0x22, 0xa0, 0xcb, 0xd9, 0x40, 0xc3, 0x3c, 0xa0, 0x2b, 0x49, 0xa0, 0x7f, 0x86, 0xe5, 0x67,
+	0x76, 0x40, 0x58, 0x07, 0x05, 0x11, 0x9d, 0x5e, 0x87, 0x72, 0x56, 0x21, 0x7f, 0x1a, 0x62, 0xff,
+	0x3c, 0xea, 0x5b, 0x26, 0xe8, 0xdf, 0x01, 0x92, 0xaf, 0x17, 0x64, 0xf8, 0x15, 0x14, 0x82, 0x88,
+	0x04, 0xd5, 0x66, 0x25, 0xe3, 0x01, 0xa9, 0xa3, 0x0d, 0x61, 0xab, 0xb7, 0x60, 0x8d, 0xde, 0x25,
+	0xea, 0xdc, 0xc6, 0x13, 0x77, 0x67, 0x97, 0x85, 0xfe, 0x23, 0xac, 0x27, 0xcf, 0x08, 0x1f, 0xbe,
+	0x85, 0x28, 0xb3, 0x36, 0x8e, 0xfc, 0x48, 0x27, 0x21, 0xde, 0x54, 0x86, 0x74, 0x44, 0xff, 0x57,
+	0x81, 0xdb, 0xec, 0x6e, 0xa9, 0xab, 0x2f, 0xf6, 0x28, 0x59, 0x64, 0xb9, 0x54, 0x91, 0x4d, 0xc0,
+	0x57, 0xaf, 0x01, 0xfe, 0x82, 0x04, 0x3e, 0xe3, 0x67, 0x62, 0x3a, 0x93, 0x09, 0xc5, 0x04, 0x5a,
+	0x93, 0xde, 0xc9, 0x49, 0x80, 0x39, 0x3d, 0xab, 0x86, 0x90, 0xa8, 0xb5, 0x63, 0x8f, 0x6c, 0xc2,
+	0x4a, 0x55, 0x35, 0xb8, 0xa0, 0xbf, 0x07, 0x2d, 0x1d, 0xa4, 0x80, 0x70, 0x1f, 0x16, 0x63, 0x6c,
+	0xc7, 0x41, 0xd4, 0x33, 0x1c, 0x4e, 0x34, 0xb2, 0x11, 0x3b, 0x47, 0x5f, 0x26, 0x1e, 0x31, 0x1d,
+	0x01, 0x06, 0x17, 0xf4, 0x0d, 0xb8, 0x75, 0x80, 0x79, 0xe5, 0x44, 0xb0, 0x26, 0x38, 0x4d, 0xdf,
+	0x87, 0xda, 0xd4, 0x44, 0x38, 0xd5, 0x8a, 0x86, 0x92, 0xc2, 0xfa, 0x6a, 0x7e, 0x69, 0x71, 0x53,
+	0xfd, 0x05, 0xac, 0x1d, 0x60, 0x39, 0xc6, 0x4b, 0xe4, 0x71, 0x1e, 0xe1, 0xe8, 0x6f, 0x60, 0x3d,
+	0x79, 0xa1, 0x70, 0xaf, 0x1d, 0xff, 0xae, 0xe0, 0x4e, 0x5e, 0x06, 0x32, 0xf9, 0x98, 0x6e, 0x02,
+	0x3a, 0x62, 0x2d, 0x3c, 0x0f, 0x9e, 0x18, 0xcb, 0xe4, 0xae, 0xc8, 0x32, 0xfa, 0x6f, 0x0a, 0xac,
+	0xc4, 0xde, 0xb8, 0x3e, 0xbe, 0xe8, 0x6b, 0x28, 0xbd, 0xe3, 0x23, 0x9f, 0x3a, 0x42, 0x8b, 0xe4,
+	0x93, 0x19, 0x55, 0x2d, 0xbe, 0x0c, 0x8c, 0x89, 0xbd, 0xfe, 0xbb, 0x02, 0x1a, 0xf7, 0xe3, 0xe6,
+	0xf2, 0x13, 0x43, 0x46, 0xbd, 0x2a, 0x32, 0x7f, 0x28, 0x70, 0x27, 0xc3, 0xa3, 0x9b, 0x4c, 0xf0,
+	0x07, 0x21, 0xb6, 0x03, 0x6b, 0xc2, 0x3d, 0x41, 0x2a, 0xb3, 0xea, 0x43, 0x9a, 0xe5, 0xb9, 0xf8,
+	0x97, 0xda, 0x11, 0xac, 0x27, 0xaf, 0x10, 0xe1, 0x3d, 0x95, 0xbe, 0x99, 0x95, 0x19, 0xc8, 0x25,
+	0x48, 0x73, 0x72, 0x40, 0x5f, 0x83, 0x95, 0xce, 0x7b, 0xa9, 0x3c, 0xb8, 0x5f, 0x7a, 0x13, 0x56,
+	0xe3, 0x6a, 0xf1, 0x56, 0x0d, 0xd4, 0x41, 0x70, 0xc6, 0x9e, 0x59, 0x34, 0xe8, 0x72, 0xf3, 0x0d,
+	0x54, 0x24, 0xf6, 0x43, 0x6b, 0xb0, 0xdc, 0x7b, 0xb5, 0xf3, 0xaa, 0xd3, 0x3f, 0x3a, 0xec, 0xbd,
+	0xec, 0xec, 0x75, 0xf7, 0xbb, 0x9d, 0x76, 0xed, 0x23, 0xb4, 0x0c, 0x4b, 0x5c, 0xfd, 0xb2, 0x73,
+	0xd8, 0xee, 0x1e, 0x1e, 0xd4, 0x94, 0xa9, 0xaa, 0x73, 0xb8, 0xb3, 0xfb, 0xac, 0xd3, 0xae, 0xe5,
+	0x10, 0x82, 0x2a, 0x57, 0xb5, 0xbb, 0x3d, 0xae, 0x53, 0x5b, 0x7f, 0x15, 0xa1, 0xf0, 0xdc, 0x74,
+	0xcd, 0x21, 0x46, 0xaf, 0x61, 0x51, 0xfe, 0x90, 0x47, 0x0f, 0x53, 0x61, 0x66, 0xfc, 0x10, 0xa9,
+	0x3f, 0xba, 0xc0, 0x4a, 0x44, 0x76, 0x04, 0x30, 0x1d, 0x8b, 0x28, 0x5d, 0x1d, 0xa9, 0x91, 0x5c,
+	0x7f, 0x30, 0xd7, 0x46, 0x5c, 0x6b, 0x42, 0x35, 0x3e, 0xed, 0xd0, 0xa7, 0x99, 0xc7, 0x52, 0x23,
+	0xb4, 0xfe, 0xd9, 0x85, 0x76, 0xe2, 0x89, 0x21, 0xd4, 0x92, 0xf3, 0x00, 0x35, 0xb3, 0x0f, 0xa7,
+	0xe7, 0x62, 0xfd, 0xf1, 0x25, 0x2c, 0xc5, 0x43, 0x2f, 0xa0, 0x14, 0x71, 0x3b, 0x6a, 0xa4, 0x8e,
+	0x25, 0x26, 0x43, 0x7d, 0x63, 0x8e, 0xc5, 0x14, 0x9c, 0x38, 0x27, 0x67, 0x80, 0x93, 0x39, 0x05,
+	0x32, 0xc0, 0x99, 0x41, 0xee, 0x3f, 0x40, 0x45, 0xa2, 0x4c, 0x94, 0xce, 0x59, 0x9a, 0xb4, 0xeb,
+	0x0f, 0xe7, 0x1b, 0x89, 0x9b, 0x7f, 0x81, 0xe5, 0x14, 0xe5, 0xa0, 0xc7, 0x33, 0x8e, 0x66, 0x84,
+	0xb0, 0x79, 0x19, 0xd3, 0x29, 0x50, 0xf1, 0xe6, 0xcf, 0x00, 0x2a, 0x93, 0x60, 0x32, 0x80, 0x9a,
+	0xc1, 0x22, 0xaf, 0x61, 0x51, 0xee, 0xf8, 0x8c, 0xe6, 0xca, 0xe0, 0x89, 0x8c, 0xe6, 0xca, 0xa2,
+	0x8d, 0xdd, 0xcf, 0x7f, 0xda, 0x1c, 0xda, 0xe4, 0x6d, 0x78, 0xbc, 0x35, 0xf0, 0x46, 0xdb, 0xf4,
+	0xc8, 0x36, 0x76, 0xf0, 0xf8, 0xad, 0xe9, 0x92, 0x27, 0x84, 0x3c, 0x31, 0xc7, 0xf6, 0xf6, 0xf4,
+	0x8a, 0xe3, 0x02, 0xfb, 0xab, 0xe1, 0xcb, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xab, 0x4a, 0x49,
+	0x4c, 0x86, 0x10, 0x00, 0x00,
 }
