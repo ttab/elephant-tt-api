@@ -1057,7 +1057,8 @@ func (x *ListSportsResponse) GetSports() []*SportConfig {
 
 type ListCategoriesRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// SportID is the sport to list categories for. Required.
+	// SportID is the sport to list categories for. Optional, all sports when
+	// left out.
 	SportId       int64 `protobuf:"varint,1,opt,name=sport_id,json=sportId,proto3" json:"sport_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1102,7 +1103,7 @@ func (x *ListCategoriesRequest) GetSportId() int64 {
 
 type ListCategoriesResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Categories are the categories of the sport, ordered by name.
+	// Categories are the matching categories, ordered by sport and name.
 	Categories    []*CategoryConfig `protobuf:"bytes,1,rep,name=categories,proto3" json:"categories,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

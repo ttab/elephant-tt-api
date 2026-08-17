@@ -38,8 +38,8 @@ type Manage interface {
 	// ListSports lists the sports in the import configuration.
 	ListSports(context.Context, *ListSportsRequest) (*ListSportsResponse, error)
 
-	// ListCategories lists the competition categories of a sport. Categories
-	// are identity only, they carry no import settings.
+	// ListCategories lists competition categories, for one sport or for all of
+	// them. Categories are identity only, they carry no import settings.
 	ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error)
 
 	// ListCompetitions lists competitions in the import configuration.

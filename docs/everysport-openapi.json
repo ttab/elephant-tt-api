@@ -215,7 +215,7 @@
       "ttab.everysport.ListCategoriesRequest": {
         "properties": {
           "sport_id": {
-            "description": "SportID is the sport to list categories for. Required.",
+            "description": "SportID is the sport to list categories for. Optional, all sports when left out.",
             "type": "integer"
           }
         },
@@ -224,7 +224,7 @@
       "ttab.everysport.ListCategoriesResponse": {
         "properties": {
           "categories": {
-            "description": "Categories are the categories of the sport, ordered by name.",
+            "description": "Categories are the matching categories, ordered by sport and name.",
             "items": {
               "$ref": "#/components/schemas/ttab.everysport.CategoryConfig"
             },
@@ -690,7 +690,7 @@
     },
     "/twirp/ttab.everysport.Manage/ListCategories": {
       "post": {
-        "description": "ListCategories lists the competition categories of a sport. Categories are identity only, they carry no import settings.",
+        "description": "ListCategories lists competition categories, for one sport or for all of them. Categories are identity only, they carry no import settings.",
         "requestBody": {
           "content": {
             "application/json": {

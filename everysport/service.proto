@@ -9,8 +9,8 @@ service Manage {
   rpc ManualImport(ManualImportRequest) returns (ManualImportResponse);
   // ListSports lists the sports in the import configuration.
   rpc ListSports(ListSportsRequest) returns (ListSportsResponse);
-  // ListCategories lists the competition categories of a sport. Categories
-  // are identity only, they carry no import settings.
+  // ListCategories lists competition categories, for one sport or for all of
+  // them. Categories are identity only, they carry no import settings.
   rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
   // ListCompetitions lists competitions in the import configuration.
   rpc ListCompetitions(ListCompetitionsRequest) returns (ListCompetitionsResponse);
@@ -230,12 +230,13 @@ message ListSportsResponse {
 }
 
 message ListCategoriesRequest {
-  // SportID is the sport to list categories for. Required.
+  // SportID is the sport to list categories for. Optional, all sports when
+  // left out.
   int64 sport_id = 1;
 }
 
 message ListCategoriesResponse {
-  // Categories are the categories of the sport, ordered by name.
+  // Categories are the matching categories, ordered by sport and name.
   repeated CategoryConfig categories = 1;
 }
 
