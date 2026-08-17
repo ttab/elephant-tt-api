@@ -29,6 +29,9 @@ service Manage {
   // ListPendingImports lists the competitions that have calendar entries the
   // service skipped, with the date range those entries fall in.
   rpc ListPendingImports(ListPendingImportsRequest) returns (ListPendingImportsResponse);
+  // ReviewCompetitions decides a batch of competitions at once, which is what
+  // working through the review queue is.
+  rpc ReviewCompetitions(ReviewCompetitionsRequest) returns (ReviewCompetitionsResponse);
 }
 
 message ManualImportRequest {
@@ -310,6 +313,33 @@ message UpdateCompetitionResponse {
   // Competition is the updated competition configuration.
   CompetitionConfig competition   = 1;
   // Warnings are problems with the saved settings.
+  repeated ConfigWarning warnings = 2;
+}
+
+// CompetitionRef identifies one competition. The static ID is unique on its
+// own in practice, but the sport is what the configuration is keyed on.
+message CompetitionRef {
+  // SportID is the Everysport sport ID. Required.
+  int64 sport_id  = 1;
+  // StaticID is the Everysport competition static ID. Required.
+  int64 static_id = 2;
+}
+
+message ReviewCompetitionsRequest {
+  // Competitions to decide. Required, and every one of them must exist.
+  repeated CompetitionRef competitions = 1;
+  // State to put them in. Required, and STATE_PENDING is rejected: this is
+  // the call that takes entries out of the review queue.
+  ConfigState state                    = 2;
+  // Newsvalue to give them. Required when the state is STATE_ENABLED, ignored
+  // otherwise.
+  int32 newsvalue                      = 3;
+}
+
+message ReviewCompetitionsResponse {
+  // Updated is the number of competitions that were changed.
+  int64 updated                   = 1;
+  // Warnings are problems with the settings that were saved.
   repeated ConfigWarning warnings = 2;
 }
 

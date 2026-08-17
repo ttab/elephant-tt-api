@@ -88,6 +88,20 @@
         },
         "type": "object"
       },
+      "ttab.everysport.CompetitionRef": {
+        "description": "CompetitionRef identifies one competition. The static ID is unique on its own in practice, but the sport is what the configuration is keyed on.",
+        "properties": {
+          "sport_id": {
+            "description": "SportID is the Everysport sport ID. Required.",
+            "type": "integer"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport competition static ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.ConfigState": {
         "description": "ConfigState is the review state of a configuration entry. Entries that the service discovers on its own start out as pending.",
         "enum": [
@@ -390,6 +404,41 @@
           "to_date": {
             "description": "ToDate is the date of the latest skipped entry, as YYYY-MM-DD.",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ReviewCompetitionsRequest": {
+        "properties": {
+          "competitions": {
+            "description": "Competitions to decide. Required, and every one of them must exist.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.CompetitionRef"
+            },
+            "type": "array"
+          },
+          "newsvalue": {
+            "description": "Newsvalue to give them. Required when the state is STATE_ENABLED, ignored otherwise.",
+            "type": "integer"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ReviewCompetitionsResponse": {
+        "properties": {
+          "updated": {
+            "description": "Updated is the number of competitions that were changed.",
+            "type": "integer"
+          },
+          "warnings": {
+            "description": "Warnings are problems with the settings that were saved.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigWarning"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -824,6 +873,44 @@
           }
         ],
         "summary": "ManualImport",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ReviewCompetitions": {
+      "post": {
+        "description": "ReviewCompetitions decides a batch of competitions at once, which is what working through the review queue is.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ReviewCompetitionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ReviewCompetitionsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ReviewCompetitions",
         "tags": [
           "Manage"
         ]
