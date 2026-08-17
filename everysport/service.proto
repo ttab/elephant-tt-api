@@ -7,6 +7,31 @@ option go_package = "github.com/ttab/elephant-tt-api/everysport";
 service Manage {
   // ManualImport re-imports calendar events based on a search query.
   rpc ManualImport(ManualImportRequest) returns (ManualImportResponse);
+  // ListSports lists the sports in the import configuration.
+  rpc ListSports(ListSportsRequest) returns (ListSportsResponse);
+  // ListCategories lists competition categories, for one sport or for all of
+  // them. Categories are identity only, they carry no import settings.
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
+  // ListCompetitions lists competitions in the import configuration.
+  rpc ListCompetitions(ListCompetitionsRequest) returns (ListCompetitionsResponse);
+  // GetSport returns a single sport configuration.
+  rpc GetSport(GetSportRequest) returns (GetSportResponse);
+  // GetCompetition returns a single competition configuration.
+  rpc GetCompetition(GetCompetitionRequest) returns (GetCompetitionResponse);
+  // UpdateSport replaces the editable settings of a sport.
+  rpc UpdateSport(UpdateSportRequest) returns (UpdateSportResponse);
+  // UpdateCompetition replaces the editable settings of a competition.
+  rpc UpdateCompetition(UpdateCompetitionRequest) returns (UpdateCompetitionResponse);
+  // UpdateCategory updates the editable fields of a competition category.
+  rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
+  // ExportConfig returns the full import configuration as CSV.
+  rpc ExportConfig(ExportConfigRequest) returns (ExportConfigResponse);
+  // ListPendingImports lists the competitions that have calendar entries the
+  // service skipped, with the date range those entries fall in.
+  rpc ListPendingImports(ListPendingImportsRequest) returns (ListPendingImportsResponse);
+  // ReviewCompetitions decides a batch of competitions at once, which is what
+  // working through the review queue is.
+  rpc ReviewCompetitions(ReviewCompetitionsRequest) returns (ReviewCompetitionsResponse);
 }
 
 message ManualImportRequest {
@@ -21,9 +46,323 @@ message ManualImportRequest {
   int64 competition = 4;
   // Force overwrite of calendar entries.
   bool force        = 5;
+  // Competitions only re-imports the events for the given competition static
+  // IDs. Combines with competition: an event matches if its static ID is in
+  // either. Optional.
+  repeated int64 competitions = 6;
 }
 
 message ManualImportResponse {
   // QueuedImports is the total numer of events that were queued for import.
   int64 queued_imports = 1;
+}
+
+message ListPendingImportsRequest {
+  // OnlyEnabled excludes the competitions that wouldn't import anyway, which
+  // is every entry that isn't enabled. Optional.
+  bool only_enabled = 1;
+}
+
+message ListPendingImportsResponse {
+  // Imports are the competitions with skipped entries, ordered by sport and
+  // competition name.
+  repeated PendingImport imports = 1;
+}
+
+// PendingImport is a competition with calendar entries that the service saw and
+// skipped, because the competition or its sport was not enabled at the time.
+// Enabling the competition does not import them: the entries have gone past in
+// the update feed, and only a manual import brings them back. An entry stops
+// being counted as soon as it is imported, so the list empties itself as the
+// re-imports land.
+message PendingImport {
+  // SportID is the Everysport ID of the sport the competition belongs to.
+  int64 sport_id        = 1;
+  // SportName is the Everysport sport name.
+  string sport_name     = 2;
+  // StaticID is the Everysport static ID of the competition.
+  int64 static_id       = 3;
+  // Name is the Everysport competition name.
+  string name           = 4;
+  // State is the review state the competition is in now.
+  ConfigState state     = 5;
+  // FromDate is the date of the earliest skipped entry, as YYYY-MM-DD.
+  string from_date      = 6;
+  // ToDate is the date of the latest skipped entry, as YYYY-MM-DD.
+  string to_date        = 7;
+  // Entries is the number of calendar entries that are still missing.
+  int64 entries         = 8;
+  // LastSeen is when an entry was last skipped, as RFC3339.
+  string last_seen      = 9;
+  // Queued is how many of the missing entries are on the re-import queue
+  // already, waiting for the syncer to reach them. Counted from the queue
+  // itself, so it is what is actually pending rather than what was asked for.
+  int64 queued          = 10;
+}
+
+// ConfigState is the review state of a configuration entry. Entries that the
+// service discovers on its own start out as pending.
+enum ConfigState {
+  // STATE_UNSPECIFIED is the default zero value. Used as "any state" when
+  // filtering, and rejected when updating an entry.
+  STATE_UNSPECIFIED = 0;
+  // STATE_PENDING marks an entry that nobody has reviewed yet. Nothing pending
+  // is imported, and the entries that were skipped while it was pending are
+  // listed by ListPendingImports.
+  STATE_PENDING     = 1;
+  // STATE_ENABLED means that matching events are imported.
+  STATE_ENABLED     = 2;
+  // STATE_DISABLED means that matching events are not imported.
+  STATE_DISABLED    = 3;
+}
+
+// ImportSettings is the editable part of a sport or competition
+// configuration. All other fields identify the entry and are read only.
+message ImportSettings {
+  // State controls whether matching events are imported.
+  ConfigState state       = 1;
+  // Newsvalue is the value of the core/newsvalue block of created events,
+  // 1 to 5. Required when enabling an entry.
+  int32 newsvalue         = 2;
+  // MergeSetting is the strategy used to group entries into events, either
+  // "CategoryMerge" or "CompetitionMerge". Empty means that a competition
+  // uses the strategy of its sport, and that a sport uses "CategoryMerge".
+  string merge_setting    = 3;
+  // MergeEvents controls whether several calendar entries for the same day
+  // are merged into a single event document.
+  bool merge_events       = 4;
+  // Sport is the list of TT media topic names that events are linked to
+  // through core/category links, in addition to the generic "Sport" topic.
+  // Empty means that a competition uses the topics of its sport, and that a
+  // sport uses its own name.
+  repeated string sport   = 5;
+  // Comment is a free text note for whoever configures the import.
+  string comment          = 6;
+}
+
+// ConfigWarning is a problem with a configuration entry that doesn't stop it
+// from being saved.
+message ConfigWarning {
+  // Code identifies the kind of problem, f.ex. "unresolved_sport_name".
+  string code    = 1;
+  // Field is the name of the offending settings field.
+  string field   = 2;
+  // Message is a human readable description of the problem.
+  string message = 3;
+}
+
+// SportConfig is the import configuration for an Everysport sport.
+message SportConfig {
+  // ID is the Everysport sport ID.
+  int64 id                     = 1;
+  // Name is the Everysport sport name.
+  string name                  = 2;
+  // Slug is the Everysport sport slug.
+  string slug                  = 3;
+  // Settings is the editable configuration of the sport.
+  ImportSettings settings      = 4;
+  // PendingCompetitions is the number of competitions of the sport that are
+  // awaiting review.
+  int64 pending_competitions   = 5;
+  // Seen is when the sport was last listed by Everysport, as RFC3339.
+  string seen                  = 6;
+  // Updated is when the settings last changed, as RFC3339.
+  string updated               = 7;
+  // UpdatedBy is the subject that last changed the settings.
+  string updated_by            = 8;
+}
+
+// CategoryConfig is an Everysport competition category. The category tier
+// carries no import settings, it only groups competitions under a sport.
+message CategoryConfig {
+  // ID is the Everysport competition category ID.
+  int64 id          = 1;
+  // SportID is the Everysport ID of the sport the category belongs to.
+  int64 sport_id    = 2;
+  // Name is the Everysport category name.
+  string name       = 3;
+  // Gender is the gender category slug, if any.
+  string gender     = 4;
+  // Comment is a free text note for whoever configures the import.
+  string comment    = 5;
+  // Seen is when the category was last listed by Everysport, as RFC3339.
+  string seen       = 6;
+  // Updated is when the comment last changed, as RFC3339.
+  string updated    = 7;
+  // UpdatedBy is the subject that last changed the comment.
+  string updated_by = 8;
+}
+
+// CompetitionConfig is the import configuration for an Everysport
+// competition. Competitions are identified by their static ID, the
+// competition ID changes between seasons.
+message CompetitionConfig {
+  // SportID is the Everysport ID of the sport the competition belongs to.
+  int64 sport_id          = 1;
+  // StaticID is the Everysport static ID of the competition.
+  int64 static_id         = 2;
+  // CompetitionID is the Everysport competition ID we saw last.
+  int64 competition_id    = 3;
+  // CategoryID is the Everysport ID of the competition category.
+  int64 category_id       = 4;
+  // Name is the Everysport competition name.
+  string name             = 5;
+  // FullName is the full Everysport competition name.
+  string full_name        = 6;
+  // Gender is the gender category slug, if any.
+  string gender           = 7;
+  // Settings is the editable configuration of the competition.
+  ImportSettings settings = 8;
+  // Seen is when the competition was last listed by Everysport, as RFC3339.
+  string seen             = 9;
+  // Updated is when the settings last changed, as RFC3339.
+  string updated          = 10;
+  // UpdatedBy is the subject that last changed the settings.
+  string updated_by       = 11;
+}
+
+message ListSportsRequest {
+  // State only returns sports in the given state. Optional.
+  ConfigState state = 1;
+  // Query only returns sports whose name matches. Optional.
+  string query      = 2;
+}
+
+message ListSportsResponse {
+  // Sports are the matching sports, ordered by name.
+  repeated SportConfig sports = 1;
+}
+
+message ListCategoriesRequest {
+  // SportID is the sport to list categories for. Optional, all sports when
+  // left out.
+  int64 sport_id = 1;
+}
+
+message ListCategoriesResponse {
+  // Categories are the matching categories, ordered by sport and name.
+  repeated CategoryConfig categories = 1;
+}
+
+message ListCompetitionsRequest {
+  // SportID only returns competitions for the given sport. Optional.
+  int64 sport_id     = 1;
+  // CategoryID only returns competitions in the given category. Optional.
+  int64 category_id  = 2;
+  // State only returns competitions in the given state. Optional.
+  ConfigState state  = 3;
+  // Query only returns competitions whose name matches. Optional.
+  string query       = 4;
+  // Stale only returns competitions that Everysport no longer lists.
+  bool stale         = 5;
+  // Offset is the number of competitions to skip. Optional.
+  int64 offset       = 6;
+  // Limit is the maximum number of competitions to return. Optional.
+  int64 limit        = 7;
+}
+
+message ListCompetitionsResponse {
+  // Competitions are the matching competitions, ordered by name.
+  repeated CompetitionConfig competitions = 1;
+  // Total is the number of competitions that match, ignoring offset and
+  // limit.
+  int64 total                             = 2;
+}
+
+message GetSportRequest {
+  // ID is the Everysport sport ID. Required.
+  int64 id = 1;
+}
+
+message GetSportResponse {
+  // Sport is the sport configuration.
+  SportConfig sport = 1;
+}
+
+message GetCompetitionRequest {
+  // SportID is the Everysport sport ID. Required.
+  int64 sport_id  = 1;
+  // StaticID is the Everysport competition static ID. Required.
+  int64 static_id = 2;
+}
+
+message GetCompetitionResponse {
+  // Competition is the competition configuration.
+  CompetitionConfig competition = 1;
+}
+
+message UpdateSportRequest {
+  // ID is the Everysport sport ID. Required.
+  int64 id                = 1;
+  // Settings replaces the current settings of the sport in full.
+  ImportSettings settings = 2;
+}
+
+message UpdateSportResponse {
+  // Sport is the updated sport configuration.
+  SportConfig sport               = 1;
+  // Warnings are problems with the saved settings.
+  repeated ConfigWarning warnings = 2;
+}
+
+message UpdateCompetitionRequest {
+  // SportID is the Everysport sport ID. Required.
+  int64 sport_id          = 1;
+  // StaticID is the Everysport competition static ID. Required.
+  int64 static_id         = 2;
+  // Settings replaces the current settings of the competition in full.
+  ImportSettings settings = 3;
+}
+
+message UpdateCompetitionResponse {
+  // Competition is the updated competition configuration.
+  CompetitionConfig competition   = 1;
+  // Warnings are problems with the saved settings.
+  repeated ConfigWarning warnings = 2;
+}
+
+// CompetitionRef identifies one competition. The static ID is unique on its
+// own in practice, but the sport is what the configuration is keyed on.
+message CompetitionRef {
+  // SportID is the Everysport sport ID. Required.
+  int64 sport_id  = 1;
+  // StaticID is the Everysport competition static ID. Required.
+  int64 static_id = 2;
+}
+
+message ReviewCompetitionsRequest {
+  // Competitions to decide. Required, and every one of them must exist.
+  repeated CompetitionRef competitions = 1;
+  // State to put them in. Required, and STATE_PENDING is rejected: this is
+  // the call that takes entries out of the review queue.
+  ConfigState state                    = 2;
+  // Newsvalue to give them. Required when the state is STATE_ENABLED, ignored
+  // otherwise.
+  int32 newsvalue                      = 3;
+}
+
+message ReviewCompetitionsResponse {
+  // Updated is the number of competitions that were changed.
+  int64 updated                   = 1;
+  // Warnings are problems with the settings that were saved.
+  repeated ConfigWarning warnings = 2;
+}
+
+message UpdateCategoryRequest {
+  // ID is the Everysport competition category ID. Required.
+  int64 id       = 1;
+  // Comment replaces the current comment of the category.
+  string comment = 2;
+}
+
+message UpdateCategoryResponse {
+  // Category is the updated category.
+  CategoryConfig category = 1;
+}
+
+message ExportConfigRequest {}
+
+message ExportConfigResponse {
+  // CSV is the full configuration as a CSV file.
+  bytes csv = 1;
 }

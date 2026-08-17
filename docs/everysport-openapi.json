@@ -1,6 +1,331 @@
 {
   "components": {
     "schemas": {
+      "ttab.everysport.CategoryConfig": {
+        "description": "CategoryConfig is an Everysport competition category. The category tier carries no import settings, it only groups competitions under a sport.",
+        "properties": {
+          "comment": {
+            "description": "Comment is a free text note for whoever configures the import.",
+            "type": "string"
+          },
+          "gender": {
+            "description": "Gender is the gender category slug, if any.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID is the Everysport competition category ID.",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name is the Everysport category name.",
+            "type": "string"
+          },
+          "seen": {
+            "description": "Seen is when the category was last listed by Everysport, as RFC3339.",
+            "type": "string"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport ID of the sport the category belongs to.",
+            "type": "integer"
+          },
+          "updated": {
+            "description": "Updated is when the comment last changed, as RFC3339.",
+            "type": "string"
+          },
+          "updated_by": {
+            "description": "UpdatedBy is the subject that last changed the comment.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.CompetitionConfig": {
+        "description": "CompetitionConfig is the import configuration for an Everysport competition. Competitions are identified by their static ID, the competition ID changes between seasons.",
+        "properties": {
+          "category_id": {
+            "description": "CategoryID is the Everysport ID of the competition category.",
+            "type": "integer"
+          },
+          "competition_id": {
+            "description": "CompetitionID is the Everysport competition ID we saw last.",
+            "type": "integer"
+          },
+          "full_name": {
+            "description": "FullName is the full Everysport competition name.",
+            "type": "string"
+          },
+          "gender": {
+            "description": "Gender is the gender category slug, if any.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name is the Everysport competition name.",
+            "type": "string"
+          },
+          "seen": {
+            "description": "Seen is when the competition was last listed by Everysport, as RFC3339.",
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportSettings"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport ID of the sport the competition belongs to.",
+            "type": "integer"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport static ID of the competition.",
+            "type": "integer"
+          },
+          "updated": {
+            "description": "Updated is when the settings last changed, as RFC3339.",
+            "type": "string"
+          },
+          "updated_by": {
+            "description": "UpdatedBy is the subject that last changed the settings.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.CompetitionRef": {
+        "description": "CompetitionRef identifies one competition. The static ID is unique on its own in practice, but the sport is what the configuration is keyed on.",
+        "properties": {
+          "sport_id": {
+            "description": "SportID is the Everysport sport ID. Required.",
+            "type": "integer"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport competition static ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ConfigState": {
+        "description": "ConfigState is the review state of a configuration entry. Entries that the service discovers on its own start out as pending.",
+        "enum": [
+          "STATE_UNSPECIFIED",
+          "STATE_PENDING",
+          "STATE_ENABLED",
+          "STATE_DISABLED"
+        ],
+        "type": "string"
+      },
+      "ttab.everysport.ConfigWarning": {
+        "description": "ConfigWarning is a problem with a configuration entry that doesn't stop it from being saved.",
+        "properties": {
+          "code": {
+            "description": "Code identifies the kind of problem, f.ex. \"unresolved_sport_name\".",
+            "type": "string"
+          },
+          "field": {
+            "description": "Field is the name of the offending settings field.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Message is a human readable description of the problem.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ExportConfigRequest": {
+        "type": "object"
+      },
+      "ttab.everysport.ExportConfigResponse": {
+        "properties": {
+          "csv": {
+            "description": "CSV is the full configuration as a CSV file.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetCompetitionRequest": {
+        "properties": {
+          "sport_id": {
+            "description": "SportID is the Everysport sport ID. Required.",
+            "type": "integer"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport competition static ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetCompetitionResponse": {
+        "properties": {
+          "competition": {
+            "$ref": "#/components/schemas/ttab.everysport.CompetitionConfig"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetSportRequest": {
+        "properties": {
+          "id": {
+            "description": "ID is the Everysport sport ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetSportResponse": {
+        "properties": {
+          "sport": {
+            "$ref": "#/components/schemas/ttab.everysport.SportConfig"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ImportSettings": {
+        "description": "ImportSettings is the editable part of a sport or competition configuration. All other fields identify the entry and are read only.",
+        "properties": {
+          "comment": {
+            "description": "Comment is a free text note for whoever configures the import.",
+            "type": "string"
+          },
+          "merge_events": {
+            "description": "MergeEvents controls whether several calendar entries for the same day are merged into a single event document.",
+            "type": "boolean"
+          },
+          "merge_setting": {
+            "description": "MergeSetting is the strategy used to group entries into events, either \"CategoryMerge\" or \"CompetitionMerge\". Empty means that a competition uses the strategy of its sport, and that a sport uses \"CategoryMerge\".",
+            "type": "string"
+          },
+          "newsvalue": {
+            "description": "Newsvalue is the value of the core/newsvalue block of created events, 1 to 5. Required when enabling an entry.",
+            "type": "integer"
+          },
+          "sport": {
+            "description": "Sport is the list of TT media topic names that events are linked to through core/category links, in addition to the generic \"Sport\" topic. Empty means that a competition uses the topics of its sport, and that a sport uses its own name.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListCategoriesRequest": {
+        "properties": {
+          "sport_id": {
+            "description": "SportID is the sport to list categories for. Optional, all sports when left out.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListCategoriesResponse": {
+        "properties": {
+          "categories": {
+            "description": "Categories are the matching categories, ordered by sport and name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.CategoryConfig"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListCompetitionsRequest": {
+        "properties": {
+          "category_id": {
+            "description": "CategoryID only returns competitions in the given category. Optional.",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Limit is the maximum number of competitions to return. Optional.",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Offset is the number of competitions to skip. Optional.",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Query only returns competitions whose name matches. Optional.",
+            "type": "string"
+          },
+          "sport_id": {
+            "description": "SportID only returns competitions for the given sport. Optional.",
+            "type": "integer"
+          },
+          "stale": {
+            "description": "Stale only returns competitions that Everysport no longer lists.",
+            "type": "boolean"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListCompetitionsResponse": {
+        "properties": {
+          "competitions": {
+            "description": "Competitions are the matching competitions, ordered by name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.CompetitionConfig"
+            },
+            "type": "array"
+          },
+          "total": {
+            "description": "Total is the number of competitions that match, ignoring offset and limit.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListPendingImportsRequest": {
+        "properties": {
+          "only_enabled": {
+            "description": "OnlyEnabled excludes the competitions that wouldn't import anyway, which is every entry that isn't enabled. Optional.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListPendingImportsResponse": {
+        "properties": {
+          "imports": {
+            "description": "Imports are the competitions with skipped entries, ordered by sport and competition name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.PendingImport"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListSportsRequest": {
+        "properties": {
+          "query": {
+            "description": "Query only returns sports whose name matches. Optional.",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListSportsResponse": {
+        "properties": {
+          "sports": {
+            "description": "Sports are the matching sports, ordered by name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.SportConfig"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.ManualImportRequest": {
         "properties": {
           "category": {
@@ -10,6 +335,13 @@
           "competition": {
             "description": "Category only re-imports the events for the specific competition static ID.",
             "type": "integer"
+          },
+          "competitions": {
+            "description": "Competitions only re-imports the events for the given competition static IDs. Combines with competition: an event matches if its static ID is in either. Optional.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
           },
           "force": {
             "description": "Force overwrite of calendar entries.",
@@ -34,6 +366,202 @@
           }
         },
         "type": "object"
+      },
+      "ttab.everysport.PendingImport": {
+        "description": "PendingImport is a competition with calendar entries that the service saw and skipped, because the competition or its sport was not enabled at the time. Enabling the competition does not import them: the entries have gone past in the update feed, and only a manual import brings them back. An entry stops being counted as soon as it is imported, so the list empties itself as the re-imports land.",
+        "properties": {
+          "entries": {
+            "description": "Entries is the number of calendar entries that are still missing.",
+            "type": "integer"
+          },
+          "from_date": {
+            "description": "FromDate is the date of the earliest skipped entry, as YYYY-MM-DD.",
+            "type": "string"
+          },
+          "last_seen": {
+            "description": "LastSeen is when an entry was last skipped, as RFC3339.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name is the Everysport competition name.",
+            "type": "string"
+          },
+          "queued": {
+            "description": "Queued is how many of the missing entries are on the re-import queue already, waiting for the syncer to reach them. Counted from the queue itself, so it is what is actually pending rather than what was asked for.",
+            "type": "integer"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport ID of the sport the competition belongs to.",
+            "type": "integer"
+          },
+          "sport_name": {
+            "description": "SportName is the Everysport sport name.",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport static ID of the competition.",
+            "type": "integer"
+          },
+          "to_date": {
+            "description": "ToDate is the date of the latest skipped entry, as YYYY-MM-DD.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ReviewCompetitionsRequest": {
+        "properties": {
+          "competitions": {
+            "description": "Competitions to decide. Required, and every one of them must exist.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.CompetitionRef"
+            },
+            "type": "array"
+          },
+          "newsvalue": {
+            "description": "Newsvalue to give them. Required when the state is STATE_ENABLED, ignored otherwise.",
+            "type": "integer"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ReviewCompetitionsResponse": {
+        "properties": {
+          "updated": {
+            "description": "Updated is the number of competitions that were changed.",
+            "type": "integer"
+          },
+          "warnings": {
+            "description": "Warnings are problems with the settings that were saved.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigWarning"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.SportConfig": {
+        "description": "SportConfig is the import configuration for an Everysport sport.",
+        "properties": {
+          "id": {
+            "description": "ID is the Everysport sport ID.",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name is the Everysport sport name.",
+            "type": "string"
+          },
+          "pending_competitions": {
+            "description": "PendingCompetitions is the number of competitions of the sport that are awaiting review.",
+            "type": "integer"
+          },
+          "seen": {
+            "description": "Seen is when the sport was last listed by Everysport, as RFC3339.",
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportSettings"
+          },
+          "slug": {
+            "description": "Slug is the Everysport sport slug.",
+            "type": "string"
+          },
+          "updated": {
+            "description": "Updated is when the settings last changed, as RFC3339.",
+            "type": "string"
+          },
+          "updated_by": {
+            "description": "UpdatedBy is the subject that last changed the settings.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateCategoryRequest": {
+        "properties": {
+          "comment": {
+            "description": "Comment replaces the current comment of the category.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID is the Everysport competition category ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateCategoryResponse": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ttab.everysport.CategoryConfig"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateCompetitionRequest": {
+        "properties": {
+          "settings": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportSettings"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport sport ID. Required.",
+            "type": "integer"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport competition static ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateCompetitionResponse": {
+        "properties": {
+          "competition": {
+            "$ref": "#/components/schemas/ttab.everysport.CompetitionConfig"
+          },
+          "warnings": {
+            "description": "Warnings are problems with the saved settings.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigWarning"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateSportRequest": {
+        "properties": {
+          "id": {
+            "description": "ID is the Everysport sport ID. Required.",
+            "type": "integer"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportSettings"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.UpdateSportResponse": {
+        "properties": {
+          "sport": {
+            "$ref": "#/components/schemas/ttab.everysport.SportConfig"
+          },
+          "warnings": {
+            "description": "Warnings are problems with the saved settings.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigWarning"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -50,6 +578,272 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/twirp/ttab.everysport.Manage/ExportConfig": {
+      "post": {
+        "description": "ExportConfig returns the full import configuration as CSV.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ExportConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ExportConfigResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ExportConfig",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/GetCompetition": {
+      "post": {
+        "description": "GetCompetition returns a single competition configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.GetCompetitionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.GetCompetitionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetCompetition",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/GetSport": {
+      "post": {
+        "description": "GetSport returns a single sport configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.GetSportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.GetSportResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetSport",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ListCategories": {
+      "post": {
+        "description": "ListCategories lists competition categories, for one sport or for all of them. Categories are identity only, they carry no import settings.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ListCategoriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ListCategoriesResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListCategories",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ListCompetitions": {
+      "post": {
+        "description": "ListCompetitions lists competitions in the import configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ListCompetitionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ListCompetitionsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListCompetitions",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ListPendingImports": {
+      "post": {
+        "description": "ListPendingImports lists the competitions that have calendar entries the service skipped, with the date range those entries fall in.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ListPendingImportsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ListPendingImportsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListPendingImports",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ListSports": {
+      "post": {
+        "description": "ListSports lists the sports in the import configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ListSportsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ListSportsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListSports",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
     "/twirp/ttab.everysport.Manage/ManualImport": {
       "post": {
         "description": "ManualImport re-imports calendar events based on a search query.",
@@ -83,6 +877,158 @@
           }
         ],
         "summary": "ManualImport",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ReviewCompetitions": {
+      "post": {
+        "description": "ReviewCompetitions decides a batch of competitions at once, which is what working through the review queue is.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ReviewCompetitionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ReviewCompetitionsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ReviewCompetitions",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/UpdateCategory": {
+      "post": {
+        "description": "UpdateCategory updates the editable fields of a competition category.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.UpdateCategoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.UpdateCategoryResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdateCategory",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/UpdateCompetition": {
+      "post": {
+        "description": "UpdateCompetition replaces the editable settings of a competition.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.UpdateCompetitionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.UpdateCompetitionResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdateCompetition",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/UpdateSport": {
+      "post": {
+        "description": "UpdateSport replaces the editable settings of a sport.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.UpdateSportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.UpdateSportResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "UpdateSport",
         "tags": [
           "Manage"
         ]
