@@ -386,6 +386,10 @@
             "description": "Name is the Everysport competition name.",
             "type": "string"
           },
+          "queued": {
+            "description": "Queued is how many of the missing entries are on the re-import queue already, waiting for the syncer to reach them. Counted from the queue itself, so it is what is actually pending rather than what was asked for.",
+            "type": "integer"
+          },
           "sport_id": {
             "description": "SportID is the Everysport ID of the sport the competition belongs to.",
             "type": "integer"

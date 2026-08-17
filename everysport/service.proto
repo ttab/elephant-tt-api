@@ -94,6 +94,10 @@ message PendingImport {
   int64 entries         = 8;
   // LastSeen is when an entry was last skipped, as RFC3339.
   string last_seen      = 9;
+  // Queued is how many of the missing entries are on the re-import queue
+  // already, waiting for the syncer to reach them. Counted from the queue
+  // itself, so it is what is actually pending rather than what was asked for.
+  int64 queued          = 10;
 }
 
 // ConfigState is the review state of a configuration entry. Entries that the
