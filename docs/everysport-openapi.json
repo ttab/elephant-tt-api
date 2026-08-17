@@ -267,6 +267,27 @@
         },
         "type": "object"
       },
+      "ttab.everysport.ListPendingImportsRequest": {
+        "properties": {
+          "only_enabled": {
+            "description": "OnlyEnabled excludes the competitions that wouldn't import anyway, which is every entry that isn't enabled. Optional.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ListPendingImportsResponse": {
+        "properties": {
+          "imports": {
+            "description": "Imports are the competitions with skipped entries, ordered by sport and competition name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.PendingImport"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.ListSportsRequest": {
         "properties": {
           "query": {
@@ -301,6 +322,13 @@
             "description": "Category only re-imports the events for the specific competition static ID.",
             "type": "integer"
           },
+          "competitions": {
+            "description": "Competitions only re-imports the events for the given competition static IDs. Combines with competition: an event matches if its static ID is in either. Optional.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
           "force": {
             "description": "Force overwrite of calendar entries.",
             "type": "boolean"
@@ -321,6 +349,47 @@
           "queued_imports": {
             "description": "QueuedImports is the total numer of events that were queued for import.",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.PendingImport": {
+        "description": "PendingImport is a competition with calendar entries that the service saw and skipped, because the competition or its sport was not enabled at the time. Enabling the competition does not import them: the entries have gone past in the update feed, and only a manual import brings them back. An entry stops being counted as soon as it is imported, so the list empties itself as the re-imports land.",
+        "properties": {
+          "entries": {
+            "description": "Entries is the number of calendar entries that are still missing.",
+            "type": "integer"
+          },
+          "from_date": {
+            "description": "FromDate is the date of the earliest skipped entry, as YYYY-MM-DD.",
+            "type": "string"
+          },
+          "last_seen": {
+            "description": "LastSeen is when an entry was last skipped, as RFC3339.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name is the Everysport competition name.",
+            "type": "string"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport ID of the sport the competition belongs to.",
+            "type": "integer"
+          },
+          "sport_name": {
+            "description": "SportName is the Everysport sport name.",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport static ID of the competition.",
+            "type": "integer"
+          },
+          "to_date": {
+            "description": "ToDate is the date of the latest skipped entry, as YYYY-MM-DD.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -641,6 +710,44 @@
           }
         ],
         "summary": "ListCompetitions",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/ListPendingImports": {
+      "post": {
+        "description": "ListPendingImports lists the competitions that have calendar entries the service skipped, with the date range those entries fall in.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ListPendingImportsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ListPendingImportsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ListPendingImports",
         "tags": [
           "Manage"
         ]

@@ -26,6 +26,9 @@ service Manage {
   rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
   // ExportConfig returns the full import configuration as CSV.
   rpc ExportConfig(ExportConfigRequest) returns (ExportConfigResponse);
+  // ListPendingImports lists the competitions that have calendar entries the
+  // service skipped, with the date range those entries fall in.
+  rpc ListPendingImports(ListPendingImportsRequest) returns (ListPendingImportsResponse);
 }
 
 message ManualImportRequest {
@@ -40,11 +43,54 @@ message ManualImportRequest {
   int64 competition = 4;
   // Force overwrite of calendar entries.
   bool force        = 5;
+  // Competitions only re-imports the events for the given competition static
+  // IDs. Combines with competition: an event matches if its static ID is in
+  // either. Optional.
+  repeated int64 competitions = 6;
 }
 
 message ManualImportResponse {
   // QueuedImports is the total numer of events that were queued for import.
   int64 queued_imports = 1;
+}
+
+message ListPendingImportsRequest {
+  // OnlyEnabled excludes the competitions that wouldn't import anyway, which
+  // is every entry that isn't enabled. Optional.
+  bool only_enabled = 1;
+}
+
+message ListPendingImportsResponse {
+  // Imports are the competitions with skipped entries, ordered by sport and
+  // competition name.
+  repeated PendingImport imports = 1;
+}
+
+// PendingImport is a competition with calendar entries that the service saw and
+// skipped, because the competition or its sport was not enabled at the time.
+// Enabling the competition does not import them: the entries have gone past in
+// the update feed, and only a manual import brings them back. An entry stops
+// being counted as soon as it is imported, so the list empties itself as the
+// re-imports land.
+message PendingImport {
+  // SportID is the Everysport ID of the sport the competition belongs to.
+  int64 sport_id        = 1;
+  // SportName is the Everysport sport name.
+  string sport_name     = 2;
+  // StaticID is the Everysport static ID of the competition.
+  int64 static_id       = 3;
+  // Name is the Everysport competition name.
+  string name           = 4;
+  // State is the review state the competition is in now.
+  ConfigState state     = 5;
+  // FromDate is the date of the earliest skipped entry, as YYYY-MM-DD.
+  string from_date      = 6;
+  // ToDate is the date of the latest skipped entry, as YYYY-MM-DD.
+  string to_date        = 7;
+  // Entries is the number of calendar entries that are still missing.
+  int64 entries         = 8;
+  // LastSeen is when an entry was last skipped, as RFC3339.
+  string last_seen      = 9;
 }
 
 // ConfigState is the review state of a configuration entry. Entries that the
@@ -53,8 +99,9 @@ enum ConfigState {
   // STATE_UNSPECIFIED is the default zero value. Used as "any state" when
   // filtering, and rejected when updating an entry.
   STATE_UNSPECIFIED = 0;
-  // STATE_PENDING marks an entry that nobody has reviewed yet. A pending
-  // competition falls back to the settings of its sport.
+  // STATE_PENDING marks an entry that nobody has reviewed yet. Nothing pending
+  // is imported, and the entries that were skipped while it was pending are
+  // listed by ListPendingImports.
   STATE_PENDING     = 1;
   // STATE_ENABLED means that matching events are imported.
   STATE_ENABLED     = 2;
