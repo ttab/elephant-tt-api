@@ -840,7 +840,7 @@
   },
   "info": {
     "title": "ntb API",
-    "version": "v0.6.0"
+    "version": "v0.6.1"
   },
   "openapi": "3.0.0",
   "paths": {
