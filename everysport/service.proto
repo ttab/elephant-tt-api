@@ -10,7 +10,8 @@ service Manage {
   // ListSports lists the sports in the import configuration.
   rpc ListSports(ListSportsRequest) returns (ListSportsResponse);
   // ListCategories lists competition categories, for one sport or for all of
-  // them. Categories are identity only, they carry no import settings.
+  // them. A category imports nothing of its own, it carries the defaults that
+  // new competitions under it are created with.
   rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
   // ListCompetitions lists competitions in the import configuration.
   rpc ListCompetitions(ListCompetitionsRequest) returns (ListCompetitionsResponse);
@@ -18,12 +19,19 @@ service Manage {
   rpc GetSport(GetSportRequest) returns (GetSportResponse);
   // GetCompetition returns a single competition configuration.
   rpc GetCompetition(GetCompetitionRequest) returns (GetCompetitionResponse);
+  // GetCategory returns a single competition category.
+  rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse);
   // UpdateSport replaces the editable settings of a sport.
   rpc UpdateSport(UpdateSportRequest) returns (UpdateSportResponse);
   // UpdateCompetition replaces the editable settings of a competition.
   rpc UpdateCompetition(UpdateCompetitionRequest) returns (UpdateCompetitionResponse);
-  // UpdateCategory updates the editable fields of a competition category.
+  // UpdateCategory replaces the comment and the import defaults of a
+  // competition category.
   rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
+  // ApplyDefaults writes the defaults of a sport or a category to the rows
+  // below it. With dry_run set it reports what would change and writes
+  // nothing, which is what the preview shown before an apply is built from.
+  rpc ApplyDefaults(ApplyDefaultsRequest) returns (ApplyDefaultsResponse);
   // ExportConfig returns the full import configuration as CSV.
   rpc ExportConfig(ExportConfigRequest) returns (ExportConfigResponse);
   // ListPendingImports lists the competitions that have calendar entries the
@@ -118,26 +126,55 @@ enum ConfigState {
 
 // ImportSettings is the editable part of a sport or competition
 // configuration. All other fields identify the entry and are read only.
+//
+// Nothing here is inherited: a competition is imported with the settings on
+// its own row. The settings of a sport are the defaults its new competitions
+// are created with, plus its own review state.
 message ImportSettings {
+  reserved 4;
+  reserved "merge_events";
+
   // State controls whether matching events are imported.
   ConfigState state       = 1;
   // Newsvalue is the value of the core/newsvalue block of created events,
   // 1 to 5. Required when enabling an entry.
   int32 newsvalue         = 2;
-  // MergeSetting is the strategy used to group entries into events, either
-  // "CategoryMerge" or "CompetitionMerge". Empty means that a competition
-  // uses the strategy of its sport, and that a sport uses "CategoryMerge".
+  // MergeSetting is the strategy used to group entries into events, and it
+  // names the shape of the documents that come out: "NoMerge" gives one event
+  // per calendar entry, "CategoryMerge" one event per category and day, and
+  // "CompetitionMerge" one event per competition and day. Required when
+  // enabling an entry.
   string merge_setting    = 3;
-  // MergeEvents controls whether several calendar entries for the same day
-  // are merged into a single event document.
-  bool merge_events       = 4;
   // Sport is the list of TT media topic names that events are linked to
   // through core/category links, in addition to the generic "Sport" topic.
-  // Empty means that a competition uses the topics of its sport, and that a
-  // sport uses its own name.
+  // Required when enabling an entry: an entry with no names of its own
+  // publishes events linked to the generic topic and nothing else.
   repeated string sport   = 5;
   // Comment is a free text note for whoever configures the import.
   string comment          = 6;
+}
+
+// ImportDefaults is the editable part of a competition category. A category
+// imports nothing itself, so it has no state: its values are what a
+// competition discovered under it is created with, and what ApplyDefaults
+// writes downward.
+//
+// This is deliberately not an ImportSettings. A category with a state field
+// would be a field that has to be ignored, and "unset" is a real value here
+// where it is not one on a competition: a template can be unset, a field that
+// decides what a document says cannot.
+message ImportDefaults {
+  // Newsvalue is the newsvalue new competitions are created with, 1 to 5.
+  // Zero means that no default is set and the sport's is used instead.
+  int32 newsvalue       = 1;
+  // MergeSetting is the merge strategy new competitions are created with, one
+  // of "NoMerge", "CategoryMerge" and "CompetitionMerge". Empty means that no
+  // default is set and the sport's is used instead.
+  string merge_setting  = 2;
+  // Sport is the list of TT media topic names new competitions are created
+  // with. Empty means that no default is set and the sport's are used
+  // instead.
+  repeated string sport = 3;
 }
 
 // ConfigWarning is a problem with a configuration entry that doesn't stop it
@@ -173,24 +210,27 @@ message SportConfig {
 }
 
 // CategoryConfig is an Everysport competition category. The category tier
-// carries no import settings, it only groups competitions under a sport.
+// carries no import settings of its own: it groups competitions under a
+// sport, and holds the defaults new competitions in it are created with.
 message CategoryConfig {
   // ID is the Everysport competition category ID.
-  int64 id          = 1;
+  int64 id                = 1;
   // SportID is the Everysport ID of the sport the category belongs to.
-  int64 sport_id    = 2;
+  int64 sport_id          = 2;
   // Name is the Everysport category name.
-  string name       = 3;
+  string name             = 3;
   // Gender is the gender category slug, if any.
-  string gender     = 4;
+  string gender           = 4;
   // Comment is a free text note for whoever configures the import.
-  string comment    = 5;
+  string comment          = 5;
   // Seen is when the category was last listed by Everysport, as RFC3339.
-  string seen       = 6;
-  // Updated is when the comment last changed, as RFC3339.
-  string updated    = 7;
-  // UpdatedBy is the subject that last changed the comment.
-  string updated_by = 8;
+  string seen             = 6;
+  // Updated is when the comment or the defaults last changed, as RFC3339.
+  string updated          = 7;
+  // UpdatedBy is the subject that last changed them.
+  string updated_by       = 8;
+  // Defaults are the import defaults for competitions in the category.
+  ImportDefaults defaults = 9;
 }
 
 // CompetitionConfig is the import configuration for an Everysport
@@ -348,16 +388,140 @@ message ReviewCompetitionsResponse {
   repeated ConfigWarning warnings = 2;
 }
 
+message GetCategoryRequest {
+  // ID is the Everysport competition category ID. Required.
+  int64 id = 1;
+}
+
+message GetCategoryResponse {
+  // Category is the competition category.
+  CategoryConfig category = 1;
+}
+
 message UpdateCategoryRequest {
   // ID is the Everysport competition category ID. Required.
-  int64 id       = 1;
+  int64 id                = 1;
   // Comment replaces the current comment of the category.
-  string comment = 2;
+  string comment          = 2;
+  // Defaults replaces the current import defaults of the category in full.
+  ImportDefaults defaults = 3;
 }
 
 message UpdateCategoryResponse {
   // Category is the updated category.
-  CategoryConfig category = 1;
+  CategoryConfig category         = 1;
+  // Warnings are problems with the saved defaults.
+  repeated ConfigWarning warnings = 2;
+}
+
+// DefaultsTier is the configuration tier a changed row sits in.
+enum DefaultsTier {
+  // TIER_UNSPECIFIED is the default zero value, and is never returned.
+  TIER_UNSPECIFIED = 0;
+  // TIER_CATEGORY is a competition category row.
+  TIER_CATEGORY    = 1;
+  // TIER_COMPETITION is a competition row.
+  TIER_COMPETITION = 2;
+}
+
+// NewsvalueChange is what an apply does to a newsvalue.
+message NewsvalueChange {
+  // From is the value the row has now.
+  int32 from = 1;
+  // To is the value the apply writes.
+  int32 to   = 2;
+}
+
+// MergeSettingChange is what an apply does to a merge strategy.
+message MergeSettingChange {
+  // From is the value the row has now.
+  string from = 1;
+  // To is the value the apply writes.
+  string to   = 2;
+}
+
+// SportChange is what an apply does to a list of topic names.
+message SportChange {
+  // From are the names the row has now.
+  repeated string from = 1;
+  // To are the names the apply writes.
+  repeated string to   = 2;
+}
+
+// DefaultsChange is one row that an apply changes, with the old and the new
+// value of every field that changes on it. A field that isn't being applied,
+// or that already holds the value being applied, is left out, and a row where
+// nothing would change is not reported at all.
+message DefaultsChange {
+  // Tier says whether the row is a category or a competition.
+  DefaultsTier tier                = 1;
+  // SportID is the Everysport ID of the sport the row belongs to.
+  int64 sport_id                   = 2;
+  // CategoryID is the category itself for a category row, and the category
+  // the competition belongs to for a competition row. Zero when a competition
+  // has no known category.
+  int64 category_id                = 3;
+  // CategoryName is the name of that category, empty when there is none.
+  string category_name             = 4;
+  // StaticID is the Everysport competition static ID, zero for a category.
+  int64 static_id                  = 5;
+  // Name is the name of the row itself.
+  string name                      = 6;
+  // State is the review state of a competition row. STATE_UNSPECIFIED for a
+  // category row, which has no state of its own.
+  ConfigState state                = 7;
+  // Newsvalue is the change to the newsvalue, absent when it doesn't change.
+  NewsvalueChange newsvalue        = 8;
+  // MergeSetting is the change to the merge strategy, absent when it doesn't
+  // change.
+  MergeSettingChange merge_setting = 9;
+  // Sport is the change to the topic names, absent when they don't change.
+  SportChange sport                = 10;
+}
+
+// ApplyDefaultsRequest writes the defaults of a sport or a category to the
+// rows below it. At least one field must be picked, or there is nothing to
+// apply. Applying from a sport always writes its categories as well as its
+// competitions: the choice on offer is which fields, not which tier.
+message ApplyDefaultsRequest {
+  // SportID applies the defaults of a sport. Exactly one of sport_id and
+  // category_id is required.
+  int64 sport_id                          = 1;
+  // CategoryID applies the defaults of a category.
+  int64 category_id                       = 2;
+  // ApplyNewsvalue includes the newsvalue in what is written.
+  bool apply_newsvalue                    = 3;
+  // ApplyMergeSetting includes the merge strategy in what is written. The
+  // merge strategy is part of the identity of the documents a competition
+  // publishes, so changing it on an enabled competition leaves the events it
+  // has already published behind under their old identifiers.
+  bool apply_merge_setting                = 4;
+  // ApplySport includes the topic names in what is written.
+  bool apply_sport                        = 5;
+  // CompetitionStates selects the competitions to write, by review state.
+  // Required, at least one, and STATE_UNSPECIFIED is rejected. Categories are
+  // not selected by it: they have no state, and applying from a sport always
+  // writes them.
+  repeated ConfigState competition_states = 6;
+  // DryRun reports what would change and writes nothing. The rows it lists
+  // are the rows a call without it writes, as of when it ran: a discovery
+  // sweep or a review decision landing in between can change them.
+  bool dry_run                            = 7;
+}
+
+message ApplyDefaultsResponse {
+  // Changes are the rows that change, ordered by category and name.
+  repeated DefaultsChange changes = 1;
+  // Categories is the number of category rows that change.
+  int64 categories                = 2;
+  // Competitions is the number of competition rows that change.
+  int64 competitions              = 3;
+  // EnabledCompetitions is how many of those competitions are enabled, which
+  // are the rows where an apply changes something that is already published.
+  int64 enabled_competitions      = 4;
+  // DryRun repeats the flag from the request: false means the changes listed
+  // were written.
+  bool dry_run                    = 5;
 }
 
 message ExportConfigRequest {}

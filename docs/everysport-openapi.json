@@ -1,12 +1,80 @@
 {
   "components": {
     "schemas": {
+      "ttab.everysport.ApplyDefaultsRequest": {
+        "description": "ApplyDefaultsRequest writes the defaults of a sport or a category to the rows below it. At least one field must be picked, or there is nothing to apply. Applying from a sport always writes its categories as well as its competitions: the choice on offer is which fields, not which tier.",
+        "properties": {
+          "apply_merge_setting": {
+            "description": "ApplyMergeSetting includes the merge strategy in what is written. The merge strategy is part of the identity of the documents a competition publishes, so changing it on an enabled competition leaves the events it has already published behind under their old identifiers.",
+            "type": "boolean"
+          },
+          "apply_newsvalue": {
+            "description": "ApplyNewsvalue includes the newsvalue in what is written.",
+            "type": "boolean"
+          },
+          "apply_sport": {
+            "description": "ApplySport includes the topic names in what is written.",
+            "type": "boolean"
+          },
+          "category_id": {
+            "description": "CategoryID applies the defaults of a category.",
+            "type": "integer"
+          },
+          "competition_states": {
+            "description": "CompetitionStates selects the competitions to write, by review state. Required, at least one, and STATE_UNSPECIFIED is rejected. Categories are not selected by it: they have no state, and applying from a sport always writes them.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+            },
+            "type": "array"
+          },
+          "dry_run": {
+            "description": "DryRun reports what would change and writes nothing. The rows it lists are the rows a call without it writes, as of when it ran: a discovery sweep or a review decision landing in between can change them.",
+            "type": "boolean"
+          },
+          "sport_id": {
+            "description": "SportID applies the defaults of a sport. Exactly one of sport_id and category_id is required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.ApplyDefaultsResponse": {
+        "properties": {
+          "categories": {
+            "description": "Categories is the number of category rows that change.",
+            "type": "integer"
+          },
+          "changes": {
+            "description": "Changes are the rows that change, ordered by category and name.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.DefaultsChange"
+            },
+            "type": "array"
+          },
+          "competitions": {
+            "description": "Competitions is the number of competition rows that change.",
+            "type": "integer"
+          },
+          "dry_run": {
+            "description": "DryRun repeats the flag from the request: false means the changes listed were written.",
+            "type": "boolean"
+          },
+          "enabled_competitions": {
+            "description": "EnabledCompetitions is how many of those competitions are enabled, which are the rows where an apply changes something that is already published.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.CategoryConfig": {
-        "description": "CategoryConfig is an Everysport competition category. The category tier carries no import settings, it only groups competitions under a sport.",
+        "description": "CategoryConfig is an Everysport competition category. The category tier carries no import settings of its own: it groups competitions under a sport, and holds the defaults new competitions in it are created with.",
         "properties": {
           "comment": {
             "description": "Comment is a free text note for whoever configures the import.",
             "type": "string"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportDefaults"
           },
           "gender": {
             "description": "Gender is the gender category slug, if any.",
@@ -29,11 +97,11 @@
             "type": "integer"
           },
           "updated": {
-            "description": "Updated is when the comment last changed, as RFC3339.",
+            "description": "Updated is when the comment or the defaults last changed, as RFC3339.",
             "type": "string"
           },
           "updated_by": {
-            "description": "UpdatedBy is the subject that last changed the comment.",
+            "description": "UpdatedBy is the subject that last changed them.",
             "type": "string"
           }
         },
@@ -130,6 +198,56 @@
         },
         "type": "object"
       },
+      "ttab.everysport.DefaultsChange": {
+        "description": "DefaultsChange is one row that an apply changes, with the old and the new value of every field that changes on it. A field that isn't being applied, or that already holds the value being applied, is left out, and a row where nothing would change is not reported at all.",
+        "properties": {
+          "category_id": {
+            "description": "CategoryID is the category itself for a category row, and the category the competition belongs to for a competition row. Zero when a competition has no known category.",
+            "type": "integer"
+          },
+          "category_name": {
+            "description": "CategoryName is the name of that category, empty when there is none.",
+            "type": "string"
+          },
+          "merge_setting": {
+            "$ref": "#/components/schemas/ttab.everysport.MergeSettingChange"
+          },
+          "name": {
+            "description": "Name is the name of the row itself.",
+            "type": "string"
+          },
+          "newsvalue": {
+            "$ref": "#/components/schemas/ttab.everysport.NewsvalueChange"
+          },
+          "sport": {
+            "$ref": "#/components/schemas/ttab.everysport.SportChange"
+          },
+          "sport_id": {
+            "description": "SportID is the Everysport ID of the sport the row belongs to.",
+            "type": "integer"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ttab.everysport.ConfigState"
+          },
+          "static_id": {
+            "description": "StaticID is the Everysport competition static ID, zero for a category.",
+            "type": "integer"
+          },
+          "tier": {
+            "$ref": "#/components/schemas/ttab.everysport.DefaultsTier"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.DefaultsTier": {
+        "description": "DefaultsTier is the configuration tier a changed row sits in.",
+        "enum": [
+          "TIER_UNSPECIFIED",
+          "TIER_CATEGORY",
+          "TIER_COMPETITION"
+        ],
+        "type": "string"
+      },
       "ttab.everysport.ExportConfigRequest": {
         "type": "object"
       },
@@ -138,6 +256,23 @@
           "csv": {
             "description": "CSV is the full configuration as a CSV file.",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetCategoryRequest": {
+        "properties": {
+          "id": {
+            "description": "ID is the Everysport competition category ID. Required.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.GetCategoryResponse": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ttab.everysport.CategoryConfig"
           }
         },
         "type": "object"
@@ -180,19 +315,36 @@
         },
         "type": "object"
       },
+      "ttab.everysport.ImportDefaults": {
+        "description": "ImportDefaults is the editable part of a competition category. A category imports nothing itself, so it has no state: its values are what a competition discovered under it is created with, and what ApplyDefaults writes downward.\n This is deliberately not an ImportSettings. A category with a state field would be a field that has to be ignored, and \"unset\" is a real value here where it is not one on a competition: a template can be unset, a field that decides what a document says cannot.",
+        "properties": {
+          "merge_setting": {
+            "description": "MergeSetting is the merge strategy new competitions are created with, one of \"NoMerge\", \"CategoryMerge\" and \"CompetitionMerge\". Empty means that no default is set and the sport's is used instead.",
+            "type": "string"
+          },
+          "newsvalue": {
+            "description": "Newsvalue is the newsvalue new competitions are created with, 1 to 5. Zero means that no default is set and the sport's is used instead.",
+            "type": "integer"
+          },
+          "sport": {
+            "description": "Sport is the list of TT media topic names new competitions are created with. Empty means that no default is set and the sport's are used instead.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.ImportSettings": {
-        "description": "ImportSettings is the editable part of a sport or competition configuration. All other fields identify the entry and are read only.",
+        "description": "ImportSettings is the editable part of a sport or competition configuration. All other fields identify the entry and are read only.\n Nothing here is inherited: a competition is imported with the settings on its own row. The settings of a sport are the defaults its new competitions are created with, plus its own review state.",
         "properties": {
           "comment": {
             "description": "Comment is a free text note for whoever configures the import.",
             "type": "string"
           },
-          "merge_events": {
-            "description": "MergeEvents controls whether several calendar entries for the same day are merged into a single event document.",
-            "type": "boolean"
-          },
           "merge_setting": {
-            "description": "MergeSetting is the strategy used to group entries into events, either \"CategoryMerge\" or \"CompetitionMerge\". Empty means that a competition uses the strategy of its sport, and that a sport uses \"CategoryMerge\".",
+            "description": "MergeSetting is the strategy used to group entries into events, and it names the shape of the documents that come out: \"NoMerge\" gives one event per calendar entry, \"CategoryMerge\" one event per category and day, and \"CompetitionMerge\" one event per competition and day. Required when enabling an entry.",
             "type": "string"
           },
           "newsvalue": {
@@ -200,7 +352,7 @@
             "type": "integer"
           },
           "sport": {
-            "description": "Sport is the list of TT media topic names that events are linked to through core/category links, in addition to the generic \"Sport\" topic. Empty means that a competition uses the topics of its sport, and that a sport uses its own name.",
+            "description": "Sport is the list of TT media topic names that events are linked to through core/category links, in addition to the generic \"Sport\" topic. Required when enabling an entry: an entry with no names of its own publishes events linked to the generic topic and nothing else.",
             "items": {
               "type": "string"
             },
@@ -367,6 +519,34 @@
         },
         "type": "object"
       },
+      "ttab.everysport.MergeSettingChange": {
+        "description": "MergeSettingChange is what an apply does to a merge strategy.",
+        "properties": {
+          "from": {
+            "description": "From is the value the row has now.",
+            "type": "string"
+          },
+          "to": {
+            "description": "To is the value the apply writes.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ttab.everysport.NewsvalueChange": {
+        "description": "NewsvalueChange is what an apply does to a newsvalue.",
+        "properties": {
+          "from": {
+            "description": "From is the value the row has now.",
+            "type": "integer"
+          },
+          "to": {
+            "description": "To is the value the apply writes.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.PendingImport": {
         "description": "PendingImport is a competition with calendar entries that the service saw and skipped, because the competition or its sport was not enabled at the time. Enabling the competition does not import them: the entries have gone past in the update feed, and only a manual import brings them back. An entry stops being counted as soon as it is imported, so the list empties itself as the re-imports land.",
         "properties": {
@@ -447,6 +627,26 @@
         },
         "type": "object"
       },
+      "ttab.everysport.SportChange": {
+        "description": "SportChange is what an apply does to a list of topic names.",
+        "properties": {
+          "from": {
+            "description": "From are the names the row has now.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "to": {
+            "description": "To are the names the apply writes.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ttab.everysport.SportConfig": {
         "description": "SportConfig is the import configuration for an Everysport sport.",
         "properties": {
@@ -490,6 +690,9 @@
             "description": "Comment replaces the current comment of the category.",
             "type": "string"
           },
+          "defaults": {
+            "$ref": "#/components/schemas/ttab.everysport.ImportDefaults"
+          },
           "id": {
             "description": "ID is the Everysport competition category ID. Required.",
             "type": "integer"
@@ -501,6 +704,13 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ttab.everysport.CategoryConfig"
+          },
+          "warnings": {
+            "description": "Warnings are problems with the saved defaults.",
+            "items": {
+              "$ref": "#/components/schemas/ttab.everysport.ConfigWarning"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -578,6 +788,44 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/twirp/ttab.everysport.Manage/ApplyDefaults": {
+      "post": {
+        "description": "ApplyDefaults writes the defaults of a sport or a category to the rows below it. With dry_run set it reports what would change and writes nothing, which is what the preview shown before an apply is built from.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.ApplyDefaultsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.ApplyDefaultsResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ApplyDefaults",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
     "/twirp/ttab.everysport.Manage/ExportConfig": {
       "post": {
         "description": "ExportConfig returns the full import configuration as CSV.",
@@ -611,6 +859,44 @@
           }
         ],
         "summary": "ExportConfig",
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/twirp/ttab.everysport.Manage/GetCategory": {
+      "post": {
+        "description": "GetCategory returns a single competition category.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ttab.everysport.GetCategoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ttab.everysport.GetCategoryResponse"
+                }
+              }
+            },
+            "description": "Method response"
+          },
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "GetCategory",
         "tags": [
           "Manage"
         ]
@@ -694,7 +980,7 @@
     },
     "/twirp/ttab.everysport.Manage/ListCategories": {
       "post": {
-        "description": "ListCategories lists competition categories, for one sport or for all of them. Categories are identity only, they carry no import settings.",
+        "description": "ListCategories lists competition categories, for one sport or for all of them. A category imports nothing of its own, it carries the defaults that new competitions under it are created with.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -922,7 +1208,7 @@
     },
     "/twirp/ttab.everysport.Manage/UpdateCategory": {
       "post": {
-        "description": "UpdateCategory updates the editable fields of a competition category.",
+        "description": "UpdateCategory replaces the comment and the import defaults of a competition category.",
         "requestBody": {
           "content": {
             "application/json": {
