@@ -183,6 +183,10 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
 
+[`CHANGELOG.md`](CHANGELOG.md) documents what each release changed, and a
+change a consumer would want to know about gets its entry in the same commit
+as the change itself.
+
 ## License
 
 Licensed under MIT.
