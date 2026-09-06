@@ -109,13 +109,9 @@ never generated for: the Go code those services import still comes from
 pins, not the one that happens to be on the machine, so the output no longer
 depends on who regenerated it; it does need network access, since every plugin
 is resolved from the module proxy on each run, and a `GOPROXY=off` build fails
-even with a warm module cache. The `ttab/mage` pin is a pre-release
-pseudo-version of its `rpc` namespace branch
-(`v0.12.1-0.20260906115506-1fdd25ad152b`); it has to become a released tag
-before this module is tagged, so that the generated code in the tag is
-reproducible from a released generator. The release order is `ttab/mage`,
-then `elephantine`, then `ttab/mage` again with the plugin pinned to that tag,
-and only then this module — [`README.md`](README.md#releasing) has it.
+even with a warm module cache. The `ttab/mage` pin is the released v0.13.1,
+which pins `protoc-gen-elephant-rpc` to elephantine v0.29.0, so the generated
+code in this release is reproducible from released generators.
 
 Changes:
 
