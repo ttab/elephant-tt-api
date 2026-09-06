@@ -4,7 +4,7 @@ import "newsdoc/newsdoc.proto";
 
 package ttab.baboon;
 
-option go_package = "github.com/ttab/baboon/rpc/baboon";
+option go_package = "github.com/ttab/elephant-tt-api/baboon";
 
 service Assets {
   rpc StoreFont(StoreFontRequest) returns (StoreFontResponse);
