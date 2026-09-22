@@ -4,7 +4,40 @@ Everything from v0.5.0 onwards is documented here; earlier releases are not
 reconstructed. The entries are derived from the release tags, and the linked
 pull requests hold the detail.
 
-## [v0.7.0] - Unreleased
+## [v0.8.0] - Unreleased
+
+**Breaking (wires moves to `ttab.wires.v1`, native Connect):** the `wires`
+package is gone. The declaration now lives in `ttab/wires/v1` as package
+`ttab.wires.v1`, Go package `wiresv1`, and is generated for Connect only in
+connect-go's native shape: `wiresv1connect.NewRssFeedServiceHandler` takes an
+implementation of `wiresv1connect.RssFeedServiceHandler`, whose methods speak
+`*connect.Request[T]` and `*connect.Response[T]`, and
+`wiresv1connect.NewRssFeedServiceClient` returns connect-go's client. There is
+no Twirp code, no plain `RssFeed` interface and no `wiresconnect` adapters any
+more. On the wire the procedure paths change from `/ttab.wires.RssFeed/<Method>`
+to `/ttab.wires.v1.RssFeedService/<Method>`, and the `FeedType` values are
+spelled `FEED_TYPE_UNSPECIFIED`, `FEED_TYPE_ARTICLE` and
+`FEED_TYPE_PRESSRELEASE` where they were `TYPE_UNKNOWN`, `TYPE_ARTICLE` and
+`TYPE_PRESSRELEASE`; that is what a JSON body carries. Message and field
+names are unchanged. The declaration now passes buf's STANDARD lint rules,
+which is what the renames buy; elephant-wires is the only implementer and
+the only caller and moves in its v2.0.0. The other five services are
+untouched and stay dual stack.
+
+Changes:
+
+- `ttab/mage` moves to v0.15.0, which is where the versioned layout and the
+  native shape come from. The proto root is the repository root, so no other
+  file is renamed and no other service regenerates; the committed `buf.yaml`
+  only gets the new header.
+
+## [v0.7.1] - 2026-09-08
+
+Changes:
+
+- Dependency upgrade: elephant-api to v0.25.0.
+
+## [v0.7.0] - 2026-09-08
 
 **Build (Go 1.27):** the `go` directive moves from 1.25.7 to **1.27.1**. A
 module's directive is a floor for everything that compiles it, so every

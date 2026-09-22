@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: wires/service.proto
+// source: ttab/wires/v1/service.proto
 
-package wires
+package wiresv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -24,22 +24,22 @@ const (
 type FeedType int32
 
 const (
-	FeedType_TYPE_UNKNOWN      FeedType = 0
-	FeedType_TYPE_ARTICLE      FeedType = 1
-	FeedType_TYPE_PRESSRELEASE FeedType = 2
+	FeedType_FEED_TYPE_UNSPECIFIED  FeedType = 0
+	FeedType_FEED_TYPE_ARTICLE      FeedType = 1
+	FeedType_FEED_TYPE_PRESSRELEASE FeedType = 2
 )
 
 // Enum value maps for FeedType.
 var (
 	FeedType_name = map[int32]string{
-		0: "TYPE_UNKNOWN",
-		1: "TYPE_ARTICLE",
-		2: "TYPE_PRESSRELEASE",
+		0: "FEED_TYPE_UNSPECIFIED",
+		1: "FEED_TYPE_ARTICLE",
+		2: "FEED_TYPE_PRESSRELEASE",
 	}
 	FeedType_value = map[string]int32{
-		"TYPE_UNKNOWN":      0,
-		"TYPE_ARTICLE":      1,
-		"TYPE_PRESSRELEASE": 2,
+		"FEED_TYPE_UNSPECIFIED":  0,
+		"FEED_TYPE_ARTICLE":      1,
+		"FEED_TYPE_PRESSRELEASE": 2,
 	}
 )
 
@@ -54,11 +54,11 @@ func (x FeedType) String() string {
 }
 
 func (FeedType) Descriptor() protoreflect.EnumDescriptor {
-	return file_wires_service_proto_enumTypes[0].Descriptor()
+	return file_ttab_wires_v1_service_proto_enumTypes[0].Descriptor()
 }
 
 func (FeedType) Type() protoreflect.EnumType {
-	return &file_wires_service_proto_enumTypes[0]
+	return &file_ttab_wires_v1_service_proto_enumTypes[0]
 }
 
 func (x FeedType) Number() protoreflect.EnumNumber {
@@ -67,7 +67,7 @@ func (x FeedType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FeedType.Descriptor instead.
 func (FeedType) EnumDescriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{0}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{0}
 }
 
 type GetAllFeedsRequest struct {
@@ -84,7 +84,7 @@ type GetAllFeedsRequest struct {
 
 func (x *GetAllFeedsRequest) Reset() {
 	*x = GetAllFeedsRequest{}
-	mi := &file_wires_service_proto_msgTypes[0]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *GetAllFeedsRequest) String() string {
 func (*GetAllFeedsRequest) ProtoMessage() {}
 
 func (x *GetAllFeedsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[0]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *GetAllFeedsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllFeedsRequest.ProtoReflect.Descriptor instead.
 func (*GetAllFeedsRequest) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{0}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetAllFeedsRequest) GetPage() int64 {
@@ -141,7 +141,7 @@ type GetAllFeedsResponse struct {
 
 func (x *GetAllFeedsResponse) Reset() {
 	*x = GetAllFeedsResponse{}
-	mi := &file_wires_service_proto_msgTypes[1]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -153,7 +153,7 @@ func (x *GetAllFeedsResponse) String() string {
 func (*GetAllFeedsResponse) ProtoMessage() {}
 
 func (x *GetAllFeedsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[1]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -166,7 +166,7 @@ func (x *GetAllFeedsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllFeedsResponse.ProtoReflect.Descriptor instead.
 func (*GetAllFeedsResponse) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{1}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetAllFeedsResponse) GetPage() int64 {
@@ -198,9 +198,9 @@ type Feed struct {
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	// The URL from which the feed is sourced.
 	Url string `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	// Feed type enum. "TYPE_ARTICLE" (default) and "TYPE_PRESSRELEASE".
-	// Use "TYPE_ARTICLE" and "type_exceptions" field for feeds with mixed types.
-	Type FeedType `protobuf:"varint,4,opt,name=type,proto3,enum=ttab.wires.FeedType" json:"type,omitempty"`
+	// Feed type enum. "FEED_TYPE_ARTICLE" (default) and "FEED_TYPE_PRESSRELEASE".
+	// Use "FEED_TYPE_ARTICLE" and "type_exceptions" field for feeds with mixed types.
+	Type FeedType `protobuf:"varint,4,opt,name=type,proto3,enum=ttab.wires.v1.FeedType" json:"type,omitempty"`
 	// A list of exceptions for fine-grained type categorization of feed items.
 	// Primarily used for feeds with mixed content types.
 	TypeExceptions []*ExceptionRule `protobuf:"bytes,10,rep,name=type_exceptions,json=typeExceptions,proto3" json:"type_exceptions,omitempty"`
@@ -223,7 +223,7 @@ type Feed struct {
 
 func (x *Feed) Reset() {
 	*x = Feed{}
-	mi := &file_wires_service_proto_msgTypes[2]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -235,7 +235,7 @@ func (x *Feed) String() string {
 func (*Feed) ProtoMessage() {}
 
 func (x *Feed) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[2]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -248,7 +248,7 @@ func (x *Feed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Feed.ProtoReflect.Descriptor instead.
 func (*Feed) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{2}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Feed) GetUuid() string {
@@ -276,7 +276,7 @@ func (x *Feed) GetType() FeedType {
 	if x != nil {
 		return x.Type
 	}
-	return FeedType_TYPE_UNKNOWN
+	return FeedType_FEED_TYPE_UNSPECIFIED
 }
 
 func (x *Feed) GetTypeExceptions() []*ExceptionRule {
@@ -321,7 +321,7 @@ func (x *Feed) GetLastPublication() string {
 	return ""
 }
 
-// One or both fileds can be used in a rule.
+// One or both fields can be used in a rule.
 // If one of the fields in a rule matches a feed item, the exception is applied (logical OR).
 type ExceptionRule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -337,7 +337,7 @@ type ExceptionRule struct {
 
 func (x *ExceptionRule) Reset() {
 	*x = ExceptionRule{}
-	mi := &file_wires_service_proto_msgTypes[3]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -349,7 +349,7 @@ func (x *ExceptionRule) String() string {
 func (*ExceptionRule) ProtoMessage() {}
 
 func (x *ExceptionRule) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[3]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -362,7 +362,7 @@ func (x *ExceptionRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExceptionRule.ProtoReflect.Descriptor instead.
 func (*ExceptionRule) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{3}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ExceptionRule) GetTitlePattern() string {
@@ -382,7 +382,7 @@ func (x *ExceptionRule) GetHasCategory() string {
 type UpdateFeedRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The feed object containing the updated data.
-	// All fields must be set except intenally mangaged fields.
+	// All fields must be set except internally managed fields.
 	Feed          *Feed `protobuf:"bytes,1,opt,name=feed,proto3" json:"feed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -390,7 +390,7 @@ type UpdateFeedRequest struct {
 
 func (x *UpdateFeedRequest) Reset() {
 	*x = UpdateFeedRequest{}
-	mi := &file_wires_service_proto_msgTypes[4]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -402,7 +402,7 @@ func (x *UpdateFeedRequest) String() string {
 func (*UpdateFeedRequest) ProtoMessage() {}
 
 func (x *UpdateFeedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[4]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -415,7 +415,7 @@ func (x *UpdateFeedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFeedRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFeedRequest) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{4}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateFeedRequest) GetFeed() *Feed {
@@ -433,7 +433,7 @@ type UpdateFeedResponse struct {
 
 func (x *UpdateFeedResponse) Reset() {
 	*x = UpdateFeedResponse{}
-	mi := &file_wires_service_proto_msgTypes[5]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -445,7 +445,7 @@ func (x *UpdateFeedResponse) String() string {
 func (*UpdateFeedResponse) ProtoMessage() {}
 
 func (x *UpdateFeedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[5]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -458,7 +458,7 @@ func (x *UpdateFeedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFeedResponse.ProtoReflect.Descriptor instead.
 func (*UpdateFeedResponse) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{5}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{5}
 }
 
 type DeleteFeedRequest struct {
@@ -471,7 +471,7 @@ type DeleteFeedRequest struct {
 
 func (x *DeleteFeedRequest) Reset() {
 	*x = DeleteFeedRequest{}
-	mi := &file_wires_service_proto_msgTypes[6]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -483,7 +483,7 @@ func (x *DeleteFeedRequest) String() string {
 func (*DeleteFeedRequest) ProtoMessage() {}
 
 func (x *DeleteFeedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[6]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -496,7 +496,7 @@ func (x *DeleteFeedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFeedRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFeedRequest) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{6}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteFeedRequest) GetUuid() string {
@@ -514,7 +514,7 @@ type DeleteFeedResponse struct {
 
 func (x *DeleteFeedResponse) Reset() {
 	*x = DeleteFeedResponse{}
-	mi := &file_wires_service_proto_msgTypes[7]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -526,7 +526,7 @@ func (x *DeleteFeedResponse) String() string {
 func (*DeleteFeedResponse) ProtoMessage() {}
 
 func (x *DeleteFeedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wires_service_proto_msgTypes[7]
+	mi := &file_ttab_wires_v1_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -539,29 +539,28 @@ func (x *DeleteFeedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFeedResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFeedResponse) Descriptor() ([]byte, []int) {
-	return file_wires_service_proto_rawDescGZIP(), []int{7}
+	return file_ttab_wires_v1_service_proto_rawDescGZIP(), []int{7}
 }
 
-var File_wires_service_proto protoreflect.FileDescriptor
+var File_ttab_wires_v1_service_proto protoreflect.FileDescriptor
 
-const file_wires_service_proto_rawDesc = "" +
+const file_ttab_wires_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13wires/service.proto\x12\n" +
-	"ttab.wires\"E\n" +
+	"\x1bttab/wires/v1/service.proto\x12\rttab.wires.v1\"E\n" +
 	"\x12GetAllFeedsRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\"n\n" +
+	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\"q\n" +
 	"\x13GetAllFeedsResponse\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
-	"\tnext_page\x18\x02 \x01(\x03R\bnextPage\x12&\n" +
-	"\x05feeds\x18\x03 \x03(\v2\x10.ttab.wires.FeedR\x05feeds\"\xe8\x02\n" +
+	"\tnext_page\x18\x02 \x01(\x03R\bnextPage\x12)\n" +
+	"\x05feeds\x18\x03 \x03(\v2\x13.ttab.wires.v1.FeedR\x05feeds\"\xee\x02\n" +
 	"\x04Feed\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x10\n" +
-	"\x03url\x18\x03 \x01(\tR\x03url\x12(\n" +
-	"\x04type\x18\x04 \x01(\x0e2\x14.ttab.wires.FeedTypeR\x04type\x12B\n" +
+	"\x03url\x18\x03 \x01(\tR\x03url\x12+\n" +
+	"\x04type\x18\x04 \x01(\x0e2\x17.ttab.wires.v1.FeedTypeR\x04type\x12E\n" +
 	"\x0ftype_exceptions\x18\n" +
-	" \x03(\v2\x19.ttab.wires.ExceptionRuleR\x0etypeExceptions\x12!\n" +
+	" \x03(\v2\x1c.ttab.wires.v1.ExceptionRuleR\x0etypeExceptions\x12!\n" +
 	"\fsection_code\x18\x05 \x01(\tR\vsectionCode\x12)\n" +
 	"\x10refresh_interval\x18\x06 \x01(\x03R\x0frefreshInterval\x12\x1a\n" +
 	"\blanguage\x18\a \x01(\tR\blanguage\x12!\n" +
@@ -569,60 +568,60 @@ const file_wires_service_proto_rawDesc = "" +
 	"\x10last_publication\x18\t \x01(\tR\x0flastPublication\"W\n" +
 	"\rExceptionRule\x12#\n" +
 	"\rtitle_pattern\x18\x01 \x01(\tR\ftitlePattern\x12!\n" +
-	"\fhas_category\x18\x02 \x01(\tR\vhasCategory\"9\n" +
-	"\x11UpdateFeedRequest\x12$\n" +
-	"\x04feed\x18\x01 \x01(\v2\x10.ttab.wires.FeedR\x04feed\"\x14\n" +
+	"\fhas_category\x18\x02 \x01(\tR\vhasCategory\"<\n" +
+	"\x11UpdateFeedRequest\x12'\n" +
+	"\x04feed\x18\x01 \x01(\v2\x13.ttab.wires.v1.FeedR\x04feed\"\x14\n" +
 	"\x12UpdateFeedResponse\"'\n" +
 	"\x11DeleteFeedRequest\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"\x14\n" +
-	"\x12DeleteFeedResponse*E\n" +
-	"\bFeedType\x12\x10\n" +
-	"\fTYPE_UNKNOWN\x10\x00\x12\x10\n" +
-	"\fTYPE_ARTICLE\x10\x01\x12\x15\n" +
-	"\x11TYPE_PRESSRELEASE\x10\x022\xf3\x01\n" +
-	"\aRssFeed\x12N\n" +
-	"\vGetAllFeeds\x12\x1e.ttab.wires.GetAllFeedsRequest\x1a\x1f.ttab.wires.GetAllFeedsResponse\x12K\n" +
+	"\x12DeleteFeedResponse*X\n" +
+	"\bFeedType\x12\x19\n" +
+	"\x15FEED_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
+	"\x11FEED_TYPE_ARTICLE\x10\x01\x12\x1a\n" +
+	"\x16FEED_TYPE_PRESSRELEASE\x10\x022\x8c\x02\n" +
+	"\x0eRssFeedService\x12T\n" +
+	"\vGetAllFeeds\x12!.ttab.wires.v1.GetAllFeedsRequest\x1a\".ttab.wires.v1.GetAllFeedsResponse\x12Q\n" +
 	"\n" +
-	"UpdateFeed\x12\x1d.ttab.wires.UpdateFeedRequest\x1a\x1e.ttab.wires.UpdateFeedResponse\x12K\n" +
+	"UpdateFeed\x12 .ttab.wires.v1.UpdateFeedRequest\x1a!.ttab.wires.v1.UpdateFeedResponse\x12Q\n" +
 	"\n" +
-	"DeleteFeed\x12\x1d.ttab.wires.DeleteFeedRequest\x1a\x1e.ttab.wires.DeleteFeedResponseB'Z%github.com/ttab/elephant-tt-api/wiresb\x06proto3"
+	"DeleteFeed\x12 .ttab.wires.v1.DeleteFeedRequest\x1a!.ttab.wires.v1.DeleteFeedResponseB7Z5github.com/ttab/elephant-tt-api/ttab/wires/v1;wiresv1b\x06proto3"
 
 var (
-	file_wires_service_proto_rawDescOnce sync.Once
-	file_wires_service_proto_rawDescData []byte
+	file_ttab_wires_v1_service_proto_rawDescOnce sync.Once
+	file_ttab_wires_v1_service_proto_rawDescData []byte
 )
 
-func file_wires_service_proto_rawDescGZIP() []byte {
-	file_wires_service_proto_rawDescOnce.Do(func() {
-		file_wires_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_wires_service_proto_rawDesc), len(file_wires_service_proto_rawDesc)))
+func file_ttab_wires_v1_service_proto_rawDescGZIP() []byte {
+	file_ttab_wires_v1_service_proto_rawDescOnce.Do(func() {
+		file_ttab_wires_v1_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ttab_wires_v1_service_proto_rawDesc), len(file_ttab_wires_v1_service_proto_rawDesc)))
 	})
-	return file_wires_service_proto_rawDescData
+	return file_ttab_wires_v1_service_proto_rawDescData
 }
 
-var file_wires_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_wires_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_wires_service_proto_goTypes = []any{
-	(FeedType)(0),               // 0: ttab.wires.FeedType
-	(*GetAllFeedsRequest)(nil),  // 1: ttab.wires.GetAllFeedsRequest
-	(*GetAllFeedsResponse)(nil), // 2: ttab.wires.GetAllFeedsResponse
-	(*Feed)(nil),                // 3: ttab.wires.Feed
-	(*ExceptionRule)(nil),       // 4: ttab.wires.ExceptionRule
-	(*UpdateFeedRequest)(nil),   // 5: ttab.wires.UpdateFeedRequest
-	(*UpdateFeedResponse)(nil),  // 6: ttab.wires.UpdateFeedResponse
-	(*DeleteFeedRequest)(nil),   // 7: ttab.wires.DeleteFeedRequest
-	(*DeleteFeedResponse)(nil),  // 8: ttab.wires.DeleteFeedResponse
+var file_ttab_wires_v1_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_ttab_wires_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_ttab_wires_v1_service_proto_goTypes = []any{
+	(FeedType)(0),               // 0: ttab.wires.v1.FeedType
+	(*GetAllFeedsRequest)(nil),  // 1: ttab.wires.v1.GetAllFeedsRequest
+	(*GetAllFeedsResponse)(nil), // 2: ttab.wires.v1.GetAllFeedsResponse
+	(*Feed)(nil),                // 3: ttab.wires.v1.Feed
+	(*ExceptionRule)(nil),       // 4: ttab.wires.v1.ExceptionRule
+	(*UpdateFeedRequest)(nil),   // 5: ttab.wires.v1.UpdateFeedRequest
+	(*UpdateFeedResponse)(nil),  // 6: ttab.wires.v1.UpdateFeedResponse
+	(*DeleteFeedRequest)(nil),   // 7: ttab.wires.v1.DeleteFeedRequest
+	(*DeleteFeedResponse)(nil),  // 8: ttab.wires.v1.DeleteFeedResponse
 }
-var file_wires_service_proto_depIdxs = []int32{
-	3, // 0: ttab.wires.GetAllFeedsResponse.feeds:type_name -> ttab.wires.Feed
-	0, // 1: ttab.wires.Feed.type:type_name -> ttab.wires.FeedType
-	4, // 2: ttab.wires.Feed.type_exceptions:type_name -> ttab.wires.ExceptionRule
-	3, // 3: ttab.wires.UpdateFeedRequest.feed:type_name -> ttab.wires.Feed
-	1, // 4: ttab.wires.RssFeed.GetAllFeeds:input_type -> ttab.wires.GetAllFeedsRequest
-	5, // 5: ttab.wires.RssFeed.UpdateFeed:input_type -> ttab.wires.UpdateFeedRequest
-	7, // 6: ttab.wires.RssFeed.DeleteFeed:input_type -> ttab.wires.DeleteFeedRequest
-	2, // 7: ttab.wires.RssFeed.GetAllFeeds:output_type -> ttab.wires.GetAllFeedsResponse
-	6, // 8: ttab.wires.RssFeed.UpdateFeed:output_type -> ttab.wires.UpdateFeedResponse
-	8, // 9: ttab.wires.RssFeed.DeleteFeed:output_type -> ttab.wires.DeleteFeedResponse
+var file_ttab_wires_v1_service_proto_depIdxs = []int32{
+	3, // 0: ttab.wires.v1.GetAllFeedsResponse.feeds:type_name -> ttab.wires.v1.Feed
+	0, // 1: ttab.wires.v1.Feed.type:type_name -> ttab.wires.v1.FeedType
+	4, // 2: ttab.wires.v1.Feed.type_exceptions:type_name -> ttab.wires.v1.ExceptionRule
+	3, // 3: ttab.wires.v1.UpdateFeedRequest.feed:type_name -> ttab.wires.v1.Feed
+	1, // 4: ttab.wires.v1.RssFeedService.GetAllFeeds:input_type -> ttab.wires.v1.GetAllFeedsRequest
+	5, // 5: ttab.wires.v1.RssFeedService.UpdateFeed:input_type -> ttab.wires.v1.UpdateFeedRequest
+	7, // 6: ttab.wires.v1.RssFeedService.DeleteFeed:input_type -> ttab.wires.v1.DeleteFeedRequest
+	2, // 7: ttab.wires.v1.RssFeedService.GetAllFeeds:output_type -> ttab.wires.v1.GetAllFeedsResponse
+	6, // 8: ttab.wires.v1.RssFeedService.UpdateFeed:output_type -> ttab.wires.v1.UpdateFeedResponse
+	8, // 9: ttab.wires.v1.RssFeedService.DeleteFeed:output_type -> ttab.wires.v1.DeleteFeedResponse
 	7, // [7:10] is the sub-list for method output_type
 	4, // [4:7] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -630,27 +629,27 @@ var file_wires_service_proto_depIdxs = []int32{
 	0, // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_wires_service_proto_init() }
-func file_wires_service_proto_init() {
-	if File_wires_service_proto != nil {
+func init() { file_ttab_wires_v1_service_proto_init() }
+func file_ttab_wires_v1_service_proto_init() {
+	if File_ttab_wires_v1_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_wires_service_proto_rawDesc), len(file_wires_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ttab_wires_v1_service_proto_rawDesc), len(file_ttab_wires_v1_service_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_wires_service_proto_goTypes,
-		DependencyIndexes: file_wires_service_proto_depIdxs,
-		EnumInfos:         file_wires_service_proto_enumTypes,
-		MessageInfos:      file_wires_service_proto_msgTypes,
+		GoTypes:           file_ttab_wires_v1_service_proto_goTypes,
+		DependencyIndexes: file_ttab_wires_v1_service_proto_depIdxs,
+		EnumInfos:         file_ttab_wires_v1_service_proto_enumTypes,
+		MessageInfos:      file_ttab_wires_v1_service_proto_msgTypes,
 	}.Build()
-	File_wires_service_proto = out.File
-	file_wires_service_proto_goTypes = nil
-	file_wires_service_proto_depIdxs = nil
+	File_ttab_wires_v1_service_proto = out.File
+	file_ttab_wires_v1_service_proto_goTypes = nil
+	file_ttab_wires_v1_service_proto_depIdxs = nil
 }
