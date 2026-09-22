@@ -29,7 +29,7 @@ Changes:
 - `ttab/mage` moves to v0.15.0, which is where the versioned layout and the
   native shape come from. The proto root is the repository root, so no other
   file is renamed and no other service regenerates; the committed `buf.yaml`
-  only gets the new header. (#42)
+  only gets the new header. (#43)
 
 ## [v0.7.1] - 2026-09-08
 
