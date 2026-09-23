@@ -4,7 +4,7 @@ Everything from v0.5.0 onwards is documented here; earlier releases are not
 reconstructed. The entries are derived from the release tags, and the linked
 pull requests hold the detail.
 
-## [v0.8.0] - Unreleased
+## [v0.8.0] - 2026-09-23
 
 **Breaking (wires moves to `ttab.wires.v1`, native Connect):** the `wires`
 package is gone. The declaration now lives in `ttab/wires/v1` as package
