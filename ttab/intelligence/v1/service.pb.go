@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: genai/service.proto
+// source: ttab/intelligence/v1/service.proto
 
-package genai
+package intelligencev1
 
 import (
 	newsdoc "github.com/ttab/elephant-api/newsdoc"
@@ -25,22 +25,22 @@ const (
 type JobStatus int32
 
 const (
-	JobStatus_STATUS_UNKNOWN JobStatus = 0
-	JobStatus_STATUS_DONE    JobStatus = 1
-	JobStatus_STATUS_FAILED  JobStatus = 2
+	JobStatus_JOB_STATUS_UNSPECIFIED JobStatus = 0
+	JobStatus_JOB_STATUS_DONE        JobStatus = 1
+	JobStatus_JOB_STATUS_FAILED      JobStatus = 2
 )
 
 // Enum value maps for JobStatus.
 var (
 	JobStatus_name = map[int32]string{
-		0: "STATUS_UNKNOWN",
-		1: "STATUS_DONE",
-		2: "STATUS_FAILED",
+		0: "JOB_STATUS_UNSPECIFIED",
+		1: "JOB_STATUS_DONE",
+		2: "JOB_STATUS_FAILED",
 	}
 	JobStatus_value = map[string]int32{
-		"STATUS_UNKNOWN": 0,
-		"STATUS_DONE":    1,
-		"STATUS_FAILED":  2,
+		"JOB_STATUS_UNSPECIFIED": 0,
+		"JOB_STATUS_DONE":        1,
+		"JOB_STATUS_FAILED":      2,
 	}
 )
 
@@ -55,11 +55,11 @@ func (x JobStatus) String() string {
 }
 
 func (JobStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_genai_service_proto_enumTypes[0].Descriptor()
+	return file_ttab_intelligence_v1_service_proto_enumTypes[0].Descriptor()
 }
 
 func (JobStatus) Type() protoreflect.EnumType {
-	return &file_genai_service_proto_enumTypes[0]
+	return &file_ttab_intelligence_v1_service_proto_enumTypes[0]
 }
 
 func (x JobStatus) Number() protoreflect.EnumNumber {
@@ -68,31 +68,31 @@ func (x JobStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use JobStatus.Descriptor instead.
 func (JobStatus) EnumDescriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{0}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{0}
 }
 
 type JobType int32
 
 const (
-	JobType_JOB_TYPE_UNKNOWN  JobType = 0
-	JobType_JOB_TYPE_DOCUMENT JobType = 1
-	JobType_JOB_TYPE_FEEDBACK JobType = 2
-	JobType_JOB_TYPE_TEXT     JobType = 3
+	JobType_JOB_TYPE_UNSPECIFIED JobType = 0
+	JobType_JOB_TYPE_DOCUMENT    JobType = 1
+	JobType_JOB_TYPE_FEEDBACK    JobType = 2
+	JobType_JOB_TYPE_TEXT        JobType = 3
 )
 
 // Enum value maps for JobType.
 var (
 	JobType_name = map[int32]string{
-		0: "JOB_TYPE_UNKNOWN",
+		0: "JOB_TYPE_UNSPECIFIED",
 		1: "JOB_TYPE_DOCUMENT",
 		2: "JOB_TYPE_FEEDBACK",
 		3: "JOB_TYPE_TEXT",
 	}
 	JobType_value = map[string]int32{
-		"JOB_TYPE_UNKNOWN":  0,
-		"JOB_TYPE_DOCUMENT": 1,
-		"JOB_TYPE_FEEDBACK": 2,
-		"JOB_TYPE_TEXT":     3,
+		"JOB_TYPE_UNSPECIFIED": 0,
+		"JOB_TYPE_DOCUMENT":    1,
+		"JOB_TYPE_FEEDBACK":    2,
+		"JOB_TYPE_TEXT":        3,
 	}
 )
 
@@ -107,11 +107,11 @@ func (x JobType) String() string {
 }
 
 func (JobType) Descriptor() protoreflect.EnumDescriptor {
-	return file_genai_service_proto_enumTypes[1].Descriptor()
+	return file_ttab_intelligence_v1_service_proto_enumTypes[1].Descriptor()
 }
 
 func (JobType) Type() protoreflect.EnumType {
-	return &file_genai_service_proto_enumTypes[1]
+	return &file_ttab_intelligence_v1_service_proto_enumTypes[1]
 }
 
 func (x JobType) Number() protoreflect.EnumNumber {
@@ -120,7 +120,7 @@ func (x JobType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use JobType.Descriptor instead.
 func (JobType) EnumDescriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{1}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{1}
 }
 
 type DocumentFromTextRequest struct {
@@ -134,9 +134,9 @@ type DocumentFromTextRequest struct {
 	// URI to set for the document.
 	Uri string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
 	// AdditionalLinks that should be added to the generated document.
-	AdditionalLinks []*newsdoc.Block `protobuf:"bytes,5,rep,name=additionalLinks,proto3" json:"additionalLinks,omitempty"`
+	AdditionalLinks []*newsdoc.Block `protobuf:"bytes,5,rep,name=additional_links,json=additionalLinks,proto3" json:"additional_links,omitempty"`
 	// AdditionalMeta blocks that should be added to the generated document.
-	AdditionalMeta []*newsdoc.Block `protobuf:"bytes,6,rep,name=additionalMeta,proto3" json:"additionalMeta,omitempty"`
+	AdditionalMeta []*newsdoc.Block `protobuf:"bytes,6,rep,name=additional_meta,json=additionalMeta,proto3" json:"additional_meta,omitempty"`
 	// AsyncTimeoutSeconds is the time after which a JobID will be returned
 	// instead of a direct result. Optional, defaults to no timeout.
 	AsyncTimeoutSeconds int64 `protobuf:"varint,7,opt,name=async_timeout_seconds,json=asyncTimeoutSeconds,proto3" json:"async_timeout_seconds,omitempty"`
@@ -146,7 +146,7 @@ type DocumentFromTextRequest struct {
 
 func (x *DocumentFromTextRequest) Reset() {
 	*x = DocumentFromTextRequest{}
-	mi := &file_genai_service_proto_msgTypes[0]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -158,7 +158,7 @@ func (x *DocumentFromTextRequest) String() string {
 func (*DocumentFromTextRequest) ProtoMessage() {}
 
 func (x *DocumentFromTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[0]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -171,7 +171,7 @@ func (x *DocumentFromTextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentFromTextRequest.ProtoReflect.Descriptor instead.
 func (*DocumentFromTextRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{0}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DocumentFromTextRequest) GetModel() string {
@@ -235,7 +235,7 @@ type DocumentFromTextResponse struct {
 
 func (x *DocumentFromTextResponse) Reset() {
 	*x = DocumentFromTextResponse{}
-	mi := &file_genai_service_proto_msgTypes[1]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -247,7 +247,7 @@ func (x *DocumentFromTextResponse) String() string {
 func (*DocumentFromTextResponse) ProtoMessage() {}
 
 func (x *DocumentFromTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[1]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -260,7 +260,7 @@ func (x *DocumentFromTextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentFromTextResponse.ProtoReflect.Descriptor instead.
 func (*DocumentFromTextResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{1}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DocumentFromTextResponse) GetJobId() int64 {
@@ -304,7 +304,7 @@ type LanguageFeedbackRequest struct {
 
 func (x *LanguageFeedbackRequest) Reset() {
 	*x = LanguageFeedbackRequest{}
-	mi := &file_genai_service_proto_msgTypes[2]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -316,7 +316,7 @@ func (x *LanguageFeedbackRequest) String() string {
 func (*LanguageFeedbackRequest) ProtoMessage() {}
 
 func (x *LanguageFeedbackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[2]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -329,7 +329,7 @@ func (x *LanguageFeedbackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedbackRequest.ProtoReflect.Descriptor instead.
 func (*LanguageFeedbackRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{2}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *LanguageFeedbackRequest) GetModel() string {
@@ -381,7 +381,7 @@ type LanguageFeedbackResponse struct {
 
 func (x *LanguageFeedbackResponse) Reset() {
 	*x = LanguageFeedbackResponse{}
-	mi := &file_genai_service_proto_msgTypes[3]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -393,7 +393,7 @@ func (x *LanguageFeedbackResponse) String() string {
 func (*LanguageFeedbackResponse) ProtoMessage() {}
 
 func (x *LanguageFeedbackResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[3]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,7 +406,7 @@ func (x *LanguageFeedbackResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedbackResponse.ProtoReflect.Descriptor instead.
 func (*LanguageFeedbackResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{3}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LanguageFeedbackResponse) GetJobId() int64 {
@@ -450,7 +450,7 @@ type LanguageFeedback struct {
 
 func (x *LanguageFeedback) Reset() {
 	*x = LanguageFeedback{}
-	mi := &file_genai_service_proto_msgTypes[4]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -462,7 +462,7 @@ func (x *LanguageFeedback) String() string {
 func (*LanguageFeedback) ProtoMessage() {}
 
 func (x *LanguageFeedback) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[4]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -475,7 +475,7 @@ func (x *LanguageFeedback) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LanguageFeedback.ProtoReflect.Descriptor instead.
 func (*LanguageFeedback) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{4}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LanguageFeedback) GetParagraph() int64 {
@@ -532,7 +532,7 @@ type TextRequest struct {
 
 func (x *TextRequest) Reset() {
 	*x = TextRequest{}
-	mi := &file_genai_service_proto_msgTypes[5]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -544,7 +544,7 @@ func (x *TextRequest) String() string {
 func (*TextRequest) ProtoMessage() {}
 
 func (x *TextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[5]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -557,7 +557,7 @@ func (x *TextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TextRequest.ProtoReflect.Descriptor instead.
 func (*TextRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{5}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TextRequest) GetModel() string {
@@ -601,7 +601,7 @@ type TextResponse struct {
 	JobId int64 `protobuf:"varint,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	// Text is the generated text.
 	Text string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
-	// Contet blocks generated from the text.
+	// Content blocks generated from the text.
 	Content       []*newsdoc.Block `protobuf:"bytes,3,rep,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -609,7 +609,7 @@ type TextResponse struct {
 
 func (x *TextResponse) Reset() {
 	*x = TextResponse{}
-	mi := &file_genai_service_proto_msgTypes[6]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +621,7 @@ func (x *TextResponse) String() string {
 func (*TextResponse) ProtoMessage() {}
 
 func (x *TextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[6]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -634,7 +634,7 @@ func (x *TextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TextResponse.ProtoReflect.Descriptor instead.
 func (*TextResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{6}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TextResponse) GetJobId() int64 {
@@ -668,7 +668,7 @@ type ListJobsRequest struct {
 
 func (x *ListJobsRequest) Reset() {
 	*x = ListJobsRequest{}
-	mi := &file_genai_service_proto_msgTypes[7]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -680,7 +680,7 @@ func (x *ListJobsRequest) String() string {
 func (*ListJobsRequest) ProtoMessage() {}
 
 func (x *ListJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[7]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -693,7 +693,7 @@ func (x *ListJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListJobsRequest.ProtoReflect.Descriptor instead.
 func (*ListJobsRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{7}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListJobsRequest) GetAfter() int64 {
@@ -712,7 +712,7 @@ type ListJobsResponse struct {
 
 func (x *ListJobsResponse) Reset() {
 	*x = ListJobsResponse{}
-	mi := &file_genai_service_proto_msgTypes[8]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -724,7 +724,7 @@ func (x *ListJobsResponse) String() string {
 func (*ListJobsResponse) ProtoMessage() {}
 
 func (x *ListJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[8]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -737,7 +737,7 @@ func (x *ListJobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListJobsResponse.ProtoReflect.Descriptor instead.
 func (*ListJobsResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{8}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListJobsResponse) GetJobs() []*JobReference {
@@ -761,7 +761,7 @@ type WaitForJobsRequest struct {
 
 func (x *WaitForJobsRequest) Reset() {
 	*x = WaitForJobsRequest{}
-	mi := &file_genai_service_proto_msgTypes[9]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -773,7 +773,7 @@ func (x *WaitForJobsRequest) String() string {
 func (*WaitForJobsRequest) ProtoMessage() {}
 
 func (x *WaitForJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[9]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -786,7 +786,7 @@ func (x *WaitForJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaitForJobsRequest.ProtoReflect.Descriptor instead.
 func (*WaitForJobsRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{9}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *WaitForJobsRequest) GetJobs() map[int64]int64 {
@@ -813,7 +813,7 @@ type WaitForJobsResponse struct {
 
 func (x *WaitForJobsResponse) Reset() {
 	*x = WaitForJobsResponse{}
-	mi := &file_genai_service_proto_msgTypes[10]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -825,7 +825,7 @@ func (x *WaitForJobsResponse) String() string {
 func (*WaitForJobsResponse) ProtoMessage() {}
 
 func (x *WaitForJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[10]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -838,7 +838,7 @@ func (x *WaitForJobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaitForJobsResponse.ProtoReflect.Descriptor instead.
 func (*WaitForJobsResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{10}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *WaitForJobsResponse) GetUpdated() []*JobReference {
@@ -857,7 +857,7 @@ type GetResultRequest struct {
 
 func (x *GetResultRequest) Reset() {
 	*x = GetResultRequest{}
-	mi := &file_genai_service_proto_msgTypes[11]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -869,7 +869,7 @@ func (x *GetResultRequest) String() string {
 func (*GetResultRequest) ProtoMessage() {}
 
 func (x *GetResultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[11]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -882,7 +882,7 @@ func (x *GetResultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResultRequest.ProtoReflect.Descriptor instead.
 func (*GetResultRequest) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{11}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetResultRequest) GetId() int64 {
@@ -895,14 +895,14 @@ func (x *GetResultRequest) GetId() int64 {
 type JobReference struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Status        JobStatus              `protobuf:"varint,2,opt,name=status,proto3,enum=ttab.genai.JobStatus" json:"status,omitempty"`
+	Status        JobStatus              `protobuf:"varint,2,opt,name=status,proto3,enum=ttab.intelligence.v1.JobStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *JobReference) Reset() {
 	*x = JobReference{}
-	mi := &file_genai_service_proto_msgTypes[12]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -914,7 +914,7 @@ func (x *JobReference) String() string {
 func (*JobReference) ProtoMessage() {}
 
 func (x *JobReference) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[12]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -927,7 +927,7 @@ func (x *JobReference) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobReference.ProtoReflect.Descriptor instead.
 func (*JobReference) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{12}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *JobReference) GetId() int64 {
@@ -941,15 +941,15 @@ func (x *JobReference) GetStatus() JobStatus {
 	if x != nil {
 		return x.Status
 	}
-	return JobStatus_STATUS_UNKNOWN
+	return JobStatus_JOB_STATUS_UNSPECIFIED
 }
 
 type GetResultResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
-	Type          JobType                `protobuf:"varint,3,opt,name=type,proto3,enum=ttab.genai.JobType" json:"type,omitempty"`
-	Status        JobStatus              `protobuf:"varint,4,opt,name=status,proto3,enum=ttab.genai.JobStatus" json:"status,omitempty"`
+	Type          JobType                `protobuf:"varint,3,opt,name=type,proto3,enum=ttab.intelligence.v1.JobType" json:"type,omitempty"`
+	Status        JobStatus              `protobuf:"varint,4,opt,name=status,proto3,enum=ttab.intelligence.v1.JobStatus" json:"status,omitempty"`
 	ErrorCode     string                 `protobuf:"bytes,5,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`
 	Error         string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
 	Document      *newsdoc.Document      `protobuf:"bytes,7,opt,name=document,proto3" json:"document,omitempty"`
@@ -960,7 +960,7 @@ type GetResultResponse struct {
 
 func (x *GetResultResponse) Reset() {
 	*x = GetResultResponse{}
-	mi := &file_genai_service_proto_msgTypes[13]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -972,7 +972,7 @@ func (x *GetResultResponse) String() string {
 func (*GetResultResponse) ProtoMessage() {}
 
 func (x *GetResultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_genai_service_proto_msgTypes[13]
+	mi := &file_ttab_intelligence_v1_service_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -985,7 +985,7 @@ func (x *GetResultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResultResponse.ProtoReflect.Descriptor instead.
 func (*GetResultResponse) Descriptor() ([]byte, []int) {
-	return file_genai_service_proto_rawDescGZIP(), []int{13}
+	return file_ttab_intelligence_v1_service_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetResultResponse) GetId() int64 {
@@ -1006,14 +1006,14 @@ func (x *GetResultResponse) GetType() JobType {
 	if x != nil {
 		return x.Type
 	}
-	return JobType_JOB_TYPE_UNKNOWN
+	return JobType_JOB_TYPE_UNSPECIFIED
 }
 
 func (x *GetResultResponse) GetStatus() JobStatus {
 	if x != nil {
 		return x.Status
 	}
-	return JobStatus_STATUS_UNKNOWN
+	return JobStatus_JOB_STATUS_UNSPECIFIED
 }
 
 func (x *GetResultResponse) GetErrorCode() string {
@@ -1044,19 +1044,18 @@ func (x *GetResultResponse) GetFeedback() *LanguageFeedback {
 	return nil
 }
 
-var File_genai_service_proto protoreflect.FileDescriptor
+var File_ttab_intelligence_v1_service_proto protoreflect.FileDescriptor
 
-const file_genai_service_proto_rawDesc = "" +
+const file_ttab_intelligence_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13genai/service.proto\x12\n" +
-	"ttab.genai\x1a\x15newsdoc/newsdoc.proto\"\x8f\x02\n" +
+	"\"ttab/intelligence/v1/service.proto\x12\x14ttab.intelligence.v1\x1a\x15newsdoc/newsdoc.proto\"\x91\x02\n" +
 	"\x17DocumentFromTextRequest\x12\x14\n" +
 	"\x05model\x18\x01 \x01(\tR\x05model\x12\x12\n" +
 	"\x04text\x18\x02 \x01(\tR\x04text\x12\x12\n" +
 	"\x04uuid\x18\x03 \x01(\tR\x04uuid\x12\x10\n" +
-	"\x03uri\x18\x04 \x01(\tR\x03uri\x128\n" +
-	"\x0fadditionalLinks\x18\x05 \x03(\v2\x0e.newsdoc.BlockR\x0fadditionalLinks\x126\n" +
-	"\x0eadditionalMeta\x18\x06 \x03(\v2\x0e.newsdoc.BlockR\x0eadditionalMeta\x122\n" +
+	"\x03uri\x18\x04 \x01(\tR\x03uri\x129\n" +
+	"\x10additional_links\x18\x05 \x03(\v2\x0e.newsdoc.BlockR\x0fadditionalLinks\x127\n" +
+	"\x0fadditional_meta\x18\x06 \x03(\v2\x0e.newsdoc.BlockR\x0eadditionalMeta\x122\n" +
 	"\x15async_timeout_seconds\x18\a \x01(\x03R\x13asyncTimeoutSeconds\"`\n" +
 	"\x18DocumentFromTextResponse\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\x03R\x05jobId\x12-\n" +
@@ -1068,10 +1067,10 @@ const file_genai_service_proto_rawDesc = "" +
 	"paragraphs\x12#\n" +
 	"\rdocument_uuid\x18\x03 \x01(\tR\fdocumentUuid\x12-\n" +
 	"\bdocument\x18\x04 \x01(\v2\x11.newsdoc.DocumentR\bdocument\x122\n" +
-	"\x15async_timeout_seconds\x18\x05 \x01(\x03R\x13asyncTimeoutSeconds\"\x8b\x01\n" +
+	"\x15async_timeout_seconds\x18\x05 \x01(\x03R\x13asyncTimeoutSeconds\"\x95\x01\n" +
 	"\x18LanguageFeedbackResponse\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\x03R\x05jobId\x128\n" +
-	"\bfeedback\x18\x02 \x03(\v2\x1c.ttab.genai.LanguageFeedbackR\bfeedback\x12\x1e\n" +
+	"\x06job_id\x18\x01 \x01(\x03R\x05jobId\x12B\n" +
+	"\bfeedback\x18\x02 \x03(\v2&.ttab.intelligence.v1.LanguageFeedbackR\bfeedback\x12\x1e\n" +
 	"\n" +
 	"paragraphs\x18\x03 \x03(\tR\n" +
 	"paragraphs\"\xaf\x01\n" +
@@ -1097,112 +1096,112 @@ const file_genai_service_proto_rawDesc = "" +
 	"\x04text\x18\x02 \x01(\tR\x04text\x12(\n" +
 	"\acontent\x18\x03 \x03(\v2\x0e.newsdoc.BlockR\acontent\"'\n" +
 	"\x0fListJobsRequest\x12\x14\n" +
-	"\x05after\x18\x01 \x01(\x03R\x05after\"@\n" +
-	"\x10ListJobsResponse\x12,\n" +
-	"\x04jobs\x18\x01 \x03(\v2\x18.ttab.genai.JobReferenceR\x04jobs\"\xad\x01\n" +
-	"\x12WaitForJobsRequest\x12<\n" +
-	"\x04jobs\x18\x01 \x03(\v2(.ttab.genai.WaitForJobsRequest.JobsEntryR\x04jobs\x12 \n" +
+	"\x05after\x18\x01 \x01(\x03R\x05after\"J\n" +
+	"\x10ListJobsResponse\x126\n" +
+	"\x04jobs\x18\x01 \x03(\v2\".ttab.intelligence.v1.JobReferenceR\x04jobs\"\xb7\x01\n" +
+	"\x12WaitForJobsRequest\x12F\n" +
+	"\x04jobs\x18\x01 \x03(\v22.ttab.intelligence.v1.WaitForJobsRequest.JobsEntryR\x04jobs\x12 \n" +
 	"\fmax_wait_sec\x18\x02 \x01(\x03R\n" +
 	"maxWaitSec\x1a7\n" +
 	"\tJobsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x03R\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"I\n" +
-	"\x13WaitForJobsResponse\x122\n" +
-	"\aupdated\x18\x01 \x03(\v2\x18.ttab.genai.JobReferenceR\aupdated\"\"\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"S\n" +
+	"\x13WaitForJobsResponse\x12<\n" +
+	"\aupdated\x18\x01 \x03(\v2\".ttab.intelligence.v1.JobReferenceR\aupdated\"\"\n" +
 	"\x10GetResultRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"M\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"W\n" +
 	"\fJobReference\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12-\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x15.ttab.genai.JobStatusR\x06status\"\xaf\x02\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x127\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1f.ttab.intelligence.v1.JobStatusR\x06status\"\xcd\x02\n" +
 	"\x11GetResultResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
-	"\x05model\x18\x02 \x01(\tR\x05model\x12'\n" +
-	"\x04type\x18\x03 \x01(\x0e2\x13.ttab.genai.JobTypeR\x04type\x12-\n" +
-	"\x06status\x18\x04 \x01(\x0e2\x15.ttab.genai.JobStatusR\x06status\x12\x1d\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x121\n" +
+	"\x04type\x18\x03 \x01(\x0e2\x1d.ttab.intelligence.v1.JobTypeR\x04type\x127\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x1f.ttab.intelligence.v1.JobStatusR\x06status\x12\x1d\n" +
 	"\n" +
 	"error_code\x18\x05 \x01(\tR\terrorCode\x12\x14\n" +
 	"\x05error\x18\x06 \x01(\tR\x05error\x12-\n" +
-	"\bdocument\x18\a \x01(\v2\x11.newsdoc.DocumentR\bdocument\x128\n" +
-	"\bfeedback\x18\b \x01(\v2\x1c.ttab.genai.LanguageFeedbackR\bfeedback*C\n" +
-	"\tJobStatus\x12\x12\n" +
-	"\x0eSTATUS_UNKNOWN\x10\x00\x12\x0f\n" +
-	"\vSTATUS_DONE\x10\x01\x12\x11\n" +
-	"\rSTATUS_FAILED\x10\x02*`\n" +
-	"\aJobType\x12\x14\n" +
-	"\x10JOB_TYPE_UNKNOWN\x10\x00\x12\x15\n" +
+	"\bdocument\x18\a \x01(\v2\x11.newsdoc.DocumentR\bdocument\x12B\n" +
+	"\bfeedback\x18\b \x01(\v2&.ttab.intelligence.v1.LanguageFeedbackR\bfeedback*S\n" +
+	"\tJobStatus\x12\x1a\n" +
+	"\x16JOB_STATUS_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fJOB_STATUS_DONE\x10\x01\x12\x15\n" +
+	"\x11JOB_STATUS_FAILED\x10\x02*d\n" +
+	"\aJobType\x12\x18\n" +
+	"\x14JOB_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11JOB_TYPE_DOCUMENT\x10\x01\x12\x15\n" +
 	"\x11JOB_TYPE_FEEDBACK\x10\x02\x12\x11\n" +
-	"\rJOB_TYPE_TEXT\x10\x032\xe4\x03\n" +
-	"\bGenerate\x12]\n" +
-	"\x10DocumentFromText\x12#.ttab.genai.DocumentFromTextRequest\x1a$.ttab.genai.DocumentFromTextResponse\x12]\n" +
-	"\x10LanguageFeedback\x12#.ttab.genai.LanguageFeedbackRequest\x1a$.ttab.genai.LanguageFeedbackResponse\x129\n" +
-	"\x04Text\x12\x17.ttab.genai.TextRequest\x1a\x18.ttab.genai.TextResponse\x12E\n" +
-	"\bListJobs\x12\x1b.ttab.genai.ListJobsRequest\x1a\x1c.ttab.genai.ListJobsResponse\x12N\n" +
-	"\vWaitForJobs\x12\x1e.ttab.genai.WaitForJobsRequest\x1a\x1f.ttab.genai.WaitForJobsResponse\x12H\n" +
-	"\tGetResult\x12\x1c.ttab.genai.GetResultRequest\x1a\x1d.ttab.genai.GetResultResponseB'Z%github.com/ttab/elephant-tt-api/genaib\x06proto3"
+	"\rJOB_TYPE_TEXT\x10\x032\xe3\x04\n" +
+	"\x0fGenerateService\x12q\n" +
+	"\x10DocumentFromText\x12-.ttab.intelligence.v1.DocumentFromTextRequest\x1a..ttab.intelligence.v1.DocumentFromTextResponse\x12q\n" +
+	"\x10LanguageFeedback\x12-.ttab.intelligence.v1.LanguageFeedbackRequest\x1a..ttab.intelligence.v1.LanguageFeedbackResponse\x12M\n" +
+	"\x04Text\x12!.ttab.intelligence.v1.TextRequest\x1a\".ttab.intelligence.v1.TextResponse\x12Y\n" +
+	"\bListJobs\x12%.ttab.intelligence.v1.ListJobsRequest\x1a&.ttab.intelligence.v1.ListJobsResponse\x12b\n" +
+	"\vWaitForJobs\x12(.ttab.intelligence.v1.WaitForJobsRequest\x1a).ttab.intelligence.v1.WaitForJobsResponse\x12\\\n" +
+	"\tGetResult\x12&.ttab.intelligence.v1.GetResultRequest\x1a'.ttab.intelligence.v1.GetResultResponseBEZCgithub.com/ttab/elephant-tt-api/ttab/intelligence/v1;intelligencev1b\x06proto3"
 
 var (
-	file_genai_service_proto_rawDescOnce sync.Once
-	file_genai_service_proto_rawDescData []byte
+	file_ttab_intelligence_v1_service_proto_rawDescOnce sync.Once
+	file_ttab_intelligence_v1_service_proto_rawDescData []byte
 )
 
-func file_genai_service_proto_rawDescGZIP() []byte {
-	file_genai_service_proto_rawDescOnce.Do(func() {
-		file_genai_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_genai_service_proto_rawDesc), len(file_genai_service_proto_rawDesc)))
+func file_ttab_intelligence_v1_service_proto_rawDescGZIP() []byte {
+	file_ttab_intelligence_v1_service_proto_rawDescOnce.Do(func() {
+		file_ttab_intelligence_v1_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ttab_intelligence_v1_service_proto_rawDesc), len(file_ttab_intelligence_v1_service_proto_rawDesc)))
 	})
-	return file_genai_service_proto_rawDescData
+	return file_ttab_intelligence_v1_service_proto_rawDescData
 }
 
-var file_genai_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_genai_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_genai_service_proto_goTypes = []any{
-	(JobStatus)(0),                   // 0: ttab.genai.JobStatus
-	(JobType)(0),                     // 1: ttab.genai.JobType
-	(*DocumentFromTextRequest)(nil),  // 2: ttab.genai.DocumentFromTextRequest
-	(*DocumentFromTextResponse)(nil), // 3: ttab.genai.DocumentFromTextResponse
-	(*LanguageFeedbackRequest)(nil),  // 4: ttab.genai.LanguageFeedbackRequest
-	(*LanguageFeedbackResponse)(nil), // 5: ttab.genai.LanguageFeedbackResponse
-	(*LanguageFeedback)(nil),         // 6: ttab.genai.LanguageFeedback
-	(*TextRequest)(nil),              // 7: ttab.genai.TextRequest
-	(*TextResponse)(nil),             // 8: ttab.genai.TextResponse
-	(*ListJobsRequest)(nil),          // 9: ttab.genai.ListJobsRequest
-	(*ListJobsResponse)(nil),         // 10: ttab.genai.ListJobsResponse
-	(*WaitForJobsRequest)(nil),       // 11: ttab.genai.WaitForJobsRequest
-	(*WaitForJobsResponse)(nil),      // 12: ttab.genai.WaitForJobsResponse
-	(*GetResultRequest)(nil),         // 13: ttab.genai.GetResultRequest
-	(*JobReference)(nil),             // 14: ttab.genai.JobReference
-	(*GetResultResponse)(nil),        // 15: ttab.genai.GetResultResponse
-	nil,                              // 16: ttab.genai.WaitForJobsRequest.JobsEntry
+var file_ttab_intelligence_v1_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_ttab_intelligence_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_ttab_intelligence_v1_service_proto_goTypes = []any{
+	(JobStatus)(0),                   // 0: ttab.intelligence.v1.JobStatus
+	(JobType)(0),                     // 1: ttab.intelligence.v1.JobType
+	(*DocumentFromTextRequest)(nil),  // 2: ttab.intelligence.v1.DocumentFromTextRequest
+	(*DocumentFromTextResponse)(nil), // 3: ttab.intelligence.v1.DocumentFromTextResponse
+	(*LanguageFeedbackRequest)(nil),  // 4: ttab.intelligence.v1.LanguageFeedbackRequest
+	(*LanguageFeedbackResponse)(nil), // 5: ttab.intelligence.v1.LanguageFeedbackResponse
+	(*LanguageFeedback)(nil),         // 6: ttab.intelligence.v1.LanguageFeedback
+	(*TextRequest)(nil),              // 7: ttab.intelligence.v1.TextRequest
+	(*TextResponse)(nil),             // 8: ttab.intelligence.v1.TextResponse
+	(*ListJobsRequest)(nil),          // 9: ttab.intelligence.v1.ListJobsRequest
+	(*ListJobsResponse)(nil),         // 10: ttab.intelligence.v1.ListJobsResponse
+	(*WaitForJobsRequest)(nil),       // 11: ttab.intelligence.v1.WaitForJobsRequest
+	(*WaitForJobsResponse)(nil),      // 12: ttab.intelligence.v1.WaitForJobsResponse
+	(*GetResultRequest)(nil),         // 13: ttab.intelligence.v1.GetResultRequest
+	(*JobReference)(nil),             // 14: ttab.intelligence.v1.JobReference
+	(*GetResultResponse)(nil),        // 15: ttab.intelligence.v1.GetResultResponse
+	nil,                              // 16: ttab.intelligence.v1.WaitForJobsRequest.JobsEntry
 	(*newsdoc.Block)(nil),            // 17: newsdoc.Block
 	(*newsdoc.Document)(nil),         // 18: newsdoc.Document
 }
-var file_genai_service_proto_depIdxs = []int32{
-	17, // 0: ttab.genai.DocumentFromTextRequest.additionalLinks:type_name -> newsdoc.Block
-	17, // 1: ttab.genai.DocumentFromTextRequest.additionalMeta:type_name -> newsdoc.Block
-	18, // 2: ttab.genai.DocumentFromTextResponse.document:type_name -> newsdoc.Document
-	18, // 3: ttab.genai.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
-	6,  // 4: ttab.genai.LanguageFeedbackResponse.feedback:type_name -> ttab.genai.LanguageFeedback
-	17, // 5: ttab.genai.TextResponse.content:type_name -> newsdoc.Block
-	14, // 6: ttab.genai.ListJobsResponse.jobs:type_name -> ttab.genai.JobReference
-	16, // 7: ttab.genai.WaitForJobsRequest.jobs:type_name -> ttab.genai.WaitForJobsRequest.JobsEntry
-	14, // 8: ttab.genai.WaitForJobsResponse.updated:type_name -> ttab.genai.JobReference
-	0,  // 9: ttab.genai.JobReference.status:type_name -> ttab.genai.JobStatus
-	1,  // 10: ttab.genai.GetResultResponse.type:type_name -> ttab.genai.JobType
-	0,  // 11: ttab.genai.GetResultResponse.status:type_name -> ttab.genai.JobStatus
-	18, // 12: ttab.genai.GetResultResponse.document:type_name -> newsdoc.Document
-	6,  // 13: ttab.genai.GetResultResponse.feedback:type_name -> ttab.genai.LanguageFeedback
-	2,  // 14: ttab.genai.Generate.DocumentFromText:input_type -> ttab.genai.DocumentFromTextRequest
-	4,  // 15: ttab.genai.Generate.LanguageFeedback:input_type -> ttab.genai.LanguageFeedbackRequest
-	7,  // 16: ttab.genai.Generate.Text:input_type -> ttab.genai.TextRequest
-	9,  // 17: ttab.genai.Generate.ListJobs:input_type -> ttab.genai.ListJobsRequest
-	11, // 18: ttab.genai.Generate.WaitForJobs:input_type -> ttab.genai.WaitForJobsRequest
-	13, // 19: ttab.genai.Generate.GetResult:input_type -> ttab.genai.GetResultRequest
-	3,  // 20: ttab.genai.Generate.DocumentFromText:output_type -> ttab.genai.DocumentFromTextResponse
-	5,  // 21: ttab.genai.Generate.LanguageFeedback:output_type -> ttab.genai.LanguageFeedbackResponse
-	8,  // 22: ttab.genai.Generate.Text:output_type -> ttab.genai.TextResponse
-	10, // 23: ttab.genai.Generate.ListJobs:output_type -> ttab.genai.ListJobsResponse
-	12, // 24: ttab.genai.Generate.WaitForJobs:output_type -> ttab.genai.WaitForJobsResponse
-	15, // 25: ttab.genai.Generate.GetResult:output_type -> ttab.genai.GetResultResponse
+var file_ttab_intelligence_v1_service_proto_depIdxs = []int32{
+	17, // 0: ttab.intelligence.v1.DocumentFromTextRequest.additional_links:type_name -> newsdoc.Block
+	17, // 1: ttab.intelligence.v1.DocumentFromTextRequest.additional_meta:type_name -> newsdoc.Block
+	18, // 2: ttab.intelligence.v1.DocumentFromTextResponse.document:type_name -> newsdoc.Document
+	18, // 3: ttab.intelligence.v1.LanguageFeedbackRequest.document:type_name -> newsdoc.Document
+	6,  // 4: ttab.intelligence.v1.LanguageFeedbackResponse.feedback:type_name -> ttab.intelligence.v1.LanguageFeedback
+	17, // 5: ttab.intelligence.v1.TextResponse.content:type_name -> newsdoc.Block
+	14, // 6: ttab.intelligence.v1.ListJobsResponse.jobs:type_name -> ttab.intelligence.v1.JobReference
+	16, // 7: ttab.intelligence.v1.WaitForJobsRequest.jobs:type_name -> ttab.intelligence.v1.WaitForJobsRequest.JobsEntry
+	14, // 8: ttab.intelligence.v1.WaitForJobsResponse.updated:type_name -> ttab.intelligence.v1.JobReference
+	0,  // 9: ttab.intelligence.v1.JobReference.status:type_name -> ttab.intelligence.v1.JobStatus
+	1,  // 10: ttab.intelligence.v1.GetResultResponse.type:type_name -> ttab.intelligence.v1.JobType
+	0,  // 11: ttab.intelligence.v1.GetResultResponse.status:type_name -> ttab.intelligence.v1.JobStatus
+	18, // 12: ttab.intelligence.v1.GetResultResponse.document:type_name -> newsdoc.Document
+	6,  // 13: ttab.intelligence.v1.GetResultResponse.feedback:type_name -> ttab.intelligence.v1.LanguageFeedback
+	2,  // 14: ttab.intelligence.v1.GenerateService.DocumentFromText:input_type -> ttab.intelligence.v1.DocumentFromTextRequest
+	4,  // 15: ttab.intelligence.v1.GenerateService.LanguageFeedback:input_type -> ttab.intelligence.v1.LanguageFeedbackRequest
+	7,  // 16: ttab.intelligence.v1.GenerateService.Text:input_type -> ttab.intelligence.v1.TextRequest
+	9,  // 17: ttab.intelligence.v1.GenerateService.ListJobs:input_type -> ttab.intelligence.v1.ListJobsRequest
+	11, // 18: ttab.intelligence.v1.GenerateService.WaitForJobs:input_type -> ttab.intelligence.v1.WaitForJobsRequest
+	13, // 19: ttab.intelligence.v1.GenerateService.GetResult:input_type -> ttab.intelligence.v1.GetResultRequest
+	3,  // 20: ttab.intelligence.v1.GenerateService.DocumentFromText:output_type -> ttab.intelligence.v1.DocumentFromTextResponse
+	5,  // 21: ttab.intelligence.v1.GenerateService.LanguageFeedback:output_type -> ttab.intelligence.v1.LanguageFeedbackResponse
+	8,  // 22: ttab.intelligence.v1.GenerateService.Text:output_type -> ttab.intelligence.v1.TextResponse
+	10, // 23: ttab.intelligence.v1.GenerateService.ListJobs:output_type -> ttab.intelligence.v1.ListJobsResponse
+	12, // 24: ttab.intelligence.v1.GenerateService.WaitForJobs:output_type -> ttab.intelligence.v1.WaitForJobsResponse
+	15, // 25: ttab.intelligence.v1.GenerateService.GetResult:output_type -> ttab.intelligence.v1.GetResultResponse
 	20, // [20:26] is the sub-list for method output_type
 	14, // [14:20] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -1210,27 +1209,27 @@ var file_genai_service_proto_depIdxs = []int32{
 	0,  // [0:14] is the sub-list for field type_name
 }
 
-func init() { file_genai_service_proto_init() }
-func file_genai_service_proto_init() {
-	if File_genai_service_proto != nil {
+func init() { file_ttab_intelligence_v1_service_proto_init() }
+func file_ttab_intelligence_v1_service_proto_init() {
+	if File_ttab_intelligence_v1_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_genai_service_proto_rawDesc), len(file_genai_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ttab_intelligence_v1_service_proto_rawDesc), len(file_ttab_intelligence_v1_service_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_genai_service_proto_goTypes,
-		DependencyIndexes: file_genai_service_proto_depIdxs,
-		EnumInfos:         file_genai_service_proto_enumTypes,
-		MessageInfos:      file_genai_service_proto_msgTypes,
+		GoTypes:           file_ttab_intelligence_v1_service_proto_goTypes,
+		DependencyIndexes: file_ttab_intelligence_v1_service_proto_depIdxs,
+		EnumInfos:         file_ttab_intelligence_v1_service_proto_enumTypes,
+		MessageInfos:      file_ttab_intelligence_v1_service_proto_msgTypes,
 	}.Build()
-	File_genai_service_proto = out.File
-	file_genai_service_proto_goTypes = nil
-	file_genai_service_proto_depIdxs = nil
+	File_ttab_intelligence_v1_service_proto = out.File
+	file_ttab_intelligence_v1_service_proto_goTypes = nil
+	file_ttab_intelligence_v1_service_proto_depIdxs = nil
 }

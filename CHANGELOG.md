@@ -4,6 +4,31 @@ Everything from v0.5.0 onwards is documented here; earlier releases are not
 reconstructed. The entries are derived from the release tags, and the linked
 pull requests hold the detail.
 
+## [v0.9.0] - Unreleased
+
+**Breaking (genai moves to `ttab.intelligence.v1`, native Connect):** the
+`genai` package is gone. The declaration now lives in `ttab/intelligence/v1`
+as package `ttab.intelligence.v1`, Go package `intelligencev1`, and is
+generated for Connect only in connect-go's native shape:
+`intelligencev1connect.NewGenerateServiceHandler` takes an implementation of
+`intelligencev1connect.GenerateServiceHandler`, whose methods speak
+`*connect.Request[T]` and `*connect.Response[T]`, and
+`intelligencev1connect.NewGenerateServiceClient` returns connect-go's client.
+There is no Twirp code, no plain `Generate` interface and no `genaiconnect`
+adapters any more. On the wire the procedure paths change from
+`/twirp/ttab.genai.Generate/<Method>` to
+`/ttab.intelligence.v1.GenerateService/<Method>`, the
+`DocumentFromTextRequest` fields `additionalLinks` and `additionalMeta` are
+declared `additional_links` and `additional_meta` (their JSON names are
+unchanged), and the enum values are spelled `JOB_STATUS_UNSPECIFIED`,
+`JOB_STATUS_DONE`, `JOB_STATUS_FAILED` and `JOB_TYPE_UNSPECIFIED` where they
+were `STATUS_UNKNOWN`, `STATUS_DONE`, `STATUS_FAILED` and `JOB_TYPE_UNKNOWN`.
+The declaration now passes buf's STANDARD lint rules, which is what the
+renames buy. elephant-intelligence is the only implementer and has no
+callers yet; it moves in its next release. The package is named for the
+service's wider scope, so the translation, embedding and prompt services
+planned for it are added to this declaration rather than to new packages.
+
 ## [v0.8.0] - 2026-09-23
 
 **Breaking (wires moves to `ttab.wires.v1`, native Connect):** the `wires`
