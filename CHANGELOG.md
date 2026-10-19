@@ -4,7 +4,7 @@ Everything from v0.5.0 onwards is documented here; earlier releases are not
 reconstructed. The entries are derived from the release tags, and the linked
 pull requests hold the detail.
 
-## [v0.9.0] - Unreleased
+## [v0.9.0] - 2026-10-19
 
 **Breaking (genai moves to `ttab.intelligence.v1`, native Connect):** the
 `genai` package is gone. The declaration now lives in `ttab/intelligence/v1`
